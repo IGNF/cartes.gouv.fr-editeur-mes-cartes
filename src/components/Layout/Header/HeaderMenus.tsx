@@ -1,0 +1,165 @@
+import Button from "@codegouvfr/react-dsfr/Button";
+
+import { externalLink, externalUrls } from "@/router/externalUrls";
+import { routes } from "@/router/router";
+import HeaderMenu from "./HeaderMenu";
+import "../../../sass/components/buttons.scss";
+
+export function HeaderMenuHelp() {
+    return (
+        <HeaderMenu
+            openButtonProps={{
+                children: "Aide",
+                iconId: "fr-icon-question-fill",
+            }}
+            items={[
+                {
+                    iconId: "fr-icon-question-mark",
+                    children: "Questions fréquentes",
+                    linkProps: externalLink("help", "Questions fréquentes"),
+                },
+                {
+                    iconId: "fr-icon-book-2-line",
+                    children: "Guide d’utilisation",
+                    linkProps: externalLink("helpProducerGuide", "Guide d’utilisation"),
+                },
+                {
+                    iconId: "fr-icon-rfid-line",
+                    children: "Niveau de service",
+                    linkProps: externalLink("service_status", "Niveau de service"),
+                },
+                {
+                    iconId: "fr-icon-mail-line",
+                    children: "Nous contacter",
+                    linkProps: externalLink("contact_us", "Nous contacter"),
+                },
+            ]}
+        />
+    );
+}
+
+export function HeaderMenuServices() {
+    return (
+        <HeaderMenu
+            openButtonProps={{
+                children: "Services",
+                iconId: "fr-icon-grid-fill",
+            }}
+            items={[
+                {
+                    iconId: "fr-icon-road-map-line",
+                    children: "Explorer les cartes",
+                    linkProps: { href: externalUrls.maps },
+                },
+                {
+                    iconId: "fr-icon-search-line",
+                    children: "Rechercher une donnée",
+                    linkProps: { href: externalUrls.catalogue },
+                },
+                {
+                    iconId: "fr-icon-database-line",
+                    children: "Publier une donnée",
+                    linkProps: routes.discover_publish().link,
+                },
+                // {
+                //     iconId: "fr-icon-brush-line",
+                //     children: (
+                //         <>
+                //             Créer une carte{" "}
+                //             <Badge severity="success" className={"fr-ml-auto"}>
+                //                 Bêta
+                //             </Badge>
+                //         </>
+                //     ),
+                //     linkProps: { href: externalUrls.create_map },
+                // },
+            ]}
+            actionButtonProps={{
+                children: "Découvrir cartes.gouv.fr",
+                className: "frx-btn-discover",
+                linkProps: {
+                    href: externalUrls.discover_cartesgouvfr,
+                    title: "Découvrir cartes.gouv",
+                },
+            }}
+        />
+    );
+}
+
+export function HeaderMenuUser() {
+    // const { data: user } = useUserQuery();
+    const user = false;
+
+    if (!user) {
+        return (
+            <Button
+                iconId="fr-icon-account-fill"
+                // linkProps={{
+                //     href: SymfonyRouting.generate("cartesgouvfr_security_login"),
+                // }}
+            >
+                Se connecter
+            </Button>
+        );
+    }
+
+    // let userDisplayName = `${user.first_name ?? ""} ${user.last_name ?? ""}`;
+    // if (userDisplayName.replace(/\s+/g, "") === "") {
+    //     userDisplayName = user.user_name;
+    // }
+
+    // return (
+    //     <HeaderMenu
+    //         openButtonProps={{
+    //             children: "Mon espace",
+    //             iconId: "fr-icon-account-fill",
+    //         }}
+    //         items={[
+    //             {
+    //                 children: (
+    //                     <div
+    //                         style={{
+    //                             display: "flex",
+    //                             flexDirection: "column",
+    //                         }}
+    //                     >
+    //                         <strong>{userDisplayName}</strong>
+    //                         <span
+    //                             className={fr.cx("fr-text--xs", "fr-m-0")}
+    //                             style={{
+    //                                 color: fr.colors.decisions.text.mention.grey.default,
+    //                             }}
+    //                         >
+    //                             {user.email}
+    //                         </span>
+    //                     </div>
+    //                 ),
+    //             },
+    //             {
+    //                 children: "Tableau de bord",
+    //                 iconId: "fr-icon-dashboard-3-line",
+    //                 linkProps: routes.dashboard().link,
+    //             },
+    //             {
+    //                 children: "Mon compte",
+    //                 iconId: "fr-icon-user-line",
+    //                 linkProps: routes.my_account().link,
+    //             },
+    //         ]}
+    //         actionButtonProps={{
+    //             children: "Se déconnecter",
+    //             iconId: "fr-icon-logout-box-r-line",
+    //             onClick: async (e) => {
+    //                 e.preventDefault();
+
+    //                 await queryClient.cancelQueries();
+    //                 queryClient.invalidateQueries();
+    //                 queryClient.clear();
+    //                 localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
+
+    //                 window.location.href = SymfonyRouting.generate("cartesgouvfr_security_logout");
+    //             },
+    //         }}
+    //     />
+    // );
+}
