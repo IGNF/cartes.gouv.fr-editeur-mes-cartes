@@ -1,13 +1,36 @@
-import { FC, Suspense } from "react";
+import { FC, JSX, Suspense, useMemo } from "react";
 
 import AppLayout from "../components/Layout/AppLayout";
 import Main from "../components/Layout/Main";
 import LoadingText from "../components/Utils/LoadingText";
+import GroupMap from "./GroupMap";
+import { groups, knownRoutes, useRoute } from "./router";
+import useUserQuery from "@/hooks/queries/useUserQuery";
+import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import GroupApp from "./GroupApp";
-import { useRoute } from "./router";
 
 const RouterRenderer: FC = () => {
     const route = useRoute();
+    const { data: user } = useUserQuery();
+
+    const content: JSX.Element = useMemo(() => {
+        // vérification si la route demandée est bien connue/enregistrée
+        if (route.name === false || !knownRoutes.includes(route.name) || route.name === "page_not_found") {
+            return <PageNotFoundWithLayout />;
+        }
+
+        // // vérifier si l'utilisateur est authentifié et éventuellement ses droits à la ressource demandée
+        // if (!groups.public.has(route) && !user) {
+        //     return <RedirectToLogin />;
+        // }
+
+
+        if (groups.map.has(route)) {
+            return <GroupMap route={route} />;
+        }
+
+        return <GroupApp route={route} />;
+    }, [route, user]);
 
     return (
         <Suspense
@@ -19,7 +42,7 @@ const RouterRenderer: FC = () => {
                 </AppLayout>
             }
         >
-            <GroupApp route={route} />
+            {content}
         </Suspense>
     );
 };

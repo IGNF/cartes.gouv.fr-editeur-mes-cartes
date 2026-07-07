@@ -1,13 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
-import { groups, useRoute } from "@/router/router";
+import { useRoute } from "@/router/router";
 
 export default function SiteBadge() {
     const route = useRoute();
 
     if (
-        groups.community.has(route) ||
         (route.name &&
             [
                 "dashboard",

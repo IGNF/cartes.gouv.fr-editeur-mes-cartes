@@ -4,6 +4,8 @@ export const appRoot = "";
 
 // Routes non protégées
 const publicRoutes = {
+    home: defineRoute(`${appRoot}/`),
+    dashboard: defineRoute(`/`),
     discover_publish: defineRoute(
         {
             authentication_failed: param.query.optional.number,
@@ -14,6 +16,35 @@ const publicRoutes = {
     page_not_found: defineRoute(`${appRoot}/404`),
     login_disabled: defineRoute(`${appRoot}/connexion-desactivee`),
 };
+
+const mapRoutes = {
+    view_map: defineRoute(
+        {
+            mapId: param.path.string
+        },
+        (p) => `${appRoot}/voir-une-carte/${p.mapId}`
+    ),
+    edit_map: defineRoute(
+        {
+            mapId: param.path.string
+        },
+        (p) => `${appRoot}/creer-une-carte/${p.mapId}`
+    ),
+
+    map_list: defineRoute(
+        {
+            page: param.query.optional.number.default(1),
+            limit: param.query.optional.number.default(10),
+            search: param.query.optional.string,
+            sortBy: param.query.optional.string,
+            sortOrder: param.query.optional.number.default(1),
+            themeId: param.query.optional.string,
+            published: param.query.optional.number.default(0),
+        },
+        () => "/mes-cartes"
+    ),
+    create_map: defineRoute(`${appRoot}/creer-une-carte`),
+}
 
 // Chemin vers les sources utiles
 const helpRoutes = {
@@ -32,45 +63,31 @@ const privateRoutes = {
         },
         () => `${appRoot}/tableau-de-bord/entrepots`
     ),
-    my_maps: defineRoute(`${appRoot}/mes-cartes`),
 };
-
-const communityRoute = defineRoute(
-    {
-        communityId: param.path.string,
-    },
-    (p) => `${appRoot}/tableau-de-bord/communaute/${p.communityId}`
-);
-const communityRoutes = {
-    community_info: communityRoute.extend(""),
-    // Liste des membres d'une communaute
-    members_list: communityRoute.extend(
-        {
-            userId: param.query.optional.string,
-            page: param.query.optional.number.default(1),
-            limit: param.query.optional.number.default(20),
-            search: param.query.optional.string.default(""),
-        },
-        () => "/membres"
-    ),
-};
-
 
 const routeDefs = {
     ...publicRoutes,
     ...privateRoutes,
-    ...communityRoutes,
     ...helpRoutes,
+    ...mapRoutes
 };
 export const { RouteProvider, useRoute, routes, session } = createRouter(routeDefs);
 
 export const knownRoutes = Object.values(routes).map((r) => r.name);
 export const publicGroup = createGroup((Object.keys(publicRoutes) as (keyof typeof publicRoutes)[]).map((key) => routes[key]));
 export const privateGroup = createGroup((Object.keys(privateRoutes) as (keyof typeof privateRoutes)[]).map((key) => routes[key]));
-export const communityGroup = createGroup((Object.keys(communityRoutes) as (keyof typeof communityRoutes)[]).map((key) => routes[key]));
+export const mapGroup = createGroup((Object.keys(mapRoutes) as (keyof typeof mapRoutes)[]).map((key) => routes[key]));
 
 export const groups = {
     public: publicGroup,
     private: privateGroup,
-    community: communityGroup,
+    map: mapGroup
+};
+
+export const useRoutePaginationParams = () => {
+    const route = useRoute();
+    const page = route.params?.["page"] ?? 1;
+    const limit = route.params?.["limit"] ?? 10;
+
+    return { page, limit };
 };

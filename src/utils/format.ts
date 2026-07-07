@@ -5,8 +5,8 @@ import { fr } from "date-fns/locale";
  * Supprime les accents d'une chaine de caracteres
  * œ => OE et æ => AE
  */
-export const removeDiacritics = (str: String) => {
-    const removeLigature = (s) => {
+export const removeDiacritics = (str: string) => {
+    const removeLigature = (s: string) => {
         return s
             .replace(/\u0152/g, "OE")
             .replace(/\u0153/g, "oe")
@@ -14,7 +14,7 @@ export const removeDiacritics = (str: String) => {
             .replace(/\u00e6/g, "ae");
     };
 
-    if (typeof str === "string" || str instanceof String) {
+    if (typeof str === "string") {
         let s = str.normalize("NFD");
         s = removeLigature(s);
         return s.replace(/[\u0300-\u036f]/g, "");

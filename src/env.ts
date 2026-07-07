@@ -1,9 +1,6 @@
-import { appRoot } from "./router/router";
+const rootDataset = (document.getElementById("root") as HTMLDivElement | null)?.dataset;
+const env = import.meta.env as ImportMetaEnv & {
+	API_EDITEUR_URL?: string;
+};
 
-const rootDataset = (document.getElementById("root") as HTMLDivElement)?.dataset;
-
-export const espaceCoUrl = rootDataset?.["apiEspacecoUrl"] ?? null;
-export const catalogueUrl = rootDataset?.["catalogueUrl"] ?? appRoot + "/rechercher-une-donnee";
-export const configCommunityId = rootDataset?.["configCommunityId"] ?? null;
-export const configTechnicalName = rootDataset?.["configTechnicalName"] ?? null;
-export const annexesUrl = rootDataset?.["annexesUrl"] ?? "https://data.geopf.fr/annexes"
+export const apiURL = rootDataset?.["apiURL"] ?? env.VITE_API_EDITEUR_URL ?? env.API_EDITEUR_URL ?? "";

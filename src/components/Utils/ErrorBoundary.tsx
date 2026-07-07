@@ -16,7 +16,7 @@ function Fallback({ error, resetErrorBoundary }: FallbackProps) {
                 <Button
                     onClick={() => {
                         resetErrorBoundary();
-                        window.location.assign(externalUrls.my_maps);
+                        window.location.assign(externalUrls.map_list);
                     }}
                 >
                     {"Retour à l'accueil"}

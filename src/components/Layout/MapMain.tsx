@@ -10,13 +10,13 @@ import useBreadcrumb from "@/hooks/useBreadcrumb";
 import SessionExpiredAlert from "../Utils/SessionExpiredAlert";
 import { type MainProps } from "./Main";
 
-export type DatastoreMainProps = PropsWithChildren<
+export type MapMainProps = PropsWithChildren<
     MainProps
 > & {
     classes?: Partial<MainProps["classes"] & Record<"content", string>>;
 };
 
-export default function DatastoreMain(props: DatastoreMainProps) {
+export default function MapMain(props: MapMainProps) {
     const {children, customBreadcrumbProps, title, classes: propsClasses } = props;
 
     useHead({
@@ -26,15 +26,6 @@ export default function DatastoreMain(props: DatastoreMainProps) {
     const breadcrumbProps = useBreadcrumb(customBreadcrumbProps);
 
     const { classes } = useStyles();
-
-    // const { sandboxDatastore } = useDatastoreSelection();
-    // if (!sandboxDatastore) {
-    //     return (
-    //         <Main>
-    //             <LoadingText />
-    //         </Main>
-    //     );
-    // }
 
     return (
         <main id="main" role="main">
@@ -57,7 +48,7 @@ export default function DatastoreMain(props: DatastoreMainProps) {
     );
 }
 
-const useStyles = tss.withName({ DatastoreMain }).create({
+const useStyles = tss.withName({ MapMain }).create({
     sideMenuCol: {
         display: "flex",
         flexDirection: "column",

@@ -1,49 +1,36 @@
-import { JSX, lazy, useMemo } from "react";
+import { JSX, useMemo } from "react";
 import { Route } from "type-route";
 
-import AppLayout from "../components/Layout/AppLayout";
-import Main from "../components/Layout/Main";
-import { knownRoutes, routes } from "./router";
+import AppLayout, { AppLayoutProps } from "../components/Layout/AppLayout";
+import PageNotFoundWithLayout from "../pages/error/PageNotFoundWithLayout";
+import { routes } from "./router";
 
-const MyMaps = lazy(() => import("@/pages/Maps/MyMaps"));
 
-interface GroupAppProps {
+interface IGroupAppProps {
     route: Route<typeof routes>;
 }
 
-function GroupApp({ route }: GroupAppProps) {
-    const content: JSX.Element = useMemo(() => {
-        if (route.name === false || !knownRoutes.includes(route.name)) {
-            return (
-                <AppLayout>
-                    <Main>
-                        <h1>Page non trouvée</h1>
-                        <p>La page que vous cherchez n'existe pas.</p>
-                    </Main>
-                </AppLayout>
-            );
-        }
+function GroupApp(props: IGroupAppProps) {
+    const { route } = props;
 
+    const content: { render: JSX.Element; layoutProps?: AppLayoutProps } | undefined = useMemo(() => {
         switch (route.name) {
-            case "my_maps":
-                return (
-                    <AppLayout>
-                        <MyMaps />
-                    </AppLayout>
-                );
-            default:
-                return (
-                    <AppLayout>
-                        <Main>
-                            <h1>Page non trouvée</h1>
-                            <p>La page que vous cherchez n'existe pas.</p>
-                        </Main>
-                    </AppLayout>
-                );
+            case "page_not_found":
+                return {
+                    render: <PageNotFoundWithLayout />,
+                };
         }
     }, [route]);
 
-    return content;
+    if (!content) {
+        return <PageNotFoundWithLayout />;
+    }
+
+    return (
+        <AppLayout {...content?.layoutProps}>
+            {content.render}
+        </AppLayout>
+    );
 }
 
 export default GroupApp;
