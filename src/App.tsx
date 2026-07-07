@@ -1,54 +1,50 @@
-import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { defaultShouldDehydrateQuery } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { FC } from "react";
 
-import AppLayout from "@/components/Layout/AppLayout";
-import { externalUrls } from "@/router/externalUrls";
-import { routes } from "@/router/router";
+import ErrorBoundary from "./components/Utils/ErrorBoundary";
+import { queryClient } from "./modules/queryClient";
+import { RouteProvider } from "./router/router";
+import RouterRenderer from "./router/RouterRenderer";
+import { bootstrapUser } from "./utils";
 
-function App() {
-  const navItems: MainNavigationProps.Item[] = [
-    {
-      text: "Explorer les cartes",
-      linkProps: { href: externalUrls.maps },
-      isActive: true,
-    },
-    {
-      text: "Rechercher une donnee",
-      linkProps: { href: externalUrls.catalogue },
-    },
-    {
-      text: "Publier une donnee",
-      linkProps: routes.discover_publish().link,
-    },
-  ];
+import "./sass/helpers.scss";
 
-  return (
-    <AppLayout>
-      <main id="main" role="main" className="fr-container fr-py-8w">
-        <h1 className="fr-mb-3w">Bienvenue sur Mes Cartes</h1>
-        <p className="fr-text--lg fr-mb-6w">
-          Creez, gerez et publiez vos cartes et vos donnees geographiques depuis un espace unique.
-        </p>
+const persister = createAsyncStoragePersister({
+    storage: window.localStorage,
+});
 
-        <div className="fr-grid-row fr-grid-row--gutters">
-          <section className="fr-col-12 fr-col-md-4">
-            <h2 className="fr-h4">Explorer</h2>
-            <p>Consultez les cartes publiques disponibles.</p>
-            <a className="fr-link" href={externalUrls.maps}>Acceder au visualiseur</a>
-          </section>
-          <section className="fr-col-12 fr-col-md-4">
-            <h2 className="fr-h4">Rechercher</h2>
-            <p>Trouvez une donnee selon vos besoins metiers.</p>
-            <a className="fr-link" href={externalUrls.catalogue}>Ouvrir le catalogue</a>
-          </section>
-          <section className="fr-col-12 fr-col-md-4">
-            <h2 className="fr-h4">Publier</h2>
-            <p>Diffusez vos donnees et services en quelques etapes.</p>
-            <a className="fr-link" href={routes.discover_publish().href}>Publier une donnee</a>
-          </section>
-        </div>
-      </main>
-    </AppLayout>
-  )
-}
+const maxAge = 1000 * 60 * 60 * 24; // 24h
 
-export default App
+bootstrapUser();
+
+const App: FC = () => {
+    return (
+        <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+                persister,
+                maxAge,
+                dehydrateOptions: {
+                    // ne pas persister (localstorage) les données utilisateur : elles sont rechargées depuis le serveur à chaque chargement de page
+                    shouldDehydrateQuery: (query) => {
+                        const isQueryUserMe = query.queryKey.length === 2 && query.queryKey[0] === "user" && query.queryKey[1] === "me";
+                        return defaultShouldDehydrateQuery(query) && !isQueryUserMe;
+                    },
+                },
+            }}
+        >
+            <ReactQueryDevtools initialIsOpen={false} />
+
+            <RouteProvider>
+                <ErrorBoundary>
+                    <RouterRenderer />
+                </ErrorBoundary>
+            </RouteProvider>
+        </PersistQueryClientProvider>
+    );
+};
+
+export default App;

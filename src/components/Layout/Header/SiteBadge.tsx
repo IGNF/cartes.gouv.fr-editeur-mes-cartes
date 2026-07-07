@@ -7,10 +7,7 @@ export default function SiteBadge() {
     const route = useRoute();
 
     if (
-        groups.datastore.has(route) ||
         groups.community.has(route) ||
-        groups.config.has(route) ||
-        groups.espaceco.has(route) ||
         (route.name &&
             [
                 "dashboard",

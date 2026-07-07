@@ -12,8 +12,10 @@ export const externalUrls = {
     helpUserGuideGeopfServicesTutorial: appRoot + "/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/tutoriels/",
     helpProducerGuideCreateDatasheet: appRoot + "/aide/fr/guides-producteur/publier-des-donnees-via-cartes-gouv/deposer-donnees-sur-cartes-gouv/",
     helpUserGuideCreateKeys: appRoot + "/aide/fr/guides-utilisateur/creation-des-cles-et-integration-sig/",
+    helpUserGuideCreateMap: appRoot + "/aide/fr/guides-utilisateur/creer-une-carte/",
     catalogue: catalogueUrl ?? appRoot + "/rechercher-une-donnee",
     maps: appRoot + "/explorer-les-cartes",
+    my_maps: appRoot + "/mes-cartes",
     contact_us: appRoot + "/aide/fr/nous-ecrire",
     discover_cartesgouvfr: appRoot + "/decouvrir",
     present_service_maps: appRoot + "/decouvrir/explorer-les-cartes",
@@ -31,12 +33,14 @@ export const externalUrls = {
     newsletterSubscription: appRoot + "/lettre-d-information",
     community_geopf_cartesgouvfr_expertises_territoires: "https://www.expertises-territoires.fr/jcms/pl1_557493/fr/communaute-geoplateforme-et-cartes-gouv",
     roadmap: appRoot + "/evolutions",
+    
 } as const;
 
 export function externalLink(route: keyof typeof externalUrls, title?: string): RegisteredLinkProps {
     return {
         href: externalUrls[route],
+        rel: "noopener external",
         target: "_blank",
-        title: title ? `${title} - ouvre une nouvelle fenêtre` : "Ouvre une nouvelle fenêtre",
+        title: title ? `${title} - nouvelle fenêtre` : "Nouvelle fenêtre",
     };
 }

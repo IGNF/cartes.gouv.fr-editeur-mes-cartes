@@ -1,0 +1,16 @@
+.frx-community-error {
+    margin-left: -0.75rem;
+    border-left-width: 0.15rem;
+    border-left-style: solid;
+    border-left-color: var(--border-default-red-marianne);
+}
+
+.frx-scroll-list {
+    height: 15rem;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    align-items: flex-start;
+    span {
+        color: var(--text-label-grey);
+    }
+}

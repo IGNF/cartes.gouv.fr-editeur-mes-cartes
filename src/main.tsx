@@ -5,7 +5,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import App from "./App";
+import { $lang } from "./i18n";
 import { RouteProvider } from "./router/router";
+
+$lang.current = 'fr';
 // en prod
 if (import.meta.env?.APP_ENV?.toLowerCase() === "prod") {
     disableReactDevTools();
