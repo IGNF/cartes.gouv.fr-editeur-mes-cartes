@@ -9,7 +9,7 @@ interface IUseThemeResult {
 // Permet récupèrer les thèmes des cartes (avec le nombre)
 export function useTheme(data: MapItem[]): IUseThemeResult[] {
   const themes = {};
-  data.map((map) => {
+  data.forEach((map) => {
     const { theme, theme_id: themeId } = map;
     if (theme && !(theme in themes)) {
       themes[theme] = {

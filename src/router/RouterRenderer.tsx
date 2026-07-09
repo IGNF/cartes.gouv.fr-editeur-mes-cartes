@@ -5,13 +5,11 @@ import Main from "../components/Layout/Main";
 import LoadingText from "../components/Utils/LoadingText";
 import GroupMap from "./GroupMap";
 import { groups, knownRoutes, useRoute } from "./router";
-import useUserQuery from "@/hooks/queries/useUserQuery";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import GroupApp from "./GroupApp";
 
 const RouterRenderer: FC = () => {
     const route = useRoute();
-    const { data: user } = useUserQuery();
 
     const content: JSX.Element = useMemo(() => {
         // vérification si la route demandée est bien connue/enregistrée
@@ -30,7 +28,7 @@ const RouterRenderer: FC = () => {
         }
 
         return <GroupApp route={route} />;
-    }, [route, user]);
+    }, [route]);
 
     return (
         <Suspense

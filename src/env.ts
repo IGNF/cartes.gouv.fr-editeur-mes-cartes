@@ -1,5 +1,5 @@
 const rootDataset = (document.getElementById("root") as HTMLDivElement | null)?.dataset;
-const env = import.meta.env as ImportMetaEnv & {
+export const env = import.meta.env as ImportMetaEnv & {
 	API_EDITEUR_URL?: string;
 };
 

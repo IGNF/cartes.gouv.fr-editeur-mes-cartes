@@ -6,10 +6,7 @@ export enum FilterEnum {
     DISABLED = 2,
 }
 
-export type IFilters = Record<string, FilterEnum | FilterEnum[]>;
-
-const availableValues = Object.values(FilterEnum);
-
+export type IFilters = Record<string, FilterEnum | FilterEnum[] | string | null>;
 const defaultTests = {
     [FilterEnum.ENABLED]: (item, key) => Boolean(item[key]),
     [FilterEnum.DISABLED]: (item, key) => !item[key],
@@ -35,15 +32,15 @@ function getFilteredList<T>(list: T[], filters: IFilters, tests = defaultTests):
 
 interface IUseFiltersResult<T> {
     filteredItems: T[];
-    filters: IFilters;
+    filters: Record<string, string | null>;
 }
 
 export function useFilters<T>(data: T[], availableFilters: string[], tests = defaultTests): IUseFiltersResult<T> {
     const { params } = useRoute();
     const filters = Object.fromEntries(
         availableFilters.map((key) => {
-            const value = params[key] ? parseInt(params[key]) : FilterEnum.ALL;
-            return [key, availableValues.includes(value) ? value : FilterEnum.ALL];
+            const value = params[key] ? params[key] : null;
+            return [key, value];
         })
     );
     return {

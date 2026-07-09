@@ -1,10 +1,10 @@
 import api from "@/api";
 import placeholder16x9 from "@/img/placeholder.16x9.png";
-import RQKeys from "@/modules/maps/RQKeys";
-import { useQuery } from "@tanstack/react-query";
+// import RQKeys from "@/modules/maps/RQKeys";
+// import { useQuery } from "@tanstack/react-query";
 
 // Permet récupèrer les thèmes des cartes (avec le nombre)
-export function useImage(uri?: string | null): string {
+export function useImage(uri?: string | null): any {
   const URL_REGEX = /[http]?s?:\/\/[^\s]+/g;
   if (!uri || uri === "") {
     // Image par défaut
@@ -13,17 +13,18 @@ export function useImage(uri?: string | null): string {
     return uri;
   } else {
     // C'est une image importée
-    const imageQuery = useQuery({
-        queryKey: RQKeys.medias(),
-        queryFn: ({ signal }) => api.medias.getImage(uri, signal),
-        staleTime: 60000,
+    const { data } = api.media.useApiImageFilename(uri, {
+      query: {
+        // Évite les erreurs typescript en vérifiant le bon retour
+        select: (response) => {
+          if (response.status === 200) {
+            return response.data
+          } else {
+            return placeholder16x9
+          }
+        },
+      }
     });
-    const { data } = imageQuery;
-    // Le fichier a été trouvé
-    if (data) {
-      return data;
-    } else {
-      return placeholder16x9;
-    }
+    return data;
   }
 }

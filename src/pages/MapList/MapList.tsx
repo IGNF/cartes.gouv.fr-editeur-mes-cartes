@@ -10,160 +10,225 @@ import { useToggle } from "@mantine/hooks";
 import MapMain from "@/components/Layout/MapMain";
 import { useTranslation } from "@/i18n";
 import api from "@/api";
-import { useQuery } from "@tanstack/react-query";
-import RQKeys from "@/modules/maps/RQKeys";
 import PageTitle from "@/components/Layout/PageTitle";
 import { routes, useRoute } from "@/router/router";
 import { useSearch } from "@/hooks/useSearch";
 import { useFilters } from "@/hooks/useFilters";
 import { useSort } from "@/hooks/useSort";
-import { usePagination } from "@/hooks/usePagination";
+import { useFakePagination } from "@/hooks/usePagination";
 import { tss } from "tss-react";
 import MapListItem from "./MapListItem";
-import { MapItem } from "@/@types/app";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
 import NoData from "./NoData";
-import { useTheme } from "@/hooks/useTheme";
+import { usePrefetchQuery } from "@tanstack/react-query";
+import RQKeys from "@/modules/maps/RQKeys";
+import { ApiMapsParams, type MapList, MapResearch, Theme } from "@/api/model";
+import NoCorrespondingData from "./NoCorrespondingData";
 
+
+/**
+ * Élément dans l'URL de recherche
+ */
+type MapRouteParams = {
+    page: number,
+    limit: number,
+    offset: number,
+    theme: string,
+    query: string,
+}
+
+/** 
+ * Permet de récupérer les paramètres dans l'URL
+ */
+function useMapRouteParams(): MapRouteParams {
+    // Ajouter ici les différents paramètres dans l'URL
+    const route = useRoute();
+    const page = route.params?.["page"] ?? 1;
+    const limit = parseInt(route.params?.["limit"]) ?? 10;
+    const theme = route.params?.["theme"] ?? "";
+    const query = route.params?.["query"] ?? "";
+    const offset = (page - 1) * (limit);
+
+    return { page, limit, offset, theme, query };
+};
 
 const MapList: FC = () => {
+    // Traduction
     const { t } = useTranslation("MapList");
     const { t: tCommon } = useTranslation("Common");
-    const mapListQuery = useQuery({
-        queryKey: RQKeys.maps(),
-        queryFn: ({ signal }) => api.maps.getMaps({ limit: "all" }, signal),
-        staleTime: 60000,
+
+    // Param dans l'URL
+    const routeParams = useMapRouteParams();
+
+
+    // Appel à l'API
+    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useApiMaps(
+        { ...routeParams },
+        {
+            query: {
+                // Évite les erreurs typescript en vérifiant le bon retour
+                select: (response) => {
+                    if (response.status === 200) {
+                        return response.data
+                    } else if (response.status === 206) {
+                        return response.data as unknown as { maps?: MapResearch; count?: number }
+                    } else {
+                        return undefined
+                    }
+                },
+            },
+        },
+    );
+
+    // Va chercher les cartes de la page d'après
+    usePrefetchQuery({
+        queryKey: RQKeys.maps({ ...routeParams, offset: routeParams.page * routeParams.limit }),
+        queryFn: ({ signal }) => api.map.apiMaps({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
     });
-    const { data: mapList, dataUpdatedAt, isFetching, isLoading, refetch } = mapListQuery;
 
-    const { params } = useRoute();
-    const page = params["page"] ? parseInt(params["page"]) : 1;
-    const limit = params["limit"] ? parseInt(params["limit"]) : 10;
+    // Thèmes disponible
+    const { data: themesResponse } = api.theme.useApiThemes(
+        {
+            query: {
+                // Évite les erreurs typescript en vérifiant le bon retour
+                select: (response) => {
+                    if (response.status === 200) {
+                        return response.data
+                    } else {
+                        return undefined
+                    }
+                },
+            },
+        },
+    );
 
+    const themes = (themesResponse || []) as Theme[]
+
+    // Cartes et nombre total de cartes
+    const maps = (mapsResponse?.maps ?? []) as MapList[];
+    const mapCount = mapsResponse?.count ?? 0;
+
+    // Permet d'activer / désactiver l'affichage des filtres
     const [showFilters, toggleShowFilters] = useToggle();
-    // filtre et tri
-    const { search, searchedItems } = useSearch(mapList?.maps ?? []);
-    const { filteredItems, filters } = useFilters(searchedItems, ["published"]);
-    const { sortBy, sortOrder, sortedItems } = useSort(filteredItems, ["name", "nb_publications"]);
-    const { paginatedItems, totalPages } = usePagination(sortedItems, page, limit);
 
-    const themesInMap = useTheme(mapList?.maps ?? []);
+    // Filtre et tri
 
+    // Nombre de page total
+    const { totalPages } = useFakePagination(mapCount, routeParams.limit);
+
+    // Pour classes css
     const { classes, cx } = useStyles();
-    console.log(mapList)
 
     return (
         <MapMain title="Mes cartes">
             <PageTitle title={t("map_list")}>
             </PageTitle>
-            {mapList && mapList.count > 0 && (
-                <>
-                    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
-                        <div
-                            className={fr.cx("fr-col-12", "fr-py-0")}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                            }}
-                        >
-                            <strong className={fr.cx("fr-text--xl", "fr-m-0", "fr-mr-2v")}>Cartes</strong>
-                            <Badge severity="info" noIcon={true}>
-                                {filteredItems.length ?? 0}
-                            </Badge>
-                            <Button
-                                    linkProps={
-                                        routes.create_map().link
-                                    }
-                                    iconId="fr-icon-add-line"
-                                    iconPosition="right"
-                                    className={fr.cx("fr-ml-auto")}
-                                >
-                                    {t("create_map")}
-                                </Button>
-                        </div>
-                    </div>
+            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
+                <div
+                    className={fr.cx("fr-col-12", "fr-py-0")}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                    }}
+                >
+                    <strong className={fr.cx("fr-text--xl", "fr-m-0", "fr-mr-2v")}>Cartes</strong>
+                    <Badge severity="info" noIcon={true}>
+                        {mapCount}
+                    </Badge>
+                    <Button
+                        linkProps={
+                            routes.create_map().link
+                        }
+                        iconId="fr-icon-add-line"
+                        iconPosition="right"
+                        className={fr.cx("fr-ml-auto")}
+                    >
+                        {t("create_map")}
+                    </Button>
+                </div>
+            </div>
 
-                    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-2v")}>
-                        <div
-                            className={fr.cx("fr-col-12")}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: fr.spacing("4v"),
-                            }}
-                        >
-                            <SearchBar
-                                label={tCommon("search")}
-                                onButtonClick={(text) => {
-                                    if (!isLoading) {
-                                        routes.map_list({ ...filters, search: text, sortBy, sortOrder }).replace();
-                                    }
-                                }}
-                                allowEmptySearch={true}
-                                renderInput={(props) => <input {...props} disabled={isLoading} />}
-                                defaultValue={search}
-                            />
-                            <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
-                                Filtres
-                            </Button>
-                        </div>
-                    </div>
+            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-2v")}>
+                <div
+                    className={fr.cx("fr-col-12")}
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: fr.spacing("4v"),
+                    }}
+                >
+                    <SearchBar
+                        label={tCommon("search")}
+                        onButtonClick={(text) => {
+                            if (!isLoading) {
+                                routes.map_list({ ...routeParams, query: text }).push();
+                            }
+                        }}
+                        allowEmptySearch={true}
+                        renderInput={(props) => <input {...props} disabled={isLoading} />}
+                        defaultValue={routeParams.query}
+                    />
+                    <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
+                        Filtres
+                    </Button>
+                </div>
+            </div>
 
-                    {showFilters && (
-                        <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
-                            <div className={classes.filterSelect}>
-                                <SelectNext
-                                    label={t("filter_label")}
-                                    options={[
-                                        { label: "Tous les thèmes", value: "" },
-                                        ...themesInMap.map(theme => ({
-                                            label: theme.name,
-                                            value: theme.id.toString(),
-                                        }))
-                                    ]}
-                                    nativeSelectProps={{
-                                        value: filters.published?.toString() ?? "",
-                                        onChange: (event) => {
-                                            const value = event.target.value;
-                                            if (value === "") {
-                                                return
-                                            } else {
-                                                routes
-                                                    .map_list({
-                                                        ...filters,
-                                                        search,
-                                                        sortBy,
-                                                        sortOrder,
-                                                        themeId: value,
-                                                    })
-                                                    .replace();
-                                            }
-                                        },
-                                    }}
-                                    placeholder={t("filter_placeholder")}
-                                    disabled={isLoading}
-                                />
-                            </div>
-                            <div className={classes.filterSelect}>
-                            </div>
-                            {/* <div className={classes.filterApplyBtn}>
+            {showFilters && (
+                <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
+                    <div className={classes.filterSelect}>
+                        {themes.length && <SelectNext
+                            label={t("filter_label")}
+                            options={[
+                                { label: "Tous les thèmes", value: "" },
+                                ...themes.map(theme => ({
+                                    label: theme.name || "",
+                                    value: theme.name || "",
+                                }))
+                            ]}
+                            nativeSelectProps={{
+                                value: routeParams.theme?.toString() ?? "",
+                                onChange: (event) => {
+                                    const value = event.target.value;
+                                    console.log(value)
+                                    if (value === "") {
+                                        routes
+                                            .map_list({
+                                                ...routeParams,
+                                            })
+                                            .push();
+                                    } else {
+                                        routes
+                                            .map_list({
+                                                ...routeParams,
+                                                theme: value,
+                                            })
+                                            .push();
+                                    }
+                                },
+                            }}
+                            placeholder={t("filter_placeholder")}
+                            disabled={isLoading}
+                        />}
+                    </div>
+                    <div className={classes.filterSelect}>
+                    </div>
+                    {/* <div className={classes.filterApplyBtn}>
                                 <Button>Valider</Button>
                             </div> */}
-                        </div>
-                    )}
-                </>
+                </div>
             )}
             {isLoading ? (
-                <Skeleton count={6} rectangleHeight={200} />
+                <Skeleton count={3} rectangleHeight={200} />
             ) : (
                 <>
-                    {mapList && mapList.count > 0 ? (
+                    {mapCount > 0 ? (
                         <>
                             <ListHeader
                                 nbResults={{
-                                    displayed: paginatedItems.length,
-                                    total: mapList.count,
+                                    displayed: maps.length,
+                                    total: mapCount,
                                 }}
                                 dataUpdatedAt={dataUpdatedAt}
                                 isFetching={isFetching}
@@ -171,7 +236,7 @@ const MapList: FC = () => {
                             />
 
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                                {paginatedItems.map((map: MapItem) => (
+                                {maps.map((map) => (
                                     <div className={fr.cx("fr-col-12")} key={map.view_id}>
                                         <MapListItem map={map} />
                                     </div>
@@ -183,16 +248,16 @@ const MapList: FC = () => {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...routes.map_list({ ...filters, page: pageNumber, limit: limit, search, sortBy, sortOrder })
+                                            ...routes.map_list({ ...routeParams, page: pageNumber })
                                                 .link,
                                         })}
-                                        defaultPage={page}
+                                        defaultPage={routeParams.page}
                                     />
                                 </div>
                             )}
                         </>
                     ) : (
-                        <NoData />
+                        <NoCorrespondingData />
                     )}
                 </>
             )}

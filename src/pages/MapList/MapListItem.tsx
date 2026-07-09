@@ -4,16 +4,17 @@ import Card from "@codegouvfr/react-dsfr/Card";
 import { FC } from "react";
 import { symToStr } from "tsafe/symToStr";
 
-import { type MapItem } from "@/@types/app";
 import { routes } from "@/router/router";
 
 import { useImage } from "@/hooks/useImage";
+import { MapList } from "@/api/model";
 
 type MapListItemProps = {
-    map: MapItem;
+    map: MapList;
 };
 
 const MapListItem: FC<MapListItemProps> = ({ map }) => {
+    // En réalité, correspond à une image
     const imageUrl = useImage(map.img_url);
 
     return (
@@ -30,9 +31,9 @@ const MapListItem: FC<MapListItemProps> = ({ map }) => {
                 </Tag >
             }
             footer={
-                
+
                 <Button
-                    linkProps={routes.view_map({ mapId: map.view_id, }).link}
+                    linkProps={routes.view_map({ mapId: map.view_id || "", }).link}
                     iconId="fr-icon-arrow-right-s-line"
                     iconPosition="right"
                 >

@@ -1,6 +1,6 @@
-import { commonFrTranslations } from "../Common.locale";
-import { BreadcrumbFrTranslations } from "@/modules/breadcrumbs/Breadcrumb.locale";
-import { DatasheetListFrTranslations } from "@/pages/MapList/MapList.locale";
+import { commonFrTranslations } from "@/i18n/locales/Common.locale";
+import { BreadcrumbFrTranslations } from "@/i18n/locales/Breadcrumb.locale";
+import { DatasheetListFrTranslations } from "@/i18n/locales/MapList.locale";
 import type { Translations } from "../types";
 
 export const translations: Translations<"fr"> = {

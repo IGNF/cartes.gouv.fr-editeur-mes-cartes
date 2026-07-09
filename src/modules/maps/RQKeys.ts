@@ -18,7 +18,7 @@ const RQKeys = {
     themes: (): string[] => ["themes"],
 
     medias: (params?: unknown): unknown[] => ["medias", params ?? null],
-    iamge: (fileName?: string): (string | null)[] => ["image", fileName ?? ""],
+    image: (fileName?: string): (string | null)[] => ["image", fileName ?? ""],
     media_folders: (organizationId?: string): (string | null)[] => ["medias", "folders", organizationId ?? null],
 
     alerts: (): string[] => ["alerts"],

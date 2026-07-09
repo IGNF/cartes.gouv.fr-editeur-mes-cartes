@@ -1,17 +1,26 @@
 
-import client from "./client.ts";
-import maps from "./maps.ts";
-import medias from "./medias.ts";
-import organizations from "./organizations.ts";
-import themes from "./themes.ts";
+
+import * as editorial from "./editorial/editorial.ts";
+import * as login from "./login/login.ts";
+import * as map from "./map/map.ts";
+import * as media from "./media/media.ts";
+import * as notifications from "./notifications/notifications.ts";
+import * as organization from "./organization/organization.ts";
+import * as theme from "./theme/theme.ts";
+import * as user from "./user/user.ts";
+
+// TODO : AMÉLIORER ÇA
 
 const api = {
-	client,
-	maps,
-	organizations,
-	themes,
-	medias,
+	editorial,
+	login,
+	map,
+	media,
+	notifications,
+	organization,
+	theme,
+	user
 };
 
-export { client, maps, organizations, themes, medias };
+export { editorial, login, map, media, notifications, organization, theme, user };
 export default api;

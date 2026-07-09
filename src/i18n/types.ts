@@ -16,8 +16,8 @@ export const languagesDisplayNames: Record<Language, string> = {
 // types
 export type Language = (typeof languages)[number];
 export type ComponentKey =
-    | import("./Common.locale").I18n
-    | import("../modules/breadcrumbs/Breadcrumb.locale").I18n
-    | import("../pages/MapList/MapList.locale").I18n
+    | import("./locales/Common.locale").I18n
+    | import("./locales/Breadcrumb.locale").I18n
+    | import("./locales/MapList.locale").I18n
 
 export type Translations<L extends Language> = GenericTranslations<ComponentKey, Language, typeof fallbackLanguage, L>;

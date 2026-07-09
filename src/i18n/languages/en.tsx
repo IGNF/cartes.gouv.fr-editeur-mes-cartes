@@ -1,7 +1,7 @@
 
-import { commonEnTranslations } from "../Common.locale";
-import { BreadcrumbEnTranslations } from "@/modules/breadcrumbs/Breadcrumb.locale";
-import { DatasheetListEnTranslations } from "@/pages/MapList/MapList.locale";
+import { commonEnTranslations } from "../locales/Common.locale";
+import { BreadcrumbEnTranslations } from "@/i18n/locales/Breadcrumb.locale";
+import { DatasheetListEnTranslations } from "@/i18n/locales/MapList.locale";
 import type { Translations } from "../types";
 
 export const translations: Translations<"en"> = {

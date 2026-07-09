@@ -34,12 +34,10 @@ const mapRoutes = {
     map_list: defineRoute(
         {
             page: param.query.optional.number.default(1),
+            offset: param.query.optional.number.default(0),
             limit: param.query.optional.number.default(10),
-            search: param.query.optional.string,
-            sortBy: param.query.optional.string,
-            sortOrder: param.query.optional.number.default(1),
-            themeId: param.query.optional.string,
-            published: param.query.optional.number.default(0),
+            query: param.query.optional.string,
+            theme: param.query.optional.string.default(""),
         },
         () => "/mes-cartes"
     ),
