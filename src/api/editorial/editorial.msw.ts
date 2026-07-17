@@ -5,85 +5,136 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  Article,
-  GetEditorialCategories200Item,
-  GetEditorialFollowers200,
-  GetEditorialMegamenu200
-} from '../model';
+import type { Article, GetEditorialCategories200Item, GetEditorialFollowers200, GetEditorialMegamenu200 } from "../model";
 
+export const getGetEditorialFollowersResponseMock = (overrideResponse: Partial<Extract<GetEditorialFollowers200, object>> = {}): GetEditorialFollowers200 => ({
+    facebook: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    twitter: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    linkedin: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    instagram: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
 
-export const getGetEditorialFollowersResponseMock = (overrideResponse: Partial<Extract<GetEditorialFollowers200, object>> = {}): GetEditorialFollowers200 => ({facebook: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), twitter: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), linkedin: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), instagram: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
+export const getGetEditorialMegamenuResponseMock = (overrideResponse: Partial<Extract<GetEditorialMegamenu200, object>> = {}): GetEditorialMegamenu200 => ({
+    html: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
 
-export const getGetEditorialMegamenuResponseMock = (overrideResponse: Partial<Extract<GetEditorialMegamenu200, object>> = {}): GetEditorialMegamenu200 => ({html: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
+export const getGetEditorialCategoriesResponseMock = (): GetEditorialCategories200Item[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        key: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    }));
 
-export const getGetEditorialCategoriesResponseMock = (): GetEditorialCategories200Item[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({key: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), value: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined])})))
+export const getGetEditorialArticlesByCategoryResponseMock = (): Article[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        category: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        position: faker.helpers.arrayElement([faker.number.float({ fractionDigits: 2 }), undefined]),
+        title: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        content: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        tags: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+            undefined,
+        ]),
+        updated_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
+        updated_by: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        img_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+        link_text: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        link_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    }));
 
-export const getGetEditorialArticlesByCategoryResponseMock = (): Article[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), category: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), position: faker.helpers.arrayElement([faker.number.float({fractionDigits: 2}), undefined]), title: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), content: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), tags: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), undefined]), updated_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', undefined]), updated_by: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), img_url: faker.helpers.arrayElement([faker.internet.url(), undefined]), link_text: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), link_url: faker.helpers.arrayElement([faker.internet.url(), undefined])})))
+export const getGetEditorialFollowersMockHandler = (
+    overrideResponse?:
+        GetEditorialFollowers200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialFollowers200> | GetEditorialFollowers200),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/editorial/followers",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetEditorialFollowersResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
+export const getGetEditorialMegamenuMockHandler = (
+    overrideResponse?:
+        GetEditorialMegamenu200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialMegamenu200> | GetEditorialMegamenu200),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/editorial/megamenu",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetEditorialMegamenuResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
-export const getGetEditorialFollowersMockHandler = (overrideResponse?: GetEditorialFollowers200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialFollowers200> | GetEditorialFollowers200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/editorial/followers', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetEditorialCategoriesMockHandler = (
+    overrideResponse?:
+        | GetEditorialCategories200Item[]
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialCategories200Item[]> | GetEditorialCategories200Item[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/editorial/categories",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetEditorialCategoriesResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetEditorialFollowersResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetEditorialMegamenuMockHandler = (overrideResponse?: GetEditorialMegamenu200 | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialMegamenu200> | GetEditorialMegamenu200), options?: RequestHandlerOptions) => {
-  return http.get('*/api/editorial/megamenu', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetEditorialMegamenuResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetEditorialCategoriesMockHandler = (overrideResponse?: GetEditorialCategories200Item[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetEditorialCategories200Item[]> | GetEditorialCategories200Item[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/editorial/categories', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetEditorialCategoriesResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetEditorialArticlesByCategoryMockHandler = (overrideResponse?: Article[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Article[]> | Article[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/editorial/articles/:category', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetEditorialArticlesByCategoryResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getGetEditorialArticlesByCategoryMockHandler = (
+    overrideResponse?: Article[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Article[]> | Article[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/editorial/articles/:category",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetEditorialArticlesByCategoryResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 export const getEditorialMock = () => [
-  getGetEditorialFollowersMockHandler(),
-  getGetEditorialMegamenuMockHandler(),
-  getGetEditorialCategoriesMockHandler(),
-  getGetEditorialArticlesByCategoryMockHandler()
-]
+    getGetEditorialFollowersMockHandler(),
+    getGetEditorialMegamenuMockHandler(),
+    getGetEditorialCategoriesMockHandler(),
+    getGetEditorialArticlesByCategoryMockHandler(),
+];

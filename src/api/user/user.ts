@@ -5,662 +5,599 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
 import type {
-  BadRequestResponse,
-  ForbiddenResponse,
-  GetUsers200Item,
-  GetUsersParams,
-  InvalidResponse,
-  NotConnectedResponse,
-  NotFoundResponse,
-  UserMeEdit,
-  UserPublic,
-  UserView
-} from '../model';
+    BadRequestResponse,
+    ForbiddenResponse,
+    GetUsers200Item,
+    GetUsersParams,
+    InvalidResponse,
+    NotConnectedResponse,
+    NotFoundResponse,
+    UserMeEdit,
+    UserPublic,
+    UserView,
+} from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
-  for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
-    Object.defineProperty(result, key, {
-      enumerable: true,
-      configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
-    });
-  }
-  return result;
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
 };
 
 export type getMeResponse200 = {
-  data: UserView
-  status: 200
-}
+    data: UserView;
+    status: 200;
+};
 
 export type getMeResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
-
-export type getMeResponseSuccess = (getMeResponse200) & {
-  headers: Headers;
-};
-export type getMeResponseError = (getMeResponse401) & {
-  headers: Headers;
+    data: NotConnectedResponse;
+    status: 401;
 };
 
-export type getMeResponse = (getMeResponseSuccess | getMeResponseError)
+export type getMeResponseSuccess = getMeResponse200 & {
+    headers: Headers;
+};
+export type getMeResponseError = getMeResponse401 & {
+    headers: Headers;
+};
+
+export type getMeResponse = getMeResponseSuccess | getMeResponseError;
 
 export const getGetMeUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/me`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/me`
-}
-
-export const getMe = async ( options?: RequestInit): Promise<getMeResponse> => {
-
-  const res = await fetch(getGetMeUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMeResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMeResponse
-}
-
-
-
-
+export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
+    return fetchWithAuth<getMeResponse>(getGetMeUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetMeQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/me`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/me`] as const;
+};
 
+export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetMeQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMeQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMeQueryResult = NonNullable<Awaited<ReturnType<typeof getMe>>>
-export type GetMeQueryError = NotConnectedResponse
-
+export type GetMeQueryResult = NonNullable<Awaited<ReturnType<typeof getMe>>>;
+export type GetMeQueryError = NotConnectedResponse;
 
 export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMe>>,
-          TError,
-          Awaited<ReturnType<typeof getMe>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMe>>, TError, Awaited<ReturnType<typeof getMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMe>>,
-          TError,
-          Awaited<ReturnType<typeof getMe>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMe>>, TError, Awaited<ReturnType<typeof getMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMeQueryOptions(options);
 
-  const queryOptions = getGetMeQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMeQuery = async <TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMeQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMeQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type deleteMeResponse206 = {
-  data: void
-  status: 206
-}
+    data: void;
+    status: 206;
+};
 
 export type deleteMeResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
 export type deleteMeResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
+    data: ForbiddenResponse;
+    status: 403;
+};
 
 export type deleteMeResponse451 = {
-  data: InvalidResponse
-  status: 451
-}
+    data: InvalidResponse;
+    status: 451;
+};
 
-export type deleteMeResponseSuccess = (deleteMeResponse206) & {
-  headers: Headers;
+export type deleteMeResponseSuccess = deleteMeResponse206 & {
+    headers: Headers;
 };
 export type deleteMeResponseError = (deleteMeResponse401 | deleteMeResponse403 | deleteMeResponse451) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type deleteMeResponse = (deleteMeResponseSuccess | deleteMeResponseError)
+export type deleteMeResponse = deleteMeResponseSuccess | deleteMeResponseError;
 
 export const getDeleteMeUrl = () => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/me`
-}
+    return `${env.API_EDITEUR_URL}/api/me`;
+};
 
 /**
  * Supprime en douceur (https://phpreaction.com/support/suppression-en-douceur-soft-delete/) le compte de l'utilisateur connecté
  */
-export const deleteMe = async ( options?: RequestInit): Promise<deleteMeResponse> => {
+export const deleteMe = async (options?: RequestInit): Promise<deleteMeResponse> => {
+    return fetchWithAuth<deleteMeResponse>(getDeleteMeUrl(), {
+        ...options,
+        method: "DELETE",
+    });
+};
 
-  const res = await fetch(getDeleteMeUrl(),
-  {
-    ...options,
-    method: 'DELETE'
+export const getDeleteMeQueryKey = () => {
+    return ["DELETE", `${env.API_EDITEUR_URL}/api/me`] as const;
+};
 
+export const getDeleteMeQueryOptions = <
+    TData = Awaited<ReturnType<typeof deleteMe>>,
+    TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse,
+>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  }
-)
+    const queryKey = queryOptions?.queryKey ?? getDeleteMeQueryKey();
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deleteMe>>> = ({ signal }) => deleteMe({ signal, ...requestOptions });
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-  const data: deleteMeResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as deleteMeResponse
+export type DeleteMeQueryResult = NonNullable<Awaited<ReturnType<typeof deleteMe>>>;
+export type DeleteMeQueryError = NotConnectedResponse | ForbiddenResponse | InvalidResponse;
+
+export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMe>>, TError, Awaited<ReturnType<typeof deleteMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMe>>, TError, Awaited<ReturnType<typeof deleteMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getDeleteMeQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const prefetchDeleteMeQuery = async <TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
+    queryClient: QueryClient,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getDeleteMeQueryOptions(options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
+    return queryClient;
+};
 
-
-export const getDeleteMeMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError,void, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError,void, TContext> => {
-
-const mutationKey = ['deleteMe'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMe>>, void> = () => {
-
-
-          return  deleteMe(fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteMeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMe>>>
-
-    export type DeleteMeMutationError = NotConnectedResponse | ForbiddenResponse | InvalidResponse
-
-    export const useDeleteMe = <TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError,void, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteMe>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getDeleteMeMutationOptions(options), queryClient);
-    }
-    export type patchMeResponse200 = {
-  data: UserView
-  status: 200
-}
+export type patchMeResponse200 = {
+    data: UserView;
+    status: 200;
+};
 
 export type patchMeResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+    data: BadRequestResponse;
+    status: 400;
+};
 
 export type patchMeResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
-export type patchMeResponseSuccess = (patchMeResponse200) & {
-  headers: Headers;
+export type patchMeResponseSuccess = patchMeResponse200 & {
+    headers: Headers;
 };
 export type patchMeResponseError = (patchMeResponse400 | patchMeResponse401) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type patchMeResponse = (patchMeResponseSuccess | patchMeResponseError)
+export type patchMeResponse = patchMeResponseSuccess | patchMeResponseError;
 
 export const getPatchMeUrl = () => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/me`
-}
+    return `${env.API_EDITEUR_URL}/api/me`;
+};
 
 /**
  * parameter **current_password** is required to patch username, email and new_password<br>username, email et public_name sont uniques, la réponse 400 "... already used" peut être renvoyée
  */
 export const patchMe = async (userMeEdit: UserMeEdit, options?: RequestInit): Promise<patchMeResponse> => {
+    return fetchWithAuth<patchMeResponse>(getPatchMeUrl(), {
+        ...options,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...options?.headers },
+        body: JSON.stringify(userMeEdit),
+    });
+};
 
-  const res = await fetch(getPatchMeUrl(),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(userMeEdit)
-  }
-)
+export const getPatchMeQueryKey = (userMeEdit?: UserMeEdit) => {
+    return ["PATCH", `${env.API_EDITEUR_URL}/api/me`, userMeEdit] as const;
+};
 
+export const getPatchMeQueryOptions = <TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    userMeEdit: UserMeEdit,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+    const queryKey = queryOptions?.queryKey ?? getPatchMeQueryKey(userMeEdit);
 
-  const data: patchMeResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as patchMeResponse
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof patchMe>>> = ({ signal }) => patchMe(userMeEdit, { signal, ...requestOptions });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
+
+export type PatchMeQueryResult = NonNullable<Awaited<ReturnType<typeof patchMe>>>;
+export type PatchMeQueryError = BadRequestResponse | NotConnectedResponse;
+
+export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    userMeEdit: UserMeEdit,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof patchMe>>, TError, Awaited<ReturnType<typeof patchMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    userMeEdit: UserMeEdit,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof patchMe>>, TError, Awaited<ReturnType<typeof patchMe>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    userMeEdit: UserMeEdit,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    userMeEdit: UserMeEdit,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPatchMeQueryOptions(userMeEdit, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const prefetchPatchMeQuery = async <TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
+    queryClient: QueryClient,
+    userMeEdit: UserMeEdit,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPatchMeQueryOptions(userMeEdit, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
+    return queryClient;
+};
 
-
-export const getPatchMeMutationOptions = <TError = BadRequestResponse | NotConnectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError,{data: UserMeEdit}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError,{data: UserMeEdit}, TContext> => {
-
-const mutationKey = ['patchMe'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchMe>>, {data: UserMeEdit}> = (props) => {
-          const {data} = props ?? {};
-
-          return  patchMe(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PatchMeMutationResult = NonNullable<Awaited<ReturnType<typeof patchMe>>>
-    export type PatchMeMutationBody = UserMeEdit
-    export type PatchMeMutationError = BadRequestResponse | NotConnectedResponse
-
-    export const usePatchMe = <TError = BadRequestResponse | NotConnectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError,{data: UserMeEdit}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof patchMe>>,
-        TError,
-        {data: UserMeEdit},
-        TContext
-      > => {
-      return useMutation(getPatchMeMutationOptions(options), queryClient);
-    }
-    export type getUsersPublicByPublicidResponse200 = {
-  data: UserPublic
-  status: 200
-}
+export type getUsersPublicByPublicidResponse200 = {
+    data: UserPublic;
+    status: 200;
+};
 
 export type getUsersPublicByPublicidResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getUsersPublicByPublicidResponseSuccess = (getUsersPublicByPublicidResponse200) & {
-  headers: Headers;
-};
-export type getUsersPublicByPublicidResponseError = (getUsersPublicByPublicidResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type getUsersPublicByPublicidResponse = (getUsersPublicByPublicidResponseSuccess | getUsersPublicByPublicidResponseError)
+export type getUsersPublicByPublicidResponseSuccess = getUsersPublicByPublicidResponse200 & {
+    headers: Headers;
+};
+export type getUsersPublicByPublicidResponseError = getUsersPublicByPublicidResponse404 & {
+    headers: Headers;
+};
 
-export const getGetUsersPublicByPublicidUrl = (publicId: string,) => {
+export type getUsersPublicByPublicidResponse = getUsersPublicByPublicidResponseSuccess | getUsersPublicByPublicidResponseError;
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/users/public/${publicId}`
-}
+export const getGetUsersPublicByPublicidUrl = (publicId: string) => {
+    return `${env.API_EDITEUR_URL}/api/users/public/${publicId}`;
+};
 
 export const getUsersPublicByPublicid = async (publicId: string, options?: RequestInit): Promise<getUsersPublicByPublicidResponse> => {
+    return fetchWithAuth<getUsersPublicByPublicidResponse>(getGetUsersPublicByPublicidUrl(publicId), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetUsersPublicByPublicidUrl(publicId),
-  {
-    ...options,
-    method: 'GET'
+export const getGetUsersPublicByPublicidQueryKey = (publicId: string) => {
+    return [`${env.API_EDITEUR_URL}/api/users/public/${publicId}`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getUsersPublicByPublicidResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getUsersPublicByPublicidResponse
-}
-
-
-
-
-
-export const getGetUsersPublicByPublicidQueryKey = (publicId: string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/users/public/${publicId}`
-    ] as const;
+export const getGetUsersPublicByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+    publicId: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
-
-
-export const getGetUsersPublicByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(publicId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>, fetch?: RequestInit}
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetUsersPublicByPublicidQueryKey(publicId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetUsersPublicByPublicidQueryKey(publicId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersPublicByPublicid>>> = ({ signal }) =>
+        getUsersPublicByPublicid(publicId, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: publicId !== null && publicId !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getUsersPublicByPublicid>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersPublicByPublicid>>> = ({ signal }) => getUsersPublicByPublicid(publicId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: publicId !== null && publicId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetUsersPublicByPublicidQueryResult = NonNullable<Awaited<ReturnType<typeof getUsersPublicByPublicid>>>
-export type GetUsersPublicByPublicidQueryError = NotFoundResponse
-
+export type GetUsersPublicByPublicidQueryResult = NonNullable<Awaited<ReturnType<typeof getUsersPublicByPublicid>>>;
+export type GetUsersPublicByPublicidQueryError = NotFoundResponse;
 
 export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
- publicId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUsersPublicByPublicid>>,
-          TError,
-          Awaited<ReturnType<typeof getUsersPublicByPublicid>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    publicId: string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, Awaited<ReturnType<typeof getUsersPublicByPublicid>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
- publicId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUsersPublicByPublicid>>,
-          TError,
-          Awaited<ReturnType<typeof getUsersPublicByPublicid>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    publicId: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, Awaited<ReturnType<typeof getUsersPublicByPublicid>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
- publicId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    publicId: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
- publicId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    publicId: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId, options);
 
-  const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetUsersPublicByPublicidQuery = async <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
- queryClient: QueryClient, publicId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    publicId: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getUsersResponse200 = {
-  data: GetUsers200Item[]
-  status: 200
-}
+    data: GetUsers200Item[];
+    status: 200;
+};
 
 export type getUsersResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
-
-export type getUsersResponseSuccess = (getUsersResponse200) & {
-  headers: Headers;
-};
-export type getUsersResponseError = (getUsersResponse400) & {
-  headers: Headers;
+    data: BadRequestResponse;
+    status: 400;
 };
 
-export type getUsersResponse = (getUsersResponseSuccess | getUsersResponseError)
+export type getUsersResponseSuccess = getUsersResponse200 & {
+    headers: Headers;
+};
+export type getUsersResponseError = getUsersResponse400 & {
+    headers: Headers;
+};
 
-export const getGetUsersUrl = (params: GetUsersParams,) => {
-  const normalizedParams = new URLSearchParams();
+export type getUsersResponse = getUsersResponseSuccess | getUsersResponseError;
 
-  Object.entries(params || {}).forEach(([key, value]) => {
+export const getGetUsersUrl = (params: GetUsersParams) => {
+    const normalizedParams = new URLSearchParams();
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+            normalizedParams.append(key, value === null ? "null" : String(value));
+        }
+    });
 
-  const stringifiedParams = normalizedParams.toString();
+    const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/users`
-}
+    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/users`;
+};
 
 /**
  * Recherche d'utilisateurs par autocompletion
  */
 export const getUsers = async (params: GetUsersParams, options?: RequestInit): Promise<getUsersResponse> => {
+    return fetchWithAuth<getUsersResponse>(getGetUsersUrl(params), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetUsersUrl(params),
-  {
-    ...options,
-    method: 'GET'
+export const getGetUsersQueryKey = (params?: GetUsersParams) => {
+    return [`${env.API_EDITEUR_URL}/api/users`, ...(params ? [params] : [])] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getUsersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getUsersResponse
-}
-
-
-
-
-
-export const getGetUsersQueryKey = (params?: GetUsersParams,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/users`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetUsersQueryOptions = <TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(params: GetUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>, fetch?: RequestInit}
+export const getGetUsersQueryOptions = <TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
+    params: GetUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetUsersQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetUsersQueryKey(params);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsers>>> = ({ signal }) => getUsers(params, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsers>>> = ({ signal }) => getUsers(params, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getUsers>>>
-export type GetUsersQueryError = BadRequestResponse
-
+export type GetUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getUsers>>>;
+export type GetUsersQueryError = BadRequestResponse;
 
 export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
- params: GetUsersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUsers>>,
-          TError,
-          Awaited<ReturnType<typeof getUsers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: GetUsersParams,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getUsers>>, TError, Awaited<ReturnType<typeof getUsers>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
- params: GetUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUsers>>,
-          TError,
-          Awaited<ReturnType<typeof getUsers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: GetUsersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUsers>>, TError, Awaited<ReturnType<typeof getUsers>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
- params: GetUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: GetUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetUsers<TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
- params: GetUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    params: GetUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetUsersQueryOptions(params, options);
 
-  const queryOptions = getGetUsersQueryOptions(params,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetUsersQuery = async <TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(
- queryClient: QueryClient, params: GetUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    params: GetUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetUsersQueryOptions(params, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetUsersQueryOptions(params,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
-
+    return queryClient;
+};

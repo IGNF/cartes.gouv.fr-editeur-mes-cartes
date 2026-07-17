@@ -1,9 +1,11 @@
-import Button from "@codegouvfr/react-dsfr/Button";
 
+import { fr } from "@codegouvfr/react-dsfr";
 import { externalLink, externalUrls } from "@/router/externalUrls";
 import { routes } from "@/router/router";
 import HeaderMenu from "./HeaderMenu";
 import "../../../sass/components/buttons.scss";
+import { useOidc } from "@/oidc";
+import { useTranslation } from "@/i18n";
 
 export function HeaderMenuHelp() {
     return (
@@ -87,79 +89,55 @@ export function HeaderMenuServices() {
 }
 
 export function HeaderMenuUser() {
-    // const { data: user } = useUserQuery();
-    const user = false;
+    // const { t } = useTranslation({ HeaderMenus: HeaderMenuConnexion });
+    const { t } = useTranslation("Layout");
+    const { logout, isUserLoggedIn, decodedIdToken, goToAuthServer } = useOidc();
 
-    if (!user) {
-        return (
-            <Button
-                iconId="fr-icon-account-fill"
-                // linkProps={{
-                //     href: SymfonyRouting.generate("cartesgouvfr_security_login"),
-                // }}
-            >
-                Se connecter
-            </Button>
-        );
-    }
+    console.log(decodedIdToken)
 
-    // let userDisplayName = `${user.first_name ?? ""} ${user.last_name ?? ""}`;
-    // if (userDisplayName.replace(/\s+/g, "") === "") {
-    //     userDisplayName = user.user_name;
-    // }
+    return (
+        <>
+            {isUserLoggedIn ? (
+                <HeaderMenu
+                    openButtonProps={{
+                        children: "Mon compte",
+                        iconId: "fr-icon-account-circle-fill"
+                    }}
+                    items={[
+                        {
+                            children: (
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                    }}
+                                >
+                                    <span className={fr.cx("fr-text--bold")}>{decodedIdToken.preferred_username}</span>
+                                    <span
+                                        className={fr.cx("fr-text--xs", "fr-m-0")}
+                                        style={{
+                                            color: fr.colors.decisions.text.mention.grey.default,
+                                        }}
+                                    >
+                                        {decodedIdToken.email}
+                                    </span>
+                                </div>
+                            ),
+                        },
+                        { iconId: "fr-icon-dashboard-3-line", children: t("board"), linkProps: { href: externalUrls.contact_us } },
+                        { iconId: "fr-icon-user-line", children: t("account"), linkProps: { href: externalUrls.contact_us } },
+                    ]}
+                    actionButtonProps={{
+                        children: "Me déconnecter",
+                        iconId: "fr-icon-logout-box-r-line",
+                        onClick: () => logout({ redirectTo: "home" }),
+                    }}
+                />
+            ) : (
+                <>
 
-    // return (
-    //     <HeaderMenu
-    //         openButtonProps={{
-    //             children: "Mon espace",
-    //             iconId: "fr-icon-account-fill",
-    //         }}
-    //         items={[
-    //             {
-    //                 children: (
-    //                     <div
-    //                         style={{
-    //                             display: "flex",
-    //                             flexDirection: "column",
-    //                         }}
-    //                     >
-    //                         <strong>{userDisplayName}</strong>
-    //                         <span
-    //                             className={fr.cx("fr-text--xs", "fr-m-0")}
-    //                             style={{
-    //                                 color: fr.colors.decisions.text.mention.grey.default,
-    //                             }}
-    //                         >
-    //                             {user.email}
-    //                         </span>
-    //                     </div>
-    //                 ),
-    //             },
-    //             {
-    //                 children: "Tableau de bord",
-    //                 iconId: "fr-icon-dashboard-3-line",
-    //                 linkProps: routes.dashboard().link,
-    //             },
-    //             {
-    //                 children: "Mon compte",
-    //                 iconId: "fr-icon-user-line",
-    //                 linkProps: routes.my_account().link,
-    //             },
-    //         ]}
-    //         actionButtonProps={{
-    //             children: "Se déconnecter",
-    //             iconId: "fr-icon-logout-box-r-line",
-    //             onClick: async (e) => {
-    //                 e.preventDefault();
-
-    //                 await queryClient.cancelQueries();
-    //                 queryClient.invalidateQueries();
-    //                 queryClient.clear();
-    //                 localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
-
-    //                 window.location.href = SymfonyRouting.generate("cartesgouvfr_security_logout");
-    //             },
-    //         }}
-    //     />
-    // );
+                </>
+            )}
+        </>
+    );
 }

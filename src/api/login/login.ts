@@ -5,311 +5,359 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  MutationFunction,
-  QueryClient,
-  UseMutationOptions,
-  UseMutationResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
-import type {
-  Login,
-  NotConnectedResponse,
-  PostLogin401,
-  PostLogin429,
-  PostLoginBody,
-  PostTokenRefresh401,
-  PostTokenRefreshBody
-} from '../model';
+import type { Login, NotConnectedResponse, PostLogin401, PostLogin429, PostLoginBody, PostTokenRefresh401, PostTokenRefreshBody } from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
+};
 
 export type postLoginResponse200 = {
-  data: Login
-  status: 200
-}
+    data: Login;
+    status: 200;
+};
 
 export type postLoginResponse401 = {
-  data: PostLogin401
-  status: 401
-}
+    data: PostLogin401;
+    status: 401;
+};
 
 export type postLoginResponse429 = {
-  data: PostLogin429
-  status: 429
-}
+    data: PostLogin429;
+    status: 429;
+};
 
-export type postLoginResponseSuccess = (postLoginResponse200) & {
-  headers: Headers;
+export type postLoginResponseSuccess = postLoginResponse200 & {
+    headers: Headers;
 };
 export type postLoginResponseError = (postLoginResponse401 | postLoginResponse429) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type postLoginResponse = (postLoginResponseSuccess | postLoginResponseError)
+export type postLoginResponse = postLoginResponseSuccess | postLoginResponseError;
 
 export const getPostLoginUrl = () => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/login`
-}
+    return `${env.API_EDITEUR_URL}/api/login`;
+};
 
 export const postLogin = async (postLoginBody: PostLoginBody, options?: RequestInit): Promise<postLoginResponse> => {
     const formUrlEncoded = new URLSearchParams();
-formUrlEncoded.append(`username`, postLoginBody.username);
-formUrlEncoded.append(`password`, postLoginBody.password);
+    formUrlEncoded.append(`username`, postLoginBody.username);
+    formUrlEncoded.append(`password`, postLoginBody.password);
 
-  const res = await fetch(getPostLoginUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...options?.headers },
-    body: formUrlEncoded
-  }
-)
+    return fetchWithAuth<postLoginResponse>(getPostLoginUrl(), {
+        ...options,
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", ...options?.headers },
+        body: formUrlEncoded,
+    });
+};
 
+export const getPostLoginQueryKey = (postLoginBody?: PostLoginBody) => {
+    return ["POST", `${env.API_EDITEUR_URL}/api/login`, postLoginBody] as const;
+};
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+export const getPostLoginQueryOptions = <TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    postLoginBody: PostLoginBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const data: postLoginResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as postLoginResponse
+    const queryKey = queryOptions?.queryKey ?? getPostLoginQueryKey(postLoginBody);
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof postLogin>>> = ({ signal }) => postLogin(postLoginBody, { signal, ...requestOptions });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
+
+export type PostLoginQueryResult = NonNullable<Awaited<ReturnType<typeof postLogin>>>;
+export type PostLoginQueryError = PostLogin401 | PostLogin429;
+
+export function usePostLogin<TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    postLoginBody: PostLoginBody,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof postLogin>>, TError, Awaited<ReturnType<typeof postLogin>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostLogin<TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    postLoginBody: PostLoginBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof postLogin>>, TError, Awaited<ReturnType<typeof postLogin>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostLogin<TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    postLoginBody: PostLoginBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePostLogin<TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    postLoginBody: PostLoginBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPostLoginQueryOptions(postLoginBody, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const prefetchPostLoginQuery = async <TData = Awaited<ReturnType<typeof postLogin>>, TError = PostLogin401 | PostLogin429>(
+    queryClient: QueryClient,
+    postLoginBody: PostLoginBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogin>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPostLoginQueryOptions(postLoginBody, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
+    return queryClient;
+};
 
-
-export const getPostLoginMutationOptions = <TError = PostLogin401 | PostLogin429,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: PostLoginBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: PostLoginBody}, TContext> => {
-
-const mutationKey = ['postLogin'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, {data: PostLoginBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postLogin(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postLogin>>>
-    export type PostLoginMutationBody = PostLoginBody
-    export type PostLoginMutationError = PostLogin401 | PostLogin429
-
-    export const usePostLogin = <TError = PostLogin401 | PostLogin429,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError,{data: PostLoginBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postLogin>>,
-        TError,
-        {data: PostLoginBody},
-        TContext
-      > => {
-      return useMutation(getPostLoginMutationOptions(options), queryClient);
-    }
-    export type postTokenRefreshResponse200 = {
-  data: Login
-  status: 200
-}
+export type postTokenRefreshResponse200 = {
+    data: Login;
+    status: 200;
+};
 
 export type postTokenRefreshResponse401 = {
-  data: PostTokenRefresh401
-  status: 401
-}
-
-export type postTokenRefreshResponseSuccess = (postTokenRefreshResponse200) & {
-  headers: Headers;
-};
-export type postTokenRefreshResponseError = (postTokenRefreshResponse401) & {
-  headers: Headers;
+    data: PostTokenRefresh401;
+    status: 401;
 };
 
-export type postTokenRefreshResponse = (postTokenRefreshResponseSuccess | postTokenRefreshResponseError)
+export type postTokenRefreshResponseSuccess = postTokenRefreshResponse200 & {
+    headers: Headers;
+};
+export type postTokenRefreshResponseError = postTokenRefreshResponse401 & {
+    headers: Headers;
+};
+
+export type postTokenRefreshResponse = postTokenRefreshResponseSuccess | postTokenRefreshResponseError;
 
 export const getPostTokenRefreshUrl = () => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/token/refresh`
-}
+    return `${env.API_EDITEUR_URL}/api/token/refresh`;
+};
 
 export const postTokenRefresh = async (postTokenRefreshBody: PostTokenRefreshBody, options?: RequestInit): Promise<postTokenRefreshResponse> => {
     const formUrlEncoded = new URLSearchParams();
-formUrlEncoded.append(`refresh_token`, postTokenRefreshBody.refresh_token);
+    formUrlEncoded.append(`refresh_token`, postTokenRefreshBody.refresh_token);
 
-  const res = await fetch(getPostTokenRefreshUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...options?.headers },
-    body: formUrlEncoded
-  }
-)
+    return fetchWithAuth<postTokenRefreshResponse>(getPostTokenRefreshUrl(), {
+        ...options,
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded", ...options?.headers },
+        body: formUrlEncoded,
+    });
+};
 
+export const getPostTokenRefreshQueryKey = (postTokenRefreshBody?: PostTokenRefreshBody) => {
+    return ["POST", `${env.API_EDITEUR_URL}/api/token/refresh`, postTokenRefreshBody] as const;
+};
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+export const getPostTokenRefreshQueryOptions = <TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const data: postTokenRefreshResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as postTokenRefreshResponse
+    const queryKey = queryOptions?.queryKey ?? getPostTokenRefreshQueryKey(postTokenRefreshBody);
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof postTokenRefresh>>> = ({ signal }) =>
+        postTokenRefresh(postTokenRefreshBody, { signal, ...requestOptions });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
+
+export type PostTokenRefreshQueryResult = NonNullable<Awaited<ReturnType<typeof postTokenRefresh>>>;
+export type PostTokenRefreshQueryError = PostTokenRefresh401;
+
+export function usePostTokenRefresh<TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, Awaited<ReturnType<typeof postTokenRefresh>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostTokenRefresh<TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, Awaited<ReturnType<typeof postTokenRefresh>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostTokenRefresh<TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePostTokenRefresh<TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPostTokenRefreshQueryOptions(postTokenRefreshBody, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const prefetchPostTokenRefreshQuery = async <TData = Awaited<ReturnType<typeof postTokenRefresh>>, TError = PostTokenRefresh401>(
+    queryClient: QueryClient,
+    postTokenRefreshBody: PostTokenRefreshBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPostTokenRefreshQueryOptions(postTokenRefreshBody, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
+    return queryClient;
+};
 
-
-export const getPostTokenRefreshMutationOptions = <TError = PostTokenRefresh401,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError,{data: PostTokenRefreshBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError,{data: PostTokenRefreshBody}, TContext> => {
-
-const mutationKey = ['postTokenRefresh'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postTokenRefresh>>, {data: PostTokenRefreshBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postTokenRefresh(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostTokenRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof postTokenRefresh>>>
-    export type PostTokenRefreshMutationBody = PostTokenRefreshBody
-    export type PostTokenRefreshMutationError = PostTokenRefresh401
-
-    export const usePostTokenRefresh = <TError = PostTokenRefresh401,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError,{data: PostTokenRefreshBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postTokenRefresh>>,
-        TError,
-        {data: PostTokenRefreshBody},
-        TContext
-      > => {
-      return useMutation(getPostTokenRefreshMutationOptions(options), queryClient);
-    }
-    export type postLogoutResponse200 = {
-  data: void
-  status: 200
-}
+export type postLogoutResponse200 = {
+    data: void;
+    status: 200;
+};
 
 export type postLogoutResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
-
-export type postLogoutResponseSuccess = (postLogoutResponse200) & {
-  headers: Headers;
-};
-export type postLogoutResponseError = (postLogoutResponse401) & {
-  headers: Headers;
+    data: NotConnectedResponse;
+    status: 401;
 };
 
-export type postLogoutResponse = (postLogoutResponseSuccess | postLogoutResponseError)
+export type postLogoutResponseSuccess = postLogoutResponse200 & {
+    headers: Headers;
+};
+export type postLogoutResponseError = postLogoutResponse401 & {
+    headers: Headers;
+};
+
+export type postLogoutResponse = postLogoutResponseSuccess | postLogoutResponseError;
 
 export const getPostLogoutUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/logout`;
+};
 
+export const postLogout = async (options?: RequestInit): Promise<postLogoutResponse> => {
+    return fetchWithAuth<postLogoutResponse>(getPostLogoutUrl(), {
+        ...options,
+        method: "POST",
+    });
+};
 
+export const getPostLogoutQueryKey = () => {
+    return ["POST", `${env.API_EDITEUR_URL}/api/logout`] as const;
+};
 
+export const getPostLogoutQueryOptions = <TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  return `${env.API_EDITEUR_URL}/api/logout`
+    const queryKey = queryOptions?.queryKey ?? getPostLogoutQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof postLogout>>> = ({ signal }) => postLogout({ signal, ...requestOptions });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
+
+export type PostLogoutQueryResult = NonNullable<Awaited<ReturnType<typeof postLogout>>>;
+export type PostLogoutQueryError = NotConnectedResponse;
+
+export function usePostLogout<TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof postLogout>>, TError, Awaited<ReturnType<typeof postLogout>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostLogout<TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof postLogout>>, TError, Awaited<ReturnType<typeof postLogout>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostLogout<TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePostLogout<TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPostLogoutQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const postLogout = async ( options?: RequestInit): Promise<postLogoutResponse> => {
+export const prefetchPostLogoutQuery = async <TData = Awaited<ReturnType<typeof postLogout>>, TError = NotConnectedResponse>(
+    queryClient: QueryClient,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postLogout>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPostLogoutQueryOptions(options);
 
-  const res = await fetch(getPostLogoutUrl(),
-  {
-    ...options,
-    method: 'POST'
+    await queryClient.prefetchQuery(queryOptions);
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: postLogoutResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as postLogoutResponse
-}
-
-
-
-
-
-export const getPostLogoutMutationOptions = <TError = NotConnectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogout>>, TError,void, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof postLogout>>, TError,void, TContext> => {
-
-const mutationKey = ['postLogout'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogout>>, void> = () => {
-
-
-          return  postLogout(fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postLogout>>>
-
-    export type PostLogoutMutationError = NotConnectedResponse
-
-    export const usePostLogout = <TError = NotConnectedResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLogout>>, TError,void, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postLogout>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getPostLogoutMutationOptions(options), queryClient);
-    }
+    return queryClient;
+};

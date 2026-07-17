@@ -5,1314 +5,1346 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
 import type {
-  BadRequestResponse,
-  DeletedResponse,
-  ForbiddenResponse,
-  GetMapsParams,
-  GetMapsUsersParams,
-  InvalidResponse,
-  MapResearch,
-  MapView,
-  NotConnectedResponse,
-  NotFoundResponse,
-  PartialContentResponse,
-  PatchMapByEditIdBody,
-  PostMapBody,
-  PostMapFileByEditIdBody
-} from '../model';
+    BadRequestResponse,
+    DeletedResponse,
+    ForbiddenResponse,
+    GetMapsParams,
+    GetMapsUsersParams,
+    InvalidResponse,
+    MapResearch,
+    MapView,
+    NotConnectedResponse,
+    NotFoundResponse,
+    PartialContentResponse,
+    PatchMapByEditIdBody,
+    PostMapBody,
+    PostMapFileByEditIdBody,
+} from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
-  for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
-    Object.defineProperty(result, key, {
-      enumerable: true,
-      configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
-    });
-  }
-  return result;
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
 };
 
 export type getMapsResponse200 = {
-  data: MapResearch
-  status: 200
-}
+    data: MapResearch;
+    status: 200;
+};
 
 export type getMapsResponse206 = {
-  data: PartialContentResponse
-  status: 206
-}
+    data: PartialContentResponse;
+    status: 206;
+};
 
 export type getMapsResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
 export type getMapsResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
+    data: ForbiddenResponse;
+    status: 403;
+};
 
 export type getMapsResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
 export type getMapsResponseSuccess = (getMapsResponse200 | getMapsResponse206) & {
-  headers: Headers;
+    headers: Headers;
 };
 export type getMapsResponseError = (getMapsResponse401 | getMapsResponse403 | getMapsResponse404) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type getMapsResponse = (getMapsResponseSuccess | getMapsResponseError)
+export type getMapsResponse = getMapsResponseSuccess | getMapsResponseError;
 
-export const getGetMapsUrl = (params?: GetMapsParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getGetMapsUrl = (params?: GetMapsParams) => {
+    const normalizedParams = new URLSearchParams();
 
-  Object.entries(params || {}).forEach(([key, value]) => {
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+            normalizedParams.append(key, value === null ? "null" : String(value));
+        }
+    });
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
+    const stringifiedParams = normalizedParams.toString();
 
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps`
-}
+    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps`;
+};
 
 export const getMaps = async (params?: GetMapsParams, options?: RequestInit): Promise<getMapsResponse> => {
+    return fetchWithAuth<getMapsResponse>(getGetMapsUrl(params), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapsUrl(params),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapsQueryKey = (params?: GetMapsParams) => {
+    return [`${env.API_EDITEUR_URL}/api/maps`, ...(params ? [params] : [])] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapsResponse
-}
-
-
-
-
-
-export const getGetMapsQueryKey = (params?: GetMapsParams,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetMapsQueryOptions = <TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(params?: GetMapsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>, fetch?: RequestInit}
+export const getGetMapsQueryOptions = <TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
+    params?: GetMapsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapsQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapsQueryKey(params);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaps>>> = ({ signal }) => getMaps(params, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaps>>> = ({ signal }) => getMaps(params, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMapsQueryResult = NonNullable<Awaited<ReturnType<typeof getMaps>>>
-export type GetMapsQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse
-
+export type GetMapsQueryResult = NonNullable<Awaited<ReturnType<typeof getMaps>>>;
+export type GetMapsQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
 export function useGetMaps<TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
- params: undefined |  GetMapsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMaps>>,
-          TError,
-          Awaited<ReturnType<typeof getMaps>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: undefined | GetMapsParams,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMaps>>, TError, Awaited<ReturnType<typeof getMaps>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMaps<TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
- params?: GetMapsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMaps>>,
-          TError,
-          Awaited<ReturnType<typeof getMaps>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: GetMapsParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMaps>>, TError, Awaited<ReturnType<typeof getMaps>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMaps<TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
- params?: GetMapsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: GetMapsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMaps<TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
- params?: GetMapsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    params?: GetMapsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapsQueryOptions(params, options);
 
-  const queryOptions = getGetMapsQueryOptions(params,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMapsQuery = async <TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
- queryClient: QueryClient, params?: GetMapsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    params?: GetMapsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaps>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapsQueryOptions(params, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMapsQueryOptions(params,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type postMapResponse201 = {
-  data: MapView
-  status: 201
-}
+    data: MapView;
+    status: 201;
+};
 
 export type postMapResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+    data: BadRequestResponse;
+    status: 400;
+};
 
 export type postMapResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
 export type postMapResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
-export type postMapResponseSuccess = (postMapResponse201) & {
-  headers: Headers;
+export type postMapResponseSuccess = postMapResponse201 & {
+    headers: Headers;
 };
 export type postMapResponseError = (postMapResponse400 | postMapResponse401 | postMapResponse404) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type postMapResponse = (postMapResponseSuccess | postMapResponseError)
+export type postMapResponse = postMapResponseSuccess | postMapResponseError;
 
 export const getPostMapUrl = () => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps`
-}
+    return `${env.API_EDITEUR_URL}/api/maps`;
+};
 
 export const postMap = async (postMapBody: PostMapBody, options?: RequestInit): Promise<postMapResponse> => {
     const formData = new FormData();
-formData.append(`carte`, JSON.stringify(postMapBody.carte));
-formData.append(`file`, postMapBody.file);
+    formData.append(`carte`, JSON.stringify(postMapBody.carte));
+    formData.append(`file`, postMapBody.file);
 
-  const res = await fetch(getPostMapUrl(),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body: formData
-  }
-)
+    return fetchWithAuth<postMapResponse>(getPostMapUrl(), {
+        ...options,
+        method: "POST",
+        body: formData,
+    });
+};
 
+export const getPostMapQueryKey = (postMapBody?: PostMapBody) => {
+    return ["POST", `${env.API_EDITEUR_URL}/api/maps`, postMapBody] as const;
+};
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+export const getPostMapQueryOptions = <TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    postMapBody: PostMapBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const data: postMapResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as postMapResponse
+    const queryKey = queryOptions?.queryKey ?? getPostMapQueryKey(postMapBody);
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof postMap>>> = ({ signal }) => postMap(postMapBody, { signal, ...requestOptions });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
+
+export type PostMapQueryResult = NonNullable<Awaited<ReturnType<typeof postMap>>>;
+export type PostMapQueryError = BadRequestResponse | NotConnectedResponse | NotFoundResponse;
+
+export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    postMapBody: PostMapBody,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof postMap>>, TError, Awaited<ReturnType<typeof postMap>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    postMapBody: PostMapBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof postMap>>, TError, Awaited<ReturnType<typeof postMap>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    postMapBody: PostMapBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    postMapBody: PostMapBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPostMapQueryOptions(postMapBody, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const prefetchPostMapQuery = async <TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
+    queryClient: QueryClient,
+    postMapBody: PostMapBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPostMapQueryOptions(postMapBody, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
+    return queryClient;
+};
 
-
-export const getPostMapMutationOptions = <TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError,{data: PostMapBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError,{data: PostMapBody}, TContext> => {
-
-const mutationKey = ['postMap'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMap>>, {data: PostMapBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  postMap(data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostMapMutationResult = NonNullable<Awaited<ReturnType<typeof postMap>>>
-    export type PostMapMutationBody = PostMapBody
-    export type PostMapMutationError = BadRequestResponse | NotConnectedResponse | NotFoundResponse
-
-    export const usePostMap = <TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError,{data: PostMapBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postMap>>,
-        TError,
-        {data: PostMapBody},
-        TContext
-      > => {
-      return useMutation(getPostMapMutationOptions(options), queryClient);
-    }
-    export type getMapsUsersResponse200 = {
-  data: string[]
-  status: 200
-}
+export type getMapsUsersResponse200 = {
+    data: string[];
+    status: 200;
+};
 
 export type getMapsUsersResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getMapsUsersResponseSuccess = (getMapsUsersResponse200) & {
-  headers: Headers;
-};
-export type getMapsUsersResponseError = (getMapsUsersResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type getMapsUsersResponse = (getMapsUsersResponseSuccess | getMapsUsersResponseError)
+export type getMapsUsersResponseSuccess = getMapsUsersResponse200 & {
+    headers: Headers;
+};
+export type getMapsUsersResponseError = getMapsUsersResponse404 & {
+    headers: Headers;
+};
 
-export const getGetMapsUsersUrl = (params?: GetMapsUsersParams,) => {
-  const normalizedParams = new URLSearchParams();
+export type getMapsUsersResponse = getMapsUsersResponseSuccess | getMapsUsersResponseError;
 
-  Object.entries(params || {}).forEach(([key, value]) => {
+export const getGetMapsUsersUrl = (params?: GetMapsUsersParams) => {
+    const normalizedParams = new URLSearchParams();
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+            normalizedParams.append(key, value === null ? "null" : String(value));
+        }
+    });
 
-  const stringifiedParams = normalizedParams.toString();
+    const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps/users`
-}
+    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps/users`;
+};
 
 /**
  * Autocompletion des utilisateurs ayant des cartes publiques correspondant aux critères de recherche
  */
 export const getMapsUsers = async (params?: GetMapsUsersParams, options?: RequestInit): Promise<getMapsUsersResponse> => {
+    return fetchWithAuth<getMapsUsersResponse>(getGetMapsUsersUrl(params), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapsUsersUrl(params),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapsUsersQueryKey = (params?: GetMapsUsersParams) => {
+    return [`${env.API_EDITEUR_URL}/api/maps/users`, ...(params ? [params] : [])] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapsUsersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapsUsersResponse
-}
-
-
-
-
-
-export const getGetMapsUsersQueryKey = (params?: GetMapsUsersParams,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps/users`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getGetMapsUsersQueryOptions = <TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(params?: GetMapsUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>, fetch?: RequestInit}
+export const getGetMapsUsersQueryOptions = <TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
+    params?: GetMapsUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapsUsersQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapsUsersQueryKey(params);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapsUsers>>> = ({ signal }) => getMapsUsers(params, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapsUsers>>> = ({ signal }) => getMapsUsers(params, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMapsUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getMapsUsers>>>
-export type GetMapsUsersQueryError = NotFoundResponse
-
+export type GetMapsUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getMapsUsers>>>;
+export type GetMapsUsersQueryError = NotFoundResponse;
 
 export function useGetMapsUsers<TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
- params: undefined |  GetMapsUsersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapsUsers>>,
-          TError,
-          Awaited<ReturnType<typeof getMapsUsers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params: undefined | GetMapsUsersParams,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, Awaited<ReturnType<typeof getMapsUsers>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapsUsers<TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
- params?: GetMapsUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapsUsers>>,
-          TError,
-          Awaited<ReturnType<typeof getMapsUsers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: GetMapsUsersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, Awaited<ReturnType<typeof getMapsUsers>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapsUsers<TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
- params?: GetMapsUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    params?: GetMapsUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMapsUsers<TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
- params?: GetMapsUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    params?: GetMapsUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapsUsersQueryOptions(params, options);
 
-  const queryOptions = getGetMapsUsersQueryOptions(params,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMapsUsersQuery = async <TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
- queryClient: QueryClient, params?: GetMapsUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    params?: GetMapsUsersParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapsUsers>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapsUsersQueryOptions(params, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMapsUsersQueryOptions(params,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getMapByViewIdResponse200 = {
-  data: MapView
-  status: 200
-}
+    data: MapView;
+    status: 200;
+};
 
 export type getMapByViewIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
 export type getMapByViewIdResponse451 = {
-  data: InvalidResponse
-  status: 451
-}
+    data: InvalidResponse;
+    status: 451;
+};
 
-export type getMapByViewIdResponseSuccess = (getMapByViewIdResponse200) & {
-  headers: Headers;
+export type getMapByViewIdResponseSuccess = getMapByViewIdResponse200 & {
+    headers: Headers;
 };
 export type getMapByViewIdResponseError = (getMapByViewIdResponse404 | getMapByViewIdResponse451) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type getMapByViewIdResponse = (getMapByViewIdResponseSuccess | getMapByViewIdResponseError)
+export type getMapByViewIdResponse = getMapByViewIdResponseSuccess | getMapByViewIdResponseError;
 
-export const getGetMapByViewIdUrl = (viewId: number | string,) => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${viewId}`
-}
+export const getGetMapByViewIdUrl = (viewId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${viewId}`;
+};
 
 /**
  * Récupérer les metadata de la carte par son identifiant de visualisation
  */
 export const getMapByViewId = async (viewId: number | string, options?: RequestInit): Promise<getMapByViewIdResponse> => {
+    return fetchWithAuth<getMapByViewIdResponse>(getGetMapByViewIdUrl(viewId), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapByViewIdUrl(viewId),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapByViewIdQueryKey = (viewId: number | string) => {
+    return [`${env.API_EDITEUR_URL}/api/maps/${viewId}`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapByViewIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapByViewIdResponse
-}
-
-
-
-
-
-export const getGetMapByViewIdQueryKey = (viewId: number | string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps/${viewId}`
-    ] as const;
-    }
-
-
-export const getGetMapByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>, fetch?: RequestInit}
+export const getGetMapByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
+    viewId: number | string,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapByViewIdQueryKey(viewId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapByViewIdQueryKey(viewId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapByViewId>>> = ({ signal }) => getMapByViewId(viewId, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: viewId !== null && viewId !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getMapByViewId>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapByViewId>>> = ({ signal }) => getMapByViewId(viewId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: viewId !== null && viewId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMapByViewIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapByViewId>>>
-export type GetMapByViewIdQueryError = NotFoundResponse | InvalidResponse
-
+export type GetMapByViewIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapByViewId>>>;
+export type GetMapByViewIdQueryError = NotFoundResponse | InvalidResponse;
 
 export function useGetMapByViewId<TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapByViewId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapByViewId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, Awaited<ReturnType<typeof getMapByViewId>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapByViewId<TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapByViewId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapByViewId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, Awaited<ReturnType<typeof getMapByViewId>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapByViewId<TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMapByViewId<TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    viewId: number | string,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapByViewIdQueryOptions(viewId, options);
 
-  const queryOptions = getGetMapByViewIdQueryOptions(viewId,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMapByViewIdQuery = async <TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- queryClient: QueryClient, viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    viewId: number | string,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapByViewId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapByViewIdQueryOptions(viewId, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMapByViewIdQueryOptions(viewId,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getMapEditByEditIdResponse200 = {
-  data: MapView
-  status: 200
-}
+    data: MapView;
+    status: 200;
+};
 
 export type getMapEditByEditIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
 export type getMapEditByEditIdResponse451 = {
-  data: InvalidResponse
-  status: 451
-}
+    data: InvalidResponse;
+    status: 451;
+};
 
-export type getMapEditByEditIdResponseSuccess = (getMapEditByEditIdResponse200) & {
-  headers: Headers;
+export type getMapEditByEditIdResponseSuccess = getMapEditByEditIdResponse200 & {
+    headers: Headers;
 };
 export type getMapEditByEditIdResponseError = (getMapEditByEditIdResponse404 | getMapEditByEditIdResponse451) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type getMapEditByEditIdResponse = (getMapEditByEditIdResponseSuccess | getMapEditByEditIdResponseError)
+export type getMapEditByEditIdResponse = getMapEditByEditIdResponseSuccess | getMapEditByEditIdResponseError;
 
-export const getGetMapEditByEditIdUrl = (editId: number | string,) => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit`
-}
+export const getGetMapEditByEditIdUrl = (editId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit`;
+};
 
 /**
  * Récupérer les metadata de la carte par son identifiant d'édition
  */
 export const getMapEditByEditId = async (editId: number | string, options?: RequestInit): Promise<getMapEditByEditIdResponse> => {
+    return fetchWithAuth<getMapEditByEditIdResponse>(getGetMapEditByEditIdUrl(editId), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapEditByEditIdUrl(editId),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapEditByEditIdQueryKey = (editId: number | string) => {
+    return [`${env.API_EDITEUR_URL}/api/maps/${editId}/edit`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapEditByEditIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapEditByEditIdResponse
-}
-
-
-
-
-
-export const getGetMapEditByEditIdQueryKey = (editId: number | string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps/${editId}/edit`
-    ] as const;
+export const getGetMapEditByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
-
-
-export const getGetMapEditByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>, fetch?: RequestInit}
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapEditByEditIdQueryKey(editId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapEditByEditIdQueryKey(editId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapEditByEditId>>> = ({ signal }) => getMapEditByEditId(editId, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getMapEditByEditId>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapEditByEditId>>> = ({ signal }) => getMapEditByEditId(editId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMapEditByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapEditByEditId>>>
-export type GetMapEditByEditIdQueryError = NotFoundResponse | InvalidResponse
-
+export type GetMapEditByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapEditByEditId>>>;
+export type GetMapEditByEditIdQueryError = NotFoundResponse | InvalidResponse;
 
 export function useGetMapEditByEditId<TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapEditByEditId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapEditByEditId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    editId: number | string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, Awaited<ReturnType<typeof getMapEditByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapEditByEditId<TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapEditByEditId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapEditByEditId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, Awaited<ReturnType<typeof getMapEditByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapEditByEditId<TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMapEditByEditId<TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapEditByEditIdQueryOptions(editId, options);
 
-  const queryOptions = getGetMapEditByEditIdQueryOptions(editId,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMapEditByEditIdQuery = async <TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- queryClient: QueryClient, editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapEditByEditIdQueryOptions(editId, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMapEditByEditIdQueryOptions(editId,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getMapFileByViewIdResponse200 = {
-  data: unknown
-  status: 200
-}
+    data: unknown;
+    status: 200;
+};
 
 export type getMapFileByViewIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
 export type getMapFileByViewIdResponse451 = {
-  data: InvalidResponse
-  status: 451
-}
+    data: InvalidResponse;
+    status: 451;
+};
 
-export type getMapFileByViewIdResponseSuccess = (getMapFileByViewIdResponse200) & {
-  headers: Headers;
+export type getMapFileByViewIdResponseSuccess = getMapFileByViewIdResponse200 & {
+    headers: Headers;
 };
 export type getMapFileByViewIdResponseError = (getMapFileByViewIdResponse404 | getMapFileByViewIdResponse451) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type getMapFileByViewIdResponse = (getMapFileByViewIdResponseSuccess | getMapFileByViewIdResponseError)
+export type getMapFileByViewIdResponse = getMapFileByViewIdResponseSuccess | getMapFileByViewIdResponseError;
 
-export const getGetMapFileByViewIdUrl = (viewId: number | string,) => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${viewId}/file`
-}
+export const getGetMapFileByViewIdUrl = (viewId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${viewId}/file`;
+};
 
 /**
  * Récupérer les data de la carte par son identifiant de visualisation
  */
 export const getMapFileByViewId = async (viewId: number | string, options?: RequestInit): Promise<getMapFileByViewIdResponse> => {
+    return fetchWithAuth<getMapFileByViewIdResponse>(getGetMapFileByViewIdUrl(viewId), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapFileByViewIdUrl(viewId),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapFileByViewIdQueryKey = (viewId: number | string) => {
+    return [`${env.API_EDITEUR_URL}/api/maps/${viewId}/file`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapFileByViewIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapFileByViewIdResponse
-}
-
-
-
-
-
-export const getGetMapFileByViewIdQueryKey = (viewId: number | string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps/${viewId}/file`
-    ] as const;
+export const getGetMapFileByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
-
-
-export const getGetMapFileByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>, fetch?: RequestInit}
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapFileByViewIdQueryKey(viewId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapFileByViewIdQueryKey(viewId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapFileByViewId>>> = ({ signal }) => getMapFileByViewId(viewId, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: viewId !== null && viewId !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getMapFileByViewId>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapFileByViewId>>> = ({ signal }) => getMapFileByViewId(viewId, { signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: viewId !== null && viewId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetMapFileByViewIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapFileByViewId>>>
-export type GetMapFileByViewIdQueryError = NotFoundResponse | InvalidResponse
-
+export type GetMapFileByViewIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapFileByViewId>>>;
+export type GetMapFileByViewIdQueryError = NotFoundResponse | InvalidResponse;
 
 export function useGetMapFileByViewId<TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapFileByViewId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapFileByViewId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, Awaited<ReturnType<typeof getMapFileByViewId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapFileByViewId<TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapFileByViewId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapFileByViewId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, Awaited<ReturnType<typeof getMapFileByViewId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetMapFileByViewId<TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetMapFileByViewId<TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapFileByViewIdQueryOptions(viewId, options);
 
-  const queryOptions = getGetMapFileByViewIdQueryOptions(viewId,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetMapFileByViewIdQuery = async <TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
- queryClient: QueryClient, viewId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    viewId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByViewId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapFileByViewIdQueryOptions(viewId, options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetMapFileByViewIdQueryOptions(viewId,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getMapEditFileByEditIdResponse200 = {
-  data: unknown
-  status: 200
-}
+    data: unknown;
+    status: 200;
+};
 
 export type getMapEditFileByEditIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
 export type getMapEditFileByEditIdResponse451 = {
-  data: InvalidResponse
-  status: 451
-}
+    data: InvalidResponse;
+    status: 451;
+};
 
-export type getMapEditFileByEditIdResponseSuccess = (getMapEditFileByEditIdResponse200) & {
-  headers: Headers;
+export type getMapEditFileByEditIdResponseSuccess = getMapEditFileByEditIdResponse200 & {
+    headers: Headers;
 };
 export type getMapEditFileByEditIdResponseError = (getMapEditFileByEditIdResponse404 | getMapEditFileByEditIdResponse451) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type getMapEditFileByEditIdResponse = (getMapEditFileByEditIdResponseSuccess | getMapEditFileByEditIdResponseError)
+export type getMapEditFileByEditIdResponse = getMapEditFileByEditIdResponseSuccess | getMapEditFileByEditIdResponseError;
 
-export const getGetMapEditFileByEditIdUrl = (editId: number | string,) => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`
-}
+export const getGetMapEditFileByEditIdUrl = (editId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`;
+};
 
 /**
  * Récupérer les data de la carte par son identifiant d'édition
  */
 export const getMapEditFileByEditId = async (editId: number | string, options?: RequestInit): Promise<getMapEditFileByEditIdResponse> => {
+    return fetchWithAuth<getMapEditFileByEditIdResponse>(getGetMapEditFileByEditIdUrl(editId), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetMapEditFileByEditIdUrl(editId),
-  {
-    ...options,
-    method: 'GET'
+export const getGetMapEditFileByEditIdQueryKey = (editId: number | string) => {
+    return [`${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getMapEditFileByEditIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getMapEditFileByEditIdResponse
-}
-
-
-
-
-
-export const getGetMapEditFileByEditIdQueryKey = (editId: number | string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`
-    ] as const;
+export const getGetMapEditFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
-
-
-export const getGetMapEditFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>, fetch?: RequestInit}
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetMapEditFileByEditIdQueryKey(editId);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetMapEditFileByEditIdQueryKey(editId);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapEditFileByEditId>>> = ({ signal }) =>
+        getMapEditFileByEditId(editId, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getMapEditFileByEditId>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetMapEditFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapEditFileByEditId>>>;
+export type GetMapEditFileByEditIdQueryError = NotFoundResponse | InvalidResponse;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapEditFileByEditId>>> = ({ signal }) => getMapEditFileByEditId(editId, { signal, ...fetchOptions });
+export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, Awaited<ReturnType<typeof getMapEditFileByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, Awaited<ReturnType<typeof getMapEditFileByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
+export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId, options);
 
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-
-
-   return  { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
-export type GetMapEditFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapEditFileByEditId>>>
-export type GetMapEditFileByEditIdQueryError = NotFoundResponse | InvalidResponse
+export const prefetchGetMapEditFileByEditIdQuery = async <
+    TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>,
+    TError = NotFoundResponse | InvalidResponse,
+>(
+    queryClient: QueryClient,
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapEditFileByEditId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapEditFileByEditId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getMapEditFileByEditId>>,
-          TError,
-          Awaited<ReturnType<typeof getMapEditFileByEditId>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchGetMapEditFileByEditIdQuery = async <TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
- queryClient: QueryClient, editId: number | string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>, fetch?: RequestInit}
-
-  ): Promise<QueryClient> => {
-
-  const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type deleteMapByEditIdResponse204 = {
-  data: DeletedResponse
-  status: 204
-}
+    data: DeletedResponse;
+    status: 204;
+};
 
 export type deleteMapByEditIdResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
 export type deleteMapByEditIdResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
+    data: ForbiddenResponse;
+    status: 403;
+};
 
 export type deleteMapByEditIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
+    data: NotFoundResponse;
+    status: 404;
+};
 
-export type deleteMapByEditIdResponseSuccess = (deleteMapByEditIdResponse204) & {
-  headers: Headers;
+export type deleteMapByEditIdResponseSuccess = deleteMapByEditIdResponse204 & {
+    headers: Headers;
 };
 export type deleteMapByEditIdResponseError = (deleteMapByEditIdResponse401 | deleteMapByEditIdResponse403 | deleteMapByEditIdResponse404) & {
-  headers: Headers;
+    headers: Headers;
 };
 
-export type deleteMapByEditIdResponse = (deleteMapByEditIdResponseSuccess | deleteMapByEditIdResponseError)
+export type deleteMapByEditIdResponse = deleteMapByEditIdResponseSuccess | deleteMapByEditIdResponseError;
 
-export const getDeleteMapByEditIdUrl = (editId: number | string,) => {
-
-
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${editId}`
-}
+export const getDeleteMapByEditIdUrl = (editId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${editId}`;
+};
 
 export const deleteMapByEditId = async (editId: number | string, options?: RequestInit): Promise<deleteMapByEditIdResponse> => {
+    return fetchWithAuth<deleteMapByEditIdResponse>(getDeleteMapByEditIdUrl(editId), {
+        ...options,
+        method: "DELETE",
+    });
+};
 
-  const res = await fetch(getDeleteMapByEditIdUrl(editId),
-  {
-    ...options,
-    method: 'DELETE'
+export const getDeleteMapByEditIdQueryKey = (editId: number | string) => {
+    return ["DELETE", `${env.API_EDITEUR_URL}/api/maps/${editId}`] as const;
+};
 
+export const getDeleteMapByEditIdQueryOptions = <
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  }
-)
+    const queryKey = queryOptions?.queryKey ?? getDeleteMapByEditIdQueryKey(editId);
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deleteMapByEditId>>> = ({ signal }) => deleteMapByEditId(editId, { signal, ...requestOptions });
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: deleteMapByEditIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as deleteMapByEditIdResponse
-}
-
-
-
-
-
-export const getDeleteMapByEditIdMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError,{editId: number | string}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError,{editId: number | string}, TContext> => {
-
-const mutationKey = ['deleteMapByEditId'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMapByEditId>>, {editId: number | string}> = (props) => {
-          const {editId} = props ?? {};
-
-          return  deleteMapByEditId(editId,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeleteMapByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMapByEditId>>>
-
-    export type DeleteMapByEditIdMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse
-
-    export const useDeleteMapByEditId = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError,{editId: number | string}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
+    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof deleteMapByEditId>>,
         TError,
-        {editId: number | string},
-        TContext
-      > => {
-      return useMutation(getDeleteMapByEditIdMutationOptions(options), queryClient);
-    }
-    export type patchMapByEditIdResponse200 = {
-  data: MapView
-  status: 200
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type DeleteMapByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof deleteMapByEditId>>>;
+export type DeleteMapByEditIdQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+
+export function useDeleteMapByEditId<
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, Awaited<ReturnType<typeof deleteMapByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useDeleteMapByEditId<
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, Awaited<ReturnType<typeof deleteMapByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useDeleteMapByEditId<
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useDeleteMapByEditId<
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getDeleteMapByEditIdQueryOptions(editId, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const prefetchDeleteMapByEditIdQuery = async <
+    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
+    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    queryClient: QueryClient,
+    editId: number | string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getDeleteMapByEditIdQueryOptions(editId, options);
+
+    await queryClient.prefetchQuery(queryOptions);
+
+    return queryClient;
+};
+
+export type patchMapByEditIdResponse200 = {
+    data: MapView;
+    status: 200;
+};
 
 export type patchMapByEditIdResponse400 = {
-  data: BadRequestResponse
-  status: 400
-}
+    data: BadRequestResponse;
+    status: 400;
+};
 
 export type patchMapByEditIdResponse401 = {
-  data: NotConnectedResponse
-  status: 401
-}
+    data: NotConnectedResponse;
+    status: 401;
+};
 
 export type patchMapByEditIdResponse403 = {
-  data: ForbiddenResponse
-  status: 403
-}
+    data: ForbiddenResponse;
+    status: 403;
+};
 
 export type patchMapByEditIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type patchMapByEditIdResponseSuccess = (patchMapByEditIdResponse200) & {
-  headers: Headers;
-};
-export type patchMapByEditIdResponseError = (patchMapByEditIdResponse400 | patchMapByEditIdResponse401 | patchMapByEditIdResponse403 | patchMapByEditIdResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type patchMapByEditIdResponse = (patchMapByEditIdResponseSuccess | patchMapByEditIdResponseError)
+export type patchMapByEditIdResponseSuccess = patchMapByEditIdResponse200 & {
+    headers: Headers;
+};
+export type patchMapByEditIdResponseError = (
+    patchMapByEditIdResponse400 | patchMapByEditIdResponse401 | patchMapByEditIdResponse403 | patchMapByEditIdResponse404
+) & {
+    headers: Headers;
+};
 
-export const getPatchMapByEditIdUrl = (editId: number | string,) => {
+export type patchMapByEditIdResponse = patchMapByEditIdResponseSuccess | patchMapByEditIdResponseError;
 
+export const getPatchMapByEditIdUrl = (editId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${editId}`;
+};
 
+export const patchMapByEditId = async (
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: RequestInit
+): Promise<patchMapByEditIdResponse> => {
+    return fetchWithAuth<patchMapByEditIdResponse>(getPatchMapByEditIdUrl(editId), {
+        ...options,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...options?.headers },
+        body: JSON.stringify(patchMapByEditIdBody),
+    });
+};
 
+export const getPatchMapByEditIdQueryKey = (editId: number | string, patchMapByEditIdBody?: PatchMapByEditIdBody) => {
+    return ["PATCH", `${env.API_EDITEUR_URL}/api/maps/${editId}`, patchMapByEditIdBody] as const;
+};
 
-  return `${env.API_EDITEUR_URL}/api/maps/${editId}`
-}
+export const getPatchMapByEditIdQueryOptions = <
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const patchMapByEditId = async (editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody, options?: RequestInit): Promise<patchMapByEditIdResponse> => {
+    const queryKey = queryOptions?.queryKey ?? getPatchMapByEditIdQueryKey(editId, patchMapByEditIdBody);
 
-  const res = await fetch(getPatchMapByEditIdUrl(editId),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(patchMapByEditIdBody)
-  }
-)
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof patchMapByEditId>>> = ({ signal }) =>
+        patchMapByEditId(editId, patchMapByEditIdBody, { signal, ...requestOptions });
 
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: patchMapByEditIdResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as patchMapByEditIdResponse
-}
-
-
-
-
-
-export const getPatchMapByEditIdMutationOptions = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError,{editId: number | string;data: PatchMapByEditIdBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError,{editId: number | string;data: PatchMapByEditIdBody}, TContext> => {
-
-const mutationKey = ['patchMapByEditId'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchMapByEditId>>, {editId: number | string;data: PatchMapByEditIdBody}> = (props) => {
-          const {editId,data} = props ?? {};
-
-          return  patchMapByEditId(editId,data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PatchMapByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchMapByEditId>>>
-    export type PatchMapByEditIdMutationBody = PatchMapByEditIdBody
-    export type PatchMapByEditIdMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse
-
-    export const usePatchMapByEditId = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError,{editId: number | string;data: PatchMapByEditIdBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
+    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof patchMapByEditId>>,
         TError,
-        {editId: number | string;data: PatchMapByEditIdBody},
-        TContext
-      > => {
-      return useMutation(getPatchMapByEditIdMutationOptions(options), queryClient);
-    }
-    export type postMapFileByEditIdResponse200 = {
-  data: void
-  status: 200
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PatchMapByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof patchMapByEditId>>>;
+export type PatchMapByEditIdQueryError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+
+export function usePatchMapByEditId<
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, Awaited<ReturnType<typeof patchMapByEditId>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePatchMapByEditId<
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, Awaited<ReturnType<typeof patchMapByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePatchMapByEditId<
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePatchMapByEditId<
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPatchMapByEditIdQueryOptions(editId, patchMapByEditIdBody, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const prefetchPatchMapByEditIdQuery = async <
+    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+>(
+    queryClient: QueryClient,
+    editId: number | string,
+    patchMapByEditIdBody: PatchMapByEditIdBody,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getPatchMapByEditIdQueryOptions(editId, patchMapByEditIdBody, options);
+
+    await queryClient.prefetchQuery(queryOptions);
+
+    return queryClient;
+};
+
+export type postMapFileByEditIdResponse200 = {
+    data: void;
+    status: 200;
+};
 
 export type postMapFileByEditIdResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type postMapFileByEditIdResponseSuccess = (postMapFileByEditIdResponse200) & {
-  headers: Headers;
-};
-export type postMapFileByEditIdResponseError = (postMapFileByEditIdResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type postMapFileByEditIdResponse = (postMapFileByEditIdResponseSuccess | postMapFileByEditIdResponseError)
+export type postMapFileByEditIdResponseSuccess = postMapFileByEditIdResponse200 & {
+    headers: Headers;
+};
+export type postMapFileByEditIdResponseError = postMapFileByEditIdResponse404 & {
+    headers: Headers;
+};
 
-export const getPostMapFileByEditIdUrl = (editId: number | string,) => {
+export type postMapFileByEditIdResponse = postMapFileByEditIdResponseSuccess | postMapFileByEditIdResponseError;
 
+export const getPostMapFileByEditIdUrl = (editId: number | string) => {
+    return `${env.API_EDITEUR_URL}/api/maps/${editId}/file`;
+};
 
-
-
-  return `${env.API_EDITEUR_URL}/api/maps/${editId}/file`
-}
-
-export const postMapFileByEditId = async (editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody, options?: RequestInit): Promise<postMapFileByEditIdResponse> => {
+export const postMapFileByEditId = async (
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: RequestInit
+): Promise<postMapFileByEditIdResponse> => {
     const formData = new FormData();
-formData.append(`file`, postMapFileByEditIdBody.file);
+    formData.append(`file`, postMapFileByEditIdBody.file);
 
-  const res = await fetch(getPostMapFileByEditIdUrl(editId),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body: formData
-  }
-)
+    return fetchWithAuth<postMapFileByEditIdResponse>(getPostMapFileByEditIdUrl(editId), {
+        ...options,
+        method: "POST",
+        body: formData,
+    });
+};
 
+export const getPostMapFileByEditIdQueryKey = (editId: number | string, postMapFileByEditIdBody?: PostMapFileByEditIdBody) => {
+    return ["POST", `${env.API_EDITEUR_URL}/api/maps/${editId}/file`, postMapFileByEditIdBody] as const;
+};
 
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+export const getPostMapFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const data: postMapFileByEditIdResponse['data'] = body ? JSON.parse(body) : undefined
-  return { data, status: res.status, headers: res.headers } as postMapFileByEditIdResponse
-}
+    const queryKey = queryOptions?.queryKey ?? getPostMapFileByEditIdQueryKey(editId, postMapFileByEditIdBody);
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof postMapFileByEditId>>> = ({ signal }) =>
+        postMapFileByEditId(editId, postMapFileByEditIdBody, { signal, ...requestOptions });
 
-
-
-
-export const getPostMapFileByEditIdMutationOptions = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError,{editId: number | string;data: PostMapFileByEditIdBody}, TContext>, fetch?: RequestInit}
-): UseMutationOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError,{editId: number | string;data: PostMapFileByEditIdBody}, TContext> => {
-
-const mutationKey = ['postMapFileByEditId'];
-const {mutation: mutationOptions, fetch: fetchOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, fetch: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMapFileByEditId>>, {editId: number | string;data: PostMapFileByEditIdBody}> = (props) => {
-          const {editId,data} = props ?? {};
-
-          return  postMapFileByEditId(editId,data,fetchOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostMapFileByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof postMapFileByEditId>>>
-    export type PostMapFileByEditIdMutationBody = PostMapFileByEditIdBody
-    export type PostMapFileByEditIdMutationError = NotFoundResponse
-
-    export const usePostMapFileByEditId = <TError = NotFoundResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError,{editId: number | string;data: PostMapFileByEditIdBody}, TContext>, fetch?: RequestInit}
- , queryClient?: QueryClient): UseMutationResult<
+    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof postMapFileByEditId>>,
         TError,
-        {editId: number | string;data: PostMapFileByEditIdBody},
-        TContext
-      > => {
-      return useMutation(getPostMapFileByEditIdMutationOptions(options), queryClient);
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PostMapFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof postMapFileByEditId>>>;
+export type PostMapFileByEditIdQueryError = NotFoundResponse;
+
+export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, Awaited<ReturnType<typeof postMapFileByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, Awaited<ReturnType<typeof postMapFileByEditId>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getPostMapFileByEditIdQueryOptions(editId, postMapFileByEditIdBody, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+    return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const prefetchPostMapFileByEditIdQuery = async <TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
+    queryClient: QueryClient,
+    editId: number | string,
+    postMapFileByEditIdBody: PostMapFileByEditIdBody,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
+): Promise<QueryClient> => {
+    const queryOptions = getPostMapFileByEditIdQueryOptions(editId, postMapFileByEditIdBody, options);
+
+    await queryClient.prefetchQuery(queryOptions);
+
+    return queryClient;
+};

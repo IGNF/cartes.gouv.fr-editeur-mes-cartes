@@ -5,169 +5,124 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
-import type {
-  Theme
-} from '../model';
+import type { Theme } from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
-  for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
-    Object.defineProperty(result, key, {
-      enumerable: true,
-      configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
-    });
-  }
-  return result;
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
 };
 
 export type getThemesResponse200 = {
-  data: Theme[]
-  status: 200
-}
-
-export type getThemesResponseSuccess = (getThemesResponse200) & {
-  headers: Headers;
+    data: Theme[];
+    status: 200;
 };
-;
 
-export type getThemesResponse = (getThemesResponseSuccess)
+export type getThemesResponseSuccess = getThemesResponse200 & {
+    headers: Headers;
+};
+export type getThemesResponse = getThemesResponseSuccess;
 
 export const getGetThemesUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/themes`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/themes`
-}
-
-export const getThemes = async ( options?: RequestInit): Promise<getThemesResponse> => {
-
-  const res = await fetch(getGetThemesUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getThemesResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getThemesResponse
-}
-
-
-
-
+export const getThemes = async (options?: RequestInit): Promise<getThemesResponse> => {
+    return fetchWithAuth<getThemesResponse>(getGetThemesUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetThemesQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/themes`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/themes`] as const;
+};
 
+export const getGetThemesQueryOptions = <TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetThemesQueryOptions = <TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetThemesQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getThemes>>> = ({ signal }) => getThemes({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetThemesQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getThemes>>> = ({ signal }) => getThemes({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetThemesQueryResult = NonNullable<Awaited<ReturnType<typeof getThemes>>>
-export type GetThemesQueryError = unknown
-
+export type GetThemesQueryResult = NonNullable<Awaited<ReturnType<typeof getThemes>>>;
+export type GetThemesQueryError = unknown;
 
 export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getThemes>>,
-          TError,
-          Awaited<ReturnType<typeof getThemes>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getThemes>>, TError, Awaited<ReturnType<typeof getThemes>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getThemes>>,
-          TError,
-          Awaited<ReturnType<typeof getThemes>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getThemes>>, TError, Awaited<ReturnType<typeof getThemes>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetThemesQueryOptions(options);
 
-  const queryOptions = getGetThemesQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetThemesQuery = async <TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetThemesQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetThemesQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
-
+    return queryClient;
+};

@@ -10,6 +10,6 @@
  * Theme
  */
 export interface Theme {
-  id?: number;
-  name?: string;
+    id?: number;
+    name?: string;
 }

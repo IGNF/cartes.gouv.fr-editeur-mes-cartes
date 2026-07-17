@@ -19,5 +19,6 @@ export type ComponentKey =
     | import("./locales/Common.locale").I18n
     | import("./locales/Breadcrumb.locale").I18n
     | import("./locales/MapList.locale").I18n
+    | import("./locales/Layout.locale").I18n
 
 export type Translations<L extends Language> = GenericTranslations<ComponentKey, Language, typeof fallbackLanguage, L>;

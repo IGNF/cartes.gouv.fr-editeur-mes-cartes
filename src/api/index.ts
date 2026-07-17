@@ -1,5 +1,3 @@
-
-
 import * as editorial from "./editorial/editorial.ts";
 import * as login from "./login/login.ts";
 import * as map from "./map/map.ts";
@@ -9,9 +7,9 @@ import * as organization from "./organization/organization.ts";
 import * as theme from "./theme/theme.ts";
 import * as user from "./user/user.ts";
 
-// TODO : AMÉLIORER ÇA
+// TODO : AMÉLIORER ÇA ?
 
-const api = {
+export const api = {
 	editorial,
 	login,
 	map,
@@ -21,6 +19,3 @@ const api = {
 	theme,
 	user
 };
-
-export { editorial, login, map, media, notifications, organization, theme, user };
-export default api;

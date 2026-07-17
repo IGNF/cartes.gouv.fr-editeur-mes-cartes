@@ -5,566 +5,491 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
-import type {
-  Article,
-  GetEditorialCategories200Item,
-  GetEditorialFollowers200,
-  GetEditorialMegamenu200,
-  NotFoundResponse
-} from '../model';
+import type { Article, GetEditorialCategories200Item, GetEditorialFollowers200, GetEditorialMegamenu200, NotFoundResponse } from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
-  for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
-    Object.defineProperty(result, key, {
-      enumerable: true,
-      configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
-    });
-  }
-  return result;
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
 };
 
 export type getEditorialFollowersResponse200 = {
-  data: GetEditorialFollowers200
-  status: 200
-}
+    data: GetEditorialFollowers200;
+    status: 200;
+};
 
 export type getEditorialFollowersResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getEditorialFollowersResponseSuccess = (getEditorialFollowersResponse200) & {
-  headers: Headers;
-};
-export type getEditorialFollowersResponseError = (getEditorialFollowersResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type getEditorialFollowersResponse = (getEditorialFollowersResponseSuccess | getEditorialFollowersResponseError)
+export type getEditorialFollowersResponseSuccess = getEditorialFollowersResponse200 & {
+    headers: Headers;
+};
+export type getEditorialFollowersResponseError = getEditorialFollowersResponse404 & {
+    headers: Headers;
+};
+
+export type getEditorialFollowersResponse = getEditorialFollowersResponseSuccess | getEditorialFollowersResponseError;
 
 export const getGetEditorialFollowersUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/editorial/followers`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/editorial/followers`
-}
-
-export const getEditorialFollowers = async ( options?: RequestInit): Promise<getEditorialFollowersResponse> => {
-
-  const res = await fetch(getGetEditorialFollowersUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getEditorialFollowersResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getEditorialFollowersResponse
-}
-
-
-
-
+export const getEditorialFollowers = async (options?: RequestInit): Promise<getEditorialFollowersResponse> => {
+    return fetchWithAuth<getEditorialFollowersResponse>(getGetEditorialFollowersUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetEditorialFollowersQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/editorial/followers`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/editorial/followers`] as const;
+};
 
+export const getGetEditorialFollowersQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetEditorialFollowersQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetEditorialFollowersQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialFollowers>>> = ({ signal }) => getEditorialFollowers({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEditorialFollowersQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialFollowers>>> = ({ signal }) => getEditorialFollowers({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetEditorialFollowersQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialFollowers>>>
-export type GetEditorialFollowersQueryError = NotFoundResponse
-
+export type GetEditorialFollowersQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialFollowers>>>;
+export type GetEditorialFollowersQueryError = NotFoundResponse;
 
 export function useGetEditorialFollowers<TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialFollowers>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialFollowers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, Awaited<ReturnType<typeof getEditorialFollowers>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialFollowers<TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialFollowers>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialFollowers>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, Awaited<ReturnType<typeof getEditorialFollowers>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialFollowers<TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetEditorialFollowers<TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetEditorialFollowersQueryOptions(options);
 
-  const queryOptions = getGetEditorialFollowersQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetEditorialFollowersQuery = async <TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialFollowers>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetEditorialFollowersQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetEditorialFollowersQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getEditorialMegamenuResponse200 = {
-  data: GetEditorialMegamenu200
-  status: 200
-}
+    data: GetEditorialMegamenu200;
+    status: 200;
+};
 
 export type getEditorialMegamenuResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getEditorialMegamenuResponseSuccess = (getEditorialMegamenuResponse200) & {
-  headers: Headers;
-};
-export type getEditorialMegamenuResponseError = (getEditorialMegamenuResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type getEditorialMegamenuResponse = (getEditorialMegamenuResponseSuccess | getEditorialMegamenuResponseError)
+export type getEditorialMegamenuResponseSuccess = getEditorialMegamenuResponse200 & {
+    headers: Headers;
+};
+export type getEditorialMegamenuResponseError = getEditorialMegamenuResponse404 & {
+    headers: Headers;
+};
+
+export type getEditorialMegamenuResponse = getEditorialMegamenuResponseSuccess | getEditorialMegamenuResponseError;
 
 export const getGetEditorialMegamenuUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/editorial/megamenu`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/editorial/megamenu`
-}
-
-export const getEditorialMegamenu = async ( options?: RequestInit): Promise<getEditorialMegamenuResponse> => {
-
-  const res = await fetch(getGetEditorialMegamenuUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getEditorialMegamenuResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getEditorialMegamenuResponse
-}
-
-
-
-
+export const getEditorialMegamenu = async (options?: RequestInit): Promise<getEditorialMegamenuResponse> => {
+    return fetchWithAuth<getEditorialMegamenuResponse>(getGetEditorialMegamenuUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetEditorialMegamenuQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/editorial/megamenu`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/editorial/megamenu`] as const;
+};
 
+export const getGetEditorialMegamenuQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetEditorialMegamenuQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetEditorialMegamenuQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialMegamenu>>> = ({ signal }) => getEditorialMegamenu({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEditorialMegamenuQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialMegamenu>>> = ({ signal }) => getEditorialMegamenu({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetEditorialMegamenuQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialMegamenu>>>
-export type GetEditorialMegamenuQueryError = NotFoundResponse
-
+export type GetEditorialMegamenuQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialMegamenu>>>;
+export type GetEditorialMegamenuQueryError = NotFoundResponse;
 
 export function useGetEditorialMegamenu<TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialMegamenu>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialMegamenu>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, Awaited<ReturnType<typeof getEditorialMegamenu>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialMegamenu<TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialMegamenu>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialMegamenu>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, Awaited<ReturnType<typeof getEditorialMegamenu>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialMegamenu<TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetEditorialMegamenu<TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetEditorialMegamenuQueryOptions(options);
 
-  const queryOptions = getGetEditorialMegamenuQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetEditorialMegamenuQuery = async <TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialMegamenu>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetEditorialMegamenuQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetEditorialMegamenuQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getEditorialCategoriesResponse200 = {
-  data: GetEditorialCategories200Item[]
-  status: 200
-}
-
-export type getEditorialCategoriesResponseSuccess = (getEditorialCategoriesResponse200) & {
-  headers: Headers;
+    data: GetEditorialCategories200Item[];
+    status: 200;
 };
-;
 
-export type getEditorialCategoriesResponse = (getEditorialCategoriesResponseSuccess)
+export type getEditorialCategoriesResponseSuccess = getEditorialCategoriesResponse200 & {
+    headers: Headers;
+};
+export type getEditorialCategoriesResponse = getEditorialCategoriesResponseSuccess;
 
 export const getGetEditorialCategoriesUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/editorial/categories`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/editorial/categories`
-}
-
-export const getEditorialCategories = async ( options?: RequestInit): Promise<getEditorialCategoriesResponse> => {
-
-  const res = await fetch(getGetEditorialCategoriesUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getEditorialCategoriesResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getEditorialCategoriesResponse
-}
-
-
-
-
+export const getEditorialCategories = async (options?: RequestInit): Promise<getEditorialCategoriesResponse> => {
+    return fetchWithAuth<getEditorialCategoriesResponse>(getGetEditorialCategoriesUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetEditorialCategoriesQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/editorial/categories`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/editorial/categories`] as const;
+};
 
+export const getGetEditorialCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetEditorialCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetEditorialCategoriesQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialCategories>>> = ({ signal }) => getEditorialCategories({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEditorialCategoriesQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialCategories>>> = ({ signal }) => getEditorialCategories({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetEditorialCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialCategories>>>
-export type GetEditorialCategoriesQueryError = unknown
-
+export type GetEditorialCategoriesQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialCategories>>>;
+export type GetEditorialCategoriesQueryError = unknown;
 
 export function useGetEditorialCategories<TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialCategories>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialCategories>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, Awaited<ReturnType<typeof getEditorialCategories>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialCategories<TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialCategories>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialCategories>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, Awaited<ReturnType<typeof getEditorialCategories>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetEditorialCategories<TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetEditorialCategories<TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetEditorialCategoriesQueryOptions(options);
 
-  const queryOptions = getGetEditorialCategoriesQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetEditorialCategoriesQuery = async <TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialCategories>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetEditorialCategoriesQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetEditorialCategoriesQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
+    return queryClient;
+};
 
 export type getEditorialArticlesByCategoryResponse200 = {
-  data: Article[]
-  status: 200
-}
+    data: Article[];
+    status: 200;
+};
 
 export type getEditorialArticlesByCategoryResponse404 = {
-  data: NotFoundResponse
-  status: 404
-}
-
-export type getEditorialArticlesByCategoryResponseSuccess = (getEditorialArticlesByCategoryResponse200) & {
-  headers: Headers;
-};
-export type getEditorialArticlesByCategoryResponseError = (getEditorialArticlesByCategoryResponse404) & {
-  headers: Headers;
+    data: NotFoundResponse;
+    status: 404;
 };
 
-export type getEditorialArticlesByCategoryResponse = (getEditorialArticlesByCategoryResponseSuccess | getEditorialArticlesByCategoryResponseError)
+export type getEditorialArticlesByCategoryResponseSuccess = getEditorialArticlesByCategoryResponse200 & {
+    headers: Headers;
+};
+export type getEditorialArticlesByCategoryResponseError = getEditorialArticlesByCategoryResponse404 & {
+    headers: Headers;
+};
 
-export const getGetEditorialArticlesByCategoryUrl = (category: string,) => {
+export type getEditorialArticlesByCategoryResponse = getEditorialArticlesByCategoryResponseSuccess | getEditorialArticlesByCategoryResponseError;
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/editorial/articles/${category}`
-}
+export const getGetEditorialArticlesByCategoryUrl = (category: string) => {
+    return `${env.API_EDITEUR_URL}/api/editorial/articles/${category}`;
+};
 
 export const getEditorialArticlesByCategory = async (category: string, options?: RequestInit): Promise<getEditorialArticlesByCategoryResponse> => {
+    return fetchWithAuth<getEditorialArticlesByCategoryResponse>(getGetEditorialArticlesByCategoryUrl(category), {
+        ...options,
+        method: "GET",
+    });
+};
 
-  const res = await fetch(getGetEditorialArticlesByCategoryUrl(category),
-  {
-    ...options,
-    method: 'GET'
+export const getGetEditorialArticlesByCategoryQueryKey = (category: string) => {
+    return [`${env.API_EDITEUR_URL}/api/editorial/articles/${category}`] as const;
+};
 
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getEditorialArticlesByCategoryResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getEditorialArticlesByCategoryResponse
-}
-
-
-
-
-
-export const getGetEditorialArticlesByCategoryQueryKey = (category: string,) => {
-    return [
-    `${env.API_EDITEUR_URL}/api/editorial/articles/${category}`
-    ] as const;
+export const getGetEditorialArticlesByCategoryQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
+    category: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
     }
-
-
-export const getGetEditorialArticlesByCategoryQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>, fetch?: RequestInit}
 ) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getGetEditorialArticlesByCategoryQueryKey(category);
 
-  const queryKey =  queryOptions?.queryKey ?? getGetEditorialArticlesByCategoryQueryKey(category);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>> = ({ signal }) =>
+        getEditorialArticlesByCategory(category, { signal, ...requestOptions });
 
+    return { queryKey, queryFn, enabled: category !== null && category !== undefined, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type GetEditorialArticlesByCategoryQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>>;
+export type GetEditorialArticlesByCategoryQueryError = NotFoundResponse;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>> = ({ signal }) => getEditorialArticlesByCategory(category, { signal, ...fetchOptions });
+export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
+    category: string,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
+                    TError,
+                    Awaited<ReturnType<typeof getEditorialArticlesByCategory>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
+    category: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
+                    TError,
+                    Awaited<ReturnType<typeof getEditorialArticlesByCategory>>
+                >,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
+    category: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
+export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
+    category: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetEditorialArticlesByCategoryQueryOptions(category, options);
 
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-
-
-   return  { queryKey, queryFn, enabled: category !== null && category !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
-export type GetEditorialArticlesByCategoryQueryResult = NonNullable<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>>
-export type GetEditorialArticlesByCategoryQueryError = NotFoundResponse
+export const prefetchGetEditorialArticlesByCategoryQuery = async <
+    TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
+    TError = NotFoundResponse,
+>(
+    queryClient: QueryClient,
+    category: string,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
+): Promise<QueryClient> => {
+    const queryOptions = getGetEditorialArticlesByCategoryQueryOptions(category, options);
 
+    await queryClient.prefetchQuery(queryOptions);
 
-export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
- category: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialArticlesByCategory>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
- category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getEditorialArticlesByCategory>>,
-          TError,
-          Awaited<ReturnType<typeof getEditorialArticlesByCategory>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
- category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetEditorialArticlesByCategory<TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
- category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetEditorialArticlesByCategoryQueryOptions(category,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchGetEditorialArticlesByCategoryQuery = async <TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(
- queryClient: QueryClient, category: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError, TData>>, fetch?: RequestInit}
-
-  ): Promise<QueryClient> => {
-
-  const queryOptions = getGetEditorialArticlesByCategoryQueryOptions(category,options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
-
+    return queryClient;
+};

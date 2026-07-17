@@ -5,169 +5,133 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useQuery
-} from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseQueryResult,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseQueryOptions,
+    UseQueryResult,
+} from "@tanstack/react-query";
 
-import {
-  env
-} from '../../env';
+import { env } from "../../env";
 
-import type {
-  Notification
-} from '../model';
+import type { Notification } from "../model";
 
+import { fetchWithAuth } from ".././fetchWithAuth";
 
-
-
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
-  const result = { queryKey } as T & { queryKey: K };
-  for (const key of Object.keys(query)) {
-    // The explicit queryKey always wins, matching the previous
-    // `{ ...query, queryKey }` spread where it was set last.
-    if (key === 'queryKey') continue;
-    Object.defineProperty(result, key, {
-      enumerable: true,
-      configurable: true,
-      get: () => (query as Record<string, unknown>)[key],
-    });
-  }
-  return result;
+    const result = { queryKey } as T & { queryKey: K };
+    for (const key of Object.keys(query)) {
+        // The explicit queryKey always wins, matching the previous
+        // `{ ...query, queryKey }` spread where it was set last.
+        if (key === "queryKey") continue;
+        Object.defineProperty(result, key, {
+            enumerable: true,
+            configurable: true,
+            get: () => (query as Record<string, unknown>)[key],
+        });
+    }
+    return result;
 };
 
 export type getNotificationsResponse200 = {
-  data: Notification[]
-  status: 200
-}
-
-export type getNotificationsResponseSuccess = (getNotificationsResponse200) & {
-  headers: Headers;
+    data: Notification[];
+    status: 200;
 };
-;
 
-export type getNotificationsResponse = (getNotificationsResponseSuccess)
+export type getNotificationsResponseSuccess = getNotificationsResponse200 & {
+    headers: Headers;
+};
+export type getNotificationsResponse = getNotificationsResponseSuccess;
 
 export const getGetNotificationsUrl = () => {
+    return `${env.API_EDITEUR_URL}/api/notifications`;
+};
 
-
-
-
-  return `${env.API_EDITEUR_URL}/api/notifications`
-}
-
-export const getNotifications = async ( options?: RequestInit): Promise<getNotificationsResponse> => {
-
-  const res = await fetch(getGetNotificationsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-)
-
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: getNotificationsResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as getNotificationsResponse
-}
-
-
-
-
+export const getNotifications = async (options?: RequestInit): Promise<getNotificationsResponse> => {
+    return fetchWithAuth<getNotificationsResponse>(getGetNotificationsUrl(), {
+        ...options,
+        method: "GET",
+    });
+};
 
 export const getGetNotificationsQueryKey = () => {
-    return [
-    `${env.API_EDITEUR_URL}/api/notifications`
-    ] as const;
-    }
+    return [`${env.API_EDITEUR_URL}/api/notifications`] as const;
+};
 
+export const getGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}) => {
+    const { query: queryOptions, request: requestOptions } = options ?? {};
 
-export const getGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, fetch?: RequestInit}
-) => {
+    const queryKey = queryOptions?.queryKey ?? getGetNotificationsQueryKey();
 
-const {query: queryOptions, fetch: fetchOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNotifications>>> = ({ signal }) => getNotifications({ signal, ...requestOptions });
 
-  const queryKey =  queryOptions?.queryKey ?? getGetNotificationsQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+};
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNotifications>>> = ({ signal }) => getNotifications({ signal, ...fetchOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getNotifications>>>
-export type GetNotificationsQueryError = unknown
-
+export type GetNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getNotifications>>>;
+export type GetNotificationsQueryError = unknown;
 
 export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof getNotifications>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getNotifications>>, TError, Awaited<ReturnType<typeof getNotifications>>>, "initialData">;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof getNotifications>>
-        > , 'initialData'
-      >, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getNotifications>>, TError, Awaited<ReturnType<typeof getNotifications>>>,
+                "initialData"
+            >;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
 export function useGetNotifications<TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, fetch?: RequestInit}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetNotificationsQueryOptions(options);
 
-  const queryOptions = getGetNotificationsQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
+    return withQueryKey(query, queryOptions.queryKey);
 }
 
 export const prefetchGetNotificationsQuery = async <TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(
- queryClient: QueryClient,  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>, fetch?: RequestInit}
+    queryClient: QueryClient,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getNotifications>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+): Promise<QueryClient> => {
+    const queryOptions = getGetNotificationsQueryOptions(options);
 
-  ): Promise<QueryClient> => {
+    await queryClient.prefetchQuery(queryOptions);
 
-  const queryOptions = getGetNotificationsQueryOptions(options)
-
-  await queryClient.prefetchQuery(queryOptions);
-
-  return queryClient;
-}
-
-
-
-
-
+    return queryClient;
+};

@@ -3,17 +3,17 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FC, memo } from "react";
 
 import { groups, useRoute } from "@/router/router";
-import useUserQuery from "@/hooks/queries/useUserQuery";
+import { useOidc } from "@/oidc";
 
 const SessionExpiredAlert: FC = () => {
     const sessionExpired = false;
-    const { data: user } = useUserQuery();
+    const { isUserLoggedIn } = useOidc();
     const route = useRoute();
 
     return (
         !groups.public.has(route) &&
         sessionExpired &&
-        user && (
+        isUserLoggedIn && (
             <div className={fr.cx("fr-mb-4v")}>
                 <Alert
                     severity="error"

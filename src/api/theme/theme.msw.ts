@@ -5,37 +5,36 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  Theme
-} from '../model';
+import type { Theme } from "../model";
 
+export const getGetThemesResponseMock = (): Theme[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    }));
 
-export const getGetThemesResponseMock = (): Theme[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined])})))
-
-
-export const getGetThemesMockHandler = (overrideResponse?: Theme[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Theme[]> | Theme[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/themes', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetThemesResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-export const getThemeMock = () => [
-  getGetThemesMockHandler()
-]
+export const getGetThemesMockHandler = (
+    overrideResponse?: Theme[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Theme[]> | Theme[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/themes",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetThemesResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
+export const getThemeMock = () => [getGetThemesMockHandler()];

@@ -5,127 +5,222 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  DeletedResponse,
-  Media,
-  MediaList,
-  PostMediaFileById200,
-  PutMediasByIdByAttribute200
-} from '../model';
+import type { DeletedResponse, Media, MediaList, PostMediaFileById200, PutMediasByIdByAttribute200 } from "../model";
 
+export const getGetMediasResponseMock = (): MediaList[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        medias: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+                id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                file: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
+                size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                folder: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+                view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+                thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+            })),
+            undefined,
+        ]),
+        count: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        limit: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        offset: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    }));
 
-export const getGetMediasResponseMock = (): MediaList[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({medias: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), file: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), owner: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), organization_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), organization: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', undefined]), size: faker.helpers.arrayElement([faker.number.int(), undefined]), folder: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]), thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined])})), undefined]), count: faker.helpers.arrayElement([faker.number.int(), undefined]), limit: faker.helpers.arrayElement([faker.number.int(), undefined]), offset: faker.helpers.arrayElement([faker.number.int(), undefined])})))
+export const getPostMediasResponseMock = (overrideResponse: Partial<Extract<Media, object>> = {}): Media => ({
+    id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    file: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
+    size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    folder: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    ...overrideResponse,
+});
 
-export const getPostMediasResponseMock = (overrideResponse: Partial<Extract<Media, object>> = {}): Media => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), file: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), owner: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), organization_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), organization: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + 'Z', undefined]), size: faker.helpers.arrayElement([faker.number.int(), undefined]), folder: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]), thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]), ...overrideResponse})
+export const getGetMediaFoldersResponseMock = (): string[] => Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => faker.word.sample());
 
-export const getGetMediaFoldersResponseMock = (): string[] => (Array.from({length: faker.number.int({min: 1, max: 10})}, () => faker.word.sample()))
+export const getDeleteMediaByIdResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
+    code: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    message: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
 
-export const getDeleteMediaByIdResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({code: faker.helpers.arrayElement([faker.number.int(), undefined]), message: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
+export const getPutMediasByIdByAttributeResponseMock = (
+    overrideResponse: Partial<Extract<PutMediasByIdByAttribute200, object>> = {}
+): PutMediasByIdByAttribute200 => ({
+    id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
 
-export const getPutMediasByIdByAttributeResponseMock = (overrideResponse: Partial<Extract<PutMediasByIdByAttribute200, object>> = {}): PutMediasByIdByAttribute200 => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), attribute: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), value: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
+export const getPostMediaFileByIdResponseMock = (overrideResponse: Partial<Extract<PostMediaFileById200, object>> = {}): PostMediaFileById200 => ({
+    id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+    attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    view_url: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    thumb_url: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
 
-export const getPostMediaFileByIdResponseMock = (overrideResponse: Partial<Extract<PostMediaFileById200, object>> = {}): PostMediaFileById200 => ({id: faker.helpers.arrayElement([faker.number.int(), undefined]), attribute: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), view_url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), thumb_url: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), ...overrideResponse})
+export const getGetMediasMockHandler = (
+    overrideResponse?: MediaList[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MediaList[]> | MediaList[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/medias",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetMediasResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
+export const getPostMediasMockHandler = (
+    overrideResponse?: Media | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Media> | Media),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        "*/api/medias",
+        async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getPostMediasResponseMock(),
+                { status: 201 }
+            );
+        },
+        options
+    );
+};
 
-export const getGetMediasMockHandler = (overrideResponse?: MediaList[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MediaList[]> | MediaList[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/medias', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+export const getGetMediaFoldersMockHandler = (
+    overrideResponse?: string[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string[]> | string[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/medias/folders",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetMediaFoldersResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
+export const getGetImageByFilenameMockHandler = (
+    overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/image/:filename",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            if (typeof overrideResponse === "function") {
+                await overrideResponse(info);
+            }
 
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetMediasResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
 
-export const getPostMediasMockHandler = (overrideResponse?: Media | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Media> | Media), options?: RequestHandlerOptions) => {
-  return http.post('*/api/medias', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+export const getDeleteMediaByIdMockHandler = (
+    overrideResponse?: DeletedResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<DeletedResponse> | DeletedResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        "*/api/medias/:id",
+        async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getDeleteMediaByIdResponseMock(),
+                { status: 204 }
+            );
+        },
+        options
+    );
+};
 
+export const getPutMediasByIdByAttributeMockHandler = (
+    overrideResponse?:
+        | PutMediasByIdByAttribute200
+        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutMediasByIdByAttribute200> | PutMediasByIdByAttribute200),
+    options?: RequestHandlerOptions
+) => {
+    return http.put(
+        "*/api/medias/:id/:attribute",
+        async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getPutMediasByIdByAttributeResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPostMediasResponseMock(),
-      { status: 201
-      })
-  }, options)
-}
-
-export const getGetMediaFoldersMockHandler = (overrideResponse?: string[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string[]> | string[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/medias/folders', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetMediaFoldersResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetImageByFilenameMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.get('*/api/image/:filename', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 200
-      })
-  }, options)
-}
-
-export const getDeleteMediaByIdMockHandler = (overrideResponse?: DeletedResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<DeletedResponse> | DeletedResponse), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/medias/:id', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getDeleteMediaByIdResponseMock(),
-      { status: 204
-      })
-  }, options)
-}
-
-export const getPutMediasByIdByAttributeMockHandler = (overrideResponse?: PutMediasByIdByAttribute200 | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutMediasByIdByAttribute200> | PutMediasByIdByAttribute200), options?: RequestHandlerOptions) => {
-  return http.put('*/api/medias/:id/:attribute', async (info: Parameters<Parameters<typeof http.put>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPutMediasByIdByAttributeResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getPostMediaFileByIdMockHandler = (overrideResponse?: PostMediaFileById200 | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PostMediaFileById200> | PostMediaFileById200), options?: RequestHandlerOptions) => {
-  return http.post('*/api/medias/:id/file', async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPostMediaFileByIdResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getPostMediaFileByIdMockHandler = (
+    overrideResponse?: PostMediaFileById200 | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<PostMediaFileById200> | PostMediaFileById200),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        "*/api/medias/:id/file",
+        async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getPostMediaFileByIdResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 export const getMediaMock = () => [
-  getGetMediasMockHandler(),
-  getPostMediasMockHandler(),
-  getGetMediaFoldersMockHandler(),
-  getGetImageByFilenameMockHandler(),
-  getDeleteMediaByIdMockHandler(),
-  getPutMediasByIdByAttributeMockHandler(),
-  getPostMediaFileByIdMockHandler()
-]
+    getGetMediasMockHandler(),
+    getPostMediasMockHandler(),
+    getGetMediaFoldersMockHandler(),
+    getGetImageByFilenameMockHandler(),
+    getDeleteMediaByIdMockHandler(),
+    getPutMediasByIdByAttributeMockHandler(),
+    getPostMediaFileByIdMockHandler(),
+];

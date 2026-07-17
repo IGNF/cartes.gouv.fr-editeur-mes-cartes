@@ -9,21 +9,17 @@ import { FC } from "react";
 import { useToggle } from "@mantine/hooks";
 import MapMain from "@/components/Layout/MapMain";
 import { useTranslation } from "@/i18n";
-import api from "@/api";
+import { api } from "@/api";
 import PageTitle from "@/components/Layout/PageTitle";
 import { routes, useRoute } from "@/router/router";
-import { useSearch } from "@/hooks/useSearch";
-import { useFilters } from "@/hooks/useFilters";
-import { useSort } from "@/hooks/useSort";
 import { useFakePagination } from "@/hooks/usePagination";
 import { tss } from "tss-react";
 import MapListItem from "./MapListItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import NoData from "./NoData";
 import { usePrefetchQuery } from "@tanstack/react-query";
 import RQKeys from "@/modules/maps/RQKeys";
-import { ApiMapsParams, type MapList, MapResearch, Theme } from "@/api/model";
+import { type MapList, MapResearch, Theme } from "@/api/model";
 import NoCorrespondingData from "./NoCorrespondingData";
 
 
@@ -33,7 +29,6 @@ import NoCorrespondingData from "./NoCorrespondingData";
 type MapRouteParams = {
     page: number,
     limit: number,
-    offset: number,
     theme: string,
     query: string,
 }
@@ -48,9 +43,8 @@ function useMapRouteParams(): MapRouteParams {
     const limit = parseInt(route.params?.["limit"]) ?? 10;
     const theme = route.params?.["theme"] ?? "";
     const query = route.params?.["query"] ?? "";
-    const offset = (page - 1) * (limit);
-
-    return { page, limit, offset, theme, query };
+    
+    return { page, limit, theme, query };
 };
 
 const MapList: FC = () => {
@@ -60,11 +54,11 @@ const MapList: FC = () => {
 
     // Param dans l'URL
     const routeParams = useMapRouteParams();
-
+    const offset = (routeParams.page - 1) * (routeParams.limit);
 
     // Appel à l'API
-    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useApiMaps(
-        { ...routeParams },
+    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useGetMaps(
+        { ...routeParams, offset: offset, context: "profile" },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
@@ -81,14 +75,17 @@ const MapList: FC = () => {
         },
     );
 
+    // useAccessToken().then(r => console.log(r))
+
     // Va chercher les cartes de la page d'après
+    // TODO : améliorer cela car pas l'air de fonctionner
     usePrefetchQuery({
         queryKey: RQKeys.maps({ ...routeParams, offset: routeParams.page * routeParams.limit }),
-        queryFn: ({ signal }) => api.map.apiMaps({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
+        queryFn: ({ signal }) => api.map.getMaps({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
     });
 
     // Thèmes disponible
-    const { data: themesResponse } = api.theme.useApiThemes(
+    const { data: themesResponse } = api.theme.useGetThemes(
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour

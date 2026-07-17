@@ -5,7 +5,12 @@ export default defineConfig({
     output: {
       mode: 'tags-split',
       target: 'src/api',
-      schemas: 'src/api/model',
+      schemas: {
+        path: 'src/api/model',
+        splitByTags: true,
+      },
+      tsconfig: './tsconfig.json',
+      formatter: 'prettier',
       client: 'react-query',
       baseUrl: {
         runtime: 'env.API_EDITEUR_URL',
@@ -14,9 +19,16 @@ export default defineConfig({
       mock: true,
       override: {
         query: {
+          useMutation: false,
+          useQuery: true,
           usePrefetch: true,
-        }
+        },
+        mutator: {
+          path: 'src/api/fetchWithAuth.ts',
+          name: 'fetchWithAuth',
+        },
       },
+      headers: true,
     },
     input: {
       target: './macarte-api.yaml',

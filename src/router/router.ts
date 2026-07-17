@@ -34,7 +34,6 @@ const mapRoutes = {
     map_list: defineRoute(
         {
             page: param.query.optional.number.default(1),
-            offset: param.query.optional.number.default(0),
             limit: param.query.optional.number.default(10),
             query: param.query.optional.string,
             theme: param.query.optional.string.default(""),

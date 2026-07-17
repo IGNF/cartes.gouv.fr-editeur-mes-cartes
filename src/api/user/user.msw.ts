@@ -5,95 +5,190 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import {
-  faker
-} from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
-import {
-  HttpResponse,
-  http
-} from 'msw';
-import type {
-  RequestHandlerOptions
-} from 'msw';
+import { HttpResponse, http } from "msw";
+import type { RequestHandlerOptions } from "msw";
 
-import type {
-  GetUsers200Item,
-  UserPublic,
-  UserView
-} from '../model';
+import type { GetUsers200Item, UserPublic, UserView } from "../model";
 
+export const getGetMeResponseMock = (): UserView => ({
+    ...{
+        ...{
+            public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            twitter_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            facebook_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            linkedin_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            presentation: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+            cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+        },
+        ...{
+            email: faker.helpers.arrayElement([faker.internet.email(), undefined]),
+            username: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        },
+    },
+    ...{
+        locked: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        medias_limit_size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        medias_size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        roles: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+            undefined,
+        ]),
+    },
+});
 
-export const getGetMeResponseMock = (): UserView => ({...{...{public_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), public_name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), twitter_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), facebook_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), linkedin_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), presentation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]), cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined])},...{email: faker.helpers.arrayElement([faker.internet.email(), undefined]), username: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined])},},...{locked: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), id: faker.helpers.arrayElement([faker.number.int(), undefined]), medias_limit_size: faker.helpers.arrayElement([faker.number.int(), undefined]), medias_size: faker.helpers.arrayElement([faker.number.int(), undefined]), roles: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), undefined])},})
+export const getPatchMeResponseMock = (): UserView => ({
+    ...{
+        ...{
+            public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            twitter_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            facebook_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            linkedin_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            presentation: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+            profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+            cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+        },
+        ...{
+            email: faker.helpers.arrayElement([faker.internet.email(), undefined]),
+            username: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        },
+    },
+    ...{
+        locked: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        medias_limit_size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        medias_size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+        roles: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+            undefined,
+        ]),
+    },
+});
 
-export const getPatchMeResponseMock = (): UserView => ({...{...{public_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), public_name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), twitter_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), facebook_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), linkedin_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), presentation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]), cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined])},...{email: faker.helpers.arrayElement([faker.internet.email(), undefined]), username: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined])},},...{locked: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]), id: faker.helpers.arrayElement([faker.number.int(), undefined]), medias_limit_size: faker.helpers.arrayElement([faker.number.int(), undefined]), medias_size: faker.helpers.arrayElement([faker.number.int(), undefined]), roles: faker.helpers.arrayElement([Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => (faker.string.alpha({length: {min: 10, max: 20}}))), undefined])},})
+export const getGetUsersPublicByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({
+    public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    twitter_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    facebook_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    linkedin_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    presentation: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    ...overrideResponse,
+});
 
-export const getGetUsersPublicByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({public_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), public_name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), twitter_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), facebook_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), linkedin_account: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), presentation: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]), cover_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]), ...overrideResponse})
+export const getGetUsersResponseMock = (): GetUsers200Item[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+        profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+    }));
 
-export const getGetUsersResponseMock = (): GetUsers200Item[] => (Array.from({ length: faker.number.int({min: 1, max: 10}) }, (_, i) => i + 1).map(() => ({public_name: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), public_id: faker.helpers.arrayElement([faker.string.alpha({length: {min: 10, max: 20}}), undefined]), profile_picture: faker.helpers.arrayElement([faker.internet.url(), undefined])})))
+export const getGetMeMockHandler = (
+    overrideResponse?: UserView | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserView> | UserView),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/me",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetMeResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
+export const getDeleteMeMockHandler = (
+    overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        "*/api/me",
+        async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
+            if (typeof overrideResponse === "function") {
+                await overrideResponse(info);
+            }
 
-export const getGetMeMockHandler = (overrideResponse?: UserView | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserView> | UserView), options?: RequestHandlerOptions) => {
-  return http.get('*/api/me', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return new HttpResponse(null, { status: 206 });
+        },
+        options
+    );
+};
 
+export const getPatchMeMockHandler = (
+    overrideResponse?: UserView | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<UserView> | UserView),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        "*/api/me",
+        async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getPatchMeResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetMeResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getGetUsersPublicByPublicidMockHandler = (
+    overrideResponse?: UserPublic | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPublic> | UserPublic),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/users/public/:publicId",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetUsersPublicByPublicidResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
-export const getDeleteMeMockHandler = (overrideResponse?: void | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void), options?: RequestHandlerOptions) => {
-  return http.delete('*/api/me', async (info: Parameters<Parameters<typeof http.delete>[1]>[0]) => {
-  if (typeof overrideResponse === 'function') {await overrideResponse(info); }
-
-    return new HttpResponse(null,
-      { status: 206
-      })
-  }, options)
-}
-
-export const getPatchMeMockHandler = (overrideResponse?: UserView | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<UserView> | UserView), options?: RequestHandlerOptions) => {
-  return http.patch('*/api/me', async (info: Parameters<Parameters<typeof http.patch>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getPatchMeResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetUsersPublicByPublicidMockHandler = (overrideResponse?: UserPublic | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPublic> | UserPublic), options?: RequestHandlerOptions) => {
-  return http.get('*/api/users/public/:publicId', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetUsersPublicByPublicidResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
-
-export const getGetUsersMockHandler = (overrideResponse?: GetUsers200Item[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetUsers200Item[]> | GetUsers200Item[]), options?: RequestHandlerOptions) => {
-  return http.get('*/api/users', async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
-
-
-    return HttpResponse.json(overrideResponse !== undefined
-    ? (typeof overrideResponse === "function" ? await overrideResponse(info) : overrideResponse)
-    : getGetUsersResponseMock(),
-      { status: 200
-      })
-  }, options)
-}
+export const getGetUsersMockHandler = (
+    overrideResponse?: GetUsers200Item[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetUsers200Item[]> | GetUsers200Item[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        "*/api/users",
+        async (info: Parameters<Parameters<typeof http.get>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getGetUsersResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 export const getUserMock = () => [
-  getGetMeMockHandler(),
-  getDeleteMeMockHandler(),
-  getPatchMeMockHandler(),
-  getGetUsersPublicByPublicidMockHandler(),
-  getGetUsersMockHandler()
-]
+    getGetMeMockHandler(),
+    getDeleteMeMockHandler(),
+    getPatchMeMockHandler(),
+    getGetUsersPublicByPublicidMockHandler(),
+    getGetUsersMockHandler(),
+];

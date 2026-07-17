@@ -4,9 +4,11 @@ import { createHead, UnheadProvider } from "@unhead/react/client";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import App from "./App";
-import { $lang } from "./i18n";
-import { RouteProvider } from "./router/router";
+import App from "@/App";
+import { $lang } from "@/i18n";
+import { RouteProvider } from "@/router/router";
+import { OidcInitializationGate } from "@/oidc"; // Importe la gate OIDC
+import "./oidc"; // Lance l'initialisation OIDC (bootstrapOidc est appelé au chargement du module)
 
 $lang.current = 'fr';
 // en prod
@@ -25,9 +27,11 @@ const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement)
 root.render(
     <React.StrictMode>
         <UnheadProvider head={head}>
-            <RouteProvider>
-                <App />
-            </RouteProvider>
+            <OidcInitializationGate>
+                <RouteProvider>
+                    <App />
+                </RouteProvider>
+            </OidcInitializationGate>
         </UnheadProvider>
     </React.StrictMode>
 );

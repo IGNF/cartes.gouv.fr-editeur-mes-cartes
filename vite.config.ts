@@ -3,6 +3,7 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { oidcSpa } from "oidc-spa/vite-plugin";
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -11,7 +12,8 @@ export default defineConfig({
   envPrefix: ['VITE_', 'API_EDITEUR_URL', 'APP_ENV'],
   plugins: [
     react(),
-    babel({ presets: [reactCompilerPreset()] })
+    babel({ presets: [reactCompilerPreset()] }),
+    oidcSpa()
   ],
   resolve: {
     alias: {

@@ -16,6 +16,7 @@ export const externalUrls = {
     map_list: appRoot + "/mes-cartes",
     contact_us: appRoot + "/aide/fr/nous-ecrire",
     discover_cartesgouvfr: appRoot + "/decouvrir",
+    catalogue: appRoot + "/rechercher-une-donnee/search",
     present_service_maps: appRoot + "/decouvrir/explorer-les-cartes",
     present_service_catalogue: appRoot + "/decouvrir/rechercher-une-donnee",
     present_service_publish: appRoot + "/decouvrir/publier-une-donnee",
