@@ -93,8 +93,6 @@ export function HeaderMenuUser() {
     const { t } = useTranslation("Layout");
     const { logout, isUserLoggedIn, decodedIdToken, goToAuthServer } = useOidc();
 
-    console.log(decodedIdToken)
-
     return (
         <>
             {isUserLoggedIn ? (

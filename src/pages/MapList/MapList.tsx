@@ -43,7 +43,7 @@ function useMapRouteParams(): MapRouteParams {
     const limit = parseInt(route.params?.["limit"]) ?? 10;
     const theme = route.params?.["theme"] ?? "";
     const query = route.params?.["query"] ?? "";
-    
+
     return { page, limit, theme, query };
 };
 
@@ -63,11 +63,11 @@ const MapList: FC = () => {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
                 select: (response) => {
-                    if (response.status === 200) {
+                    console.log(response)
+                    if (response.status === 200 || response.status === 206) {
                         return response.data
-                    } else if (response.status === 206) {
-                        return response.data as unknown as { maps?: MapResearch; count?: number }
-                    } else {
+                    }
+                    else {
                         return undefined
                     }
                 },
@@ -188,11 +188,12 @@ const MapList: FC = () => {
                                 value: routeParams.theme?.toString() ?? "",
                                 onChange: (event) => {
                                     const value = event.target.value;
-                                    console.log(value)
                                     if (value === "") {
                                         routes
                                             .map_list({
                                                 ...routeParams,
+                                                theme: undefined,
+                                                page: 1,
                                             })
                                             .push();
                                     } else {
@@ -200,6 +201,7 @@ const MapList: FC = () => {
                                             .map_list({
                                                 ...routeParams,
                                                 theme: value,
+                                                page: 1,
                                             })
                                             .push();
                                     }
@@ -240,7 +242,7 @@ const MapList: FC = () => {
                                 ))}
                             </div>
 
-                            {totalPages > 1 && (
+                            {totalPages > 1 ? (
                                 <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
                                     <Pagination
                                         count={totalPages}
@@ -250,6 +252,9 @@ const MapList: FC = () => {
                                         })}
                                         defaultPage={routeParams.page}
                                     />
+                                </div>
+                            ) : (
+                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
                                 </div>
                             )}
                         </>

@@ -13,5 +13,13 @@ export const fetchWithAuth = async <T>(
       ...(header ? header : {}),
     },
   });
-  return response.json();
+  
+  const data = await response.json();
+  
+  // Correspond aux format créés par orval
+  return {
+    status: response.status,
+    data,
+    headers: response.headers,
+  } as T;
 };
