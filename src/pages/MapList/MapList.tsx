@@ -24,6 +24,8 @@ import NoCorrespondingData from "./NoCorrespondingData";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { createPortal } from "react-dom";
+import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
+import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
 
 /**
  * Élément dans l'URL de recherche
@@ -112,8 +114,6 @@ export default function MapList() {
             },
         },
     );
-
-
 
     // Va chercher les cartes de la page d'après
     // TODO : améliorer cela car pas l'air de fonctionner
@@ -377,15 +377,6 @@ export default function MapList() {
             )}
 
             {createPortal(
-                <shareMapModal.Component
-                    title={t("share_map")}
-                >
-                    <div />
-                </shareMapModal.Component>,
-                document.body
-            )}
-
-            {createPortal(
                 <confirmCopyMapModal.Component
                     title={t("copy_map")}
                     buttons={[
@@ -400,9 +391,22 @@ export default function MapList() {
                         },
                     ]}
                 >
-
                     <div />
                 </confirmCopyMapModal.Component>,
+                document.body
+            )}
+
+            {createPortal(
+                <shareMapModal.Component
+                    title={t("share_map")}
+                >
+
+                    <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={openedMap ? useMapLink(openedMap) : ""} className="fr-mb-1w" />
+
+                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-map__iframe-hint")} text={openedMap ? useMapIframe(openedMap) : ""} textArea className="fr-mb-1w" />
+
+                    <div />
+                </shareMapModal.Component>,
                 document.body
             )}
         </MapMain>

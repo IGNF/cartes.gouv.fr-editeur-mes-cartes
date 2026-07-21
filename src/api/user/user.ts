@@ -75,7 +75,7 @@ export type getMeResponseError = getMeResponse401 & {
 export type getMeResponse = getMeResponseSuccess | getMeResponseError;
 
 export const getGetMeUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/me`;
+    return `${env.API_EDITOR_URL}/api/me`;
 };
 
 export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
@@ -86,7 +86,7 @@ export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
 };
 
 export const getGetMeQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/me`] as const;
+    return [`${env.API_EDITOR_URL}/api/me`] as const;
 };
 
 export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(options?: {
@@ -180,7 +180,7 @@ export type deleteMeResponseError = (deleteMeResponse401 | deleteMeResponse403 |
 export type deleteMeResponse = deleteMeResponseSuccess | deleteMeResponseError;
 
 export const getDeleteMeUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/me`;
+    return `${env.API_EDITOR_URL}/api/me`;
 };
 
 /**
@@ -246,7 +246,7 @@ export type patchMeResponseError = (patchMeResponse400 | patchMeResponse401) & {
 export type patchMeResponse = patchMeResponseSuccess | patchMeResponseError;
 
 export const getPatchMeUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/me`;
+    return `${env.API_EDITOR_URL}/api/me`;
 };
 
 /**
@@ -314,7 +314,7 @@ export type getUsersPublicByPublicidResponseError = getUsersPublicByPublicidResp
 export type getUsersPublicByPublicidResponse = getUsersPublicByPublicidResponseSuccess | getUsersPublicByPublicidResponseError;
 
 export const getGetUsersPublicByPublicidUrl = (publicId: string) => {
-    return `${env.API_EDITEUR_URL}/api/users/public/${publicId}`;
+    return `${env.API_EDITOR_URL}/api/users/public/${publicId}`;
 };
 
 export const getUsersPublicByPublicid = async (publicId: string, options?: RequestInit): Promise<getUsersPublicByPublicidResponse> => {
@@ -325,7 +325,7 @@ export const getUsersPublicByPublicid = async (publicId: string, options?: Reque
 };
 
 export const getGetUsersPublicByPublicidQueryKey = (publicId: string) => {
-    return [`${env.API_EDITEUR_URL}/api/users/public/${publicId}`] as const;
+    return [`${env.API_EDITOR_URL}/api/users/public/${publicId}`] as const;
 };
 
 export const getGetUsersPublicByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
@@ -445,7 +445,7 @@ export const getGetUsersUrl = (params: GetUsersParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/users`;
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/users?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/users`;
 };
 
 /**
@@ -459,7 +459,7 @@ export const getUsers = async (params: GetUsersParams, options?: RequestInit): P
 };
 
 export const getGetUsersQueryKey = (params?: GetUsersParams) => {
-    return [`${env.API_EDITEUR_URL}/api/users`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/users`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetUsersQueryOptions = <TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(

@@ -14,9 +14,11 @@ const { i18n } = declareComponentKeys<
     | "no_map_corresponding__title"
     | "no_map_corresponding__description"
     | "delete_map"
-    | "share_map"
-    | "copy_map"
     | "delete_map--pending"
+    | "share_map"
+    | "share-map__link-hint"
+    | "share-map__iframe-hint"
+    | "copy_map"
     | { K: "delete_map--message"; P: { fileName?: string }; R: ReactNode }
 >()("MapList");
 export type I18n = typeof i18n;
@@ -32,12 +34,14 @@ export const DatasheetListFrTranslations: Translations<"fr">["MapList"] = {
     no_map_corresponding__title: "Aucune carte correspondante",
     no_map_corresponding__description: "Aucune carte ne correspond à vos filtres.",
     delete_map: "Supprimer la carte",
+    "delete_map--pending": "Carte en cours de suppression",
     share_map: "Partager la carte",
+    "share-map__link-hint": "Toute personne ayant ce lien peut visualiser votre carte sans avoir à se créer de compte.",
+    "share-map__iframe-hint": "Intégrez votre carte dans un site web",
     copy_map: "Dupliquer la carte",
     "delete_map--message": ({ fileName }) => <>Êtes-vous sûr de vouloir supprimer
         {fileName ? <> la carte <em>{fileName}</em></> : "cette carte"} ?
         <b> Cette action est irréversible.</b></>,
-    "delete_map--pending": "Carte en cours de suppression"
 };
 
 export const DatasheetListEnTranslations: Translations<"en">["MapList"] = {
@@ -51,8 +55,10 @@ export const DatasheetListEnTranslations: Translations<"en">["MapList"] = {
     no_map_corresponding__title: undefined,
     no_map_corresponding__description: undefined,
     delete_map: undefined,
-    share_map: undefined,
-    copy_map: undefined,
     "delete_map--pending": undefined,
     "delete_map--message": undefined,
+    share_map: undefined,
+    "share-map__link-hint": undefined,
+    "share-map__iframe-hint": undefined,
+    copy_map: undefined,
 };

@@ -52,7 +52,7 @@ export type getThemesResponseSuccess = getThemesResponse200 & {
 export type getThemesResponse = getThemesResponseSuccess;
 
 export const getGetThemesUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/themes`;
+    return `${env.API_EDITOR_URL}/api/themes`;
 };
 
 export const getThemes = async (options?: RequestInit): Promise<getThemesResponse> => {
@@ -63,7 +63,7 @@ export const getThemes = async (options?: RequestInit): Promise<getThemesRespons
 };
 
 export const getGetThemesQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/themes`] as const;
+    return [`${env.API_EDITOR_URL}/api/themes`] as const;
 };
 
 export const getGetThemesQueryOptions = <TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(options?: {

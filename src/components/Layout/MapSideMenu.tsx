@@ -131,7 +131,8 @@ export default function MapSideMenu() {
                     text: tCommon("maps_sidemenu"),
                     linkProps: routes.map_list().link,
                     expandedByDefault: true,
-                    isActive: route.name === routes.map_list().name || route.name === routes.home().name,
+                    // isActive: route.name === routes.map_list().name || route.name === routes.home().name,
+                    isActive: route.name === routes.map_list().name,
                 },
             ]}
             classes={{

@@ -61,7 +61,7 @@ export type getEditorialFollowersResponseError = getEditorialFollowersResponse40
 export type getEditorialFollowersResponse = getEditorialFollowersResponseSuccess | getEditorialFollowersResponseError;
 
 export const getGetEditorialFollowersUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/editorial/followers`;
+    return `${env.API_EDITOR_URL}/api/editorial/followers`;
 };
 
 export const getEditorialFollowers = async (options?: RequestInit): Promise<getEditorialFollowersResponse> => {
@@ -72,7 +72,7 @@ export const getEditorialFollowers = async (options?: RequestInit): Promise<getE
 };
 
 export const getGetEditorialFollowersQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/editorial/followers`] as const;
+    return [`${env.API_EDITOR_URL}/api/editorial/followers`] as const;
 };
 
 export const getGetEditorialFollowersQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialFollowers>>, TError = NotFoundResponse>(options?: {
@@ -171,7 +171,7 @@ export type getEditorialMegamenuResponseError = getEditorialMegamenuResponse404 
 export type getEditorialMegamenuResponse = getEditorialMegamenuResponseSuccess | getEditorialMegamenuResponseError;
 
 export const getGetEditorialMegamenuUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/editorial/megamenu`;
+    return `${env.API_EDITOR_URL}/api/editorial/megamenu`;
 };
 
 export const getEditorialMegamenu = async (options?: RequestInit): Promise<getEditorialMegamenuResponse> => {
@@ -182,7 +182,7 @@ export const getEditorialMegamenu = async (options?: RequestInit): Promise<getEd
 };
 
 export const getGetEditorialMegamenuQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/editorial/megamenu`] as const;
+    return [`${env.API_EDITOR_URL}/api/editorial/megamenu`] as const;
 };
 
 export const getGetEditorialMegamenuQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialMegamenu>>, TError = NotFoundResponse>(options?: {
@@ -272,7 +272,7 @@ export type getEditorialCategoriesResponseSuccess = getEditorialCategoriesRespon
 export type getEditorialCategoriesResponse = getEditorialCategoriesResponseSuccess;
 
 export const getGetEditorialCategoriesUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/editorial/categories`;
+    return `${env.API_EDITOR_URL}/api/editorial/categories`;
 };
 
 export const getEditorialCategories = async (options?: RequestInit): Promise<getEditorialCategoriesResponse> => {
@@ -283,7 +283,7 @@ export const getEditorialCategories = async (options?: RequestInit): Promise<get
 };
 
 export const getGetEditorialCategoriesQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/editorial/categories`] as const;
+    return [`${env.API_EDITOR_URL}/api/editorial/categories`] as const;
 };
 
 export const getGetEditorialCategoriesQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialCategories>>, TError = unknown>(options?: {
@@ -382,7 +382,7 @@ export type getEditorialArticlesByCategoryResponseError = getEditorialArticlesBy
 export type getEditorialArticlesByCategoryResponse = getEditorialArticlesByCategoryResponseSuccess | getEditorialArticlesByCategoryResponseError;
 
 export const getGetEditorialArticlesByCategoryUrl = (category: string) => {
-    return `${env.API_EDITEUR_URL}/api/editorial/articles/${category}`;
+    return `${env.API_EDITOR_URL}/api/editorial/articles/${category}`;
 };
 
 export const getEditorialArticlesByCategory = async (category: string, options?: RequestInit): Promise<getEditorialArticlesByCategoryResponse> => {
@@ -393,7 +393,7 @@ export const getEditorialArticlesByCategory = async (category: string, options?:
 };
 
 export const getGetEditorialArticlesByCategoryQueryKey = (category: string) => {
-    return [`${env.API_EDITEUR_URL}/api/editorial/articles/${category}`] as const;
+    return [`${env.API_EDITOR_URL}/api/editorial/articles/${category}`] as const;
 };
 
 export const getGetEditorialArticlesByCategoryQueryOptions = <TData = Awaited<ReturnType<typeof getEditorialArticlesByCategory>>, TError = NotFoundResponse>(

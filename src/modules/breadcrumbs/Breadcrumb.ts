@@ -13,14 +13,14 @@ const getBreadcrumb = (route: Route<typeof routes>): BreadcrumbProps | undefined
     });
 
     const mapProps: BreadcrumbProps = {
-        homeLinkProps: routes.home().link,
+        // homeLinkProps: routes.home().link,
         // segments: [{ label: t("dashboard"), linkProps: routes.dashboard().link }],
         segments: [],
         currentPageLabel: t("map_list"),
     };
 
     switch (route.name) {
-        case "home":
+        // case "home":
         case "map_list":
             return { ...mapProps, currentPageLabel: t(route.name) };
 

@@ -52,7 +52,7 @@ export type getNotificationsResponseSuccess = getNotificationsResponse200 & {
 export type getNotificationsResponse = getNotificationsResponseSuccess;
 
 export const getGetNotificationsUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/notifications`;
+    return `${env.API_EDITOR_URL}/api/notifications`;
 };
 
 export const getNotifications = async (options?: RequestInit): Promise<getNotificationsResponse> => {
@@ -63,7 +63,7 @@ export const getNotifications = async (options?: RequestInit): Promise<getNotifi
 };
 
 export const getGetNotificationsQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/notifications`] as const;
+    return [`${env.API_EDITOR_URL}/api/notifications`] as const;
 };
 
 export const getGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(options?: {

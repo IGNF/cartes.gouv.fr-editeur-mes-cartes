@@ -41,7 +41,7 @@ export type postLoginResponseError = (postLoginResponse401 | postLoginResponse42
 export type postLoginResponse = postLoginResponseSuccess | postLoginResponseError;
 
 export const getPostLoginUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/login`;
+    return `${env.API_EDITOR_URL}/api/login`;
 };
 
 export const postLogin = async (postLoginBody: PostLoginBody, options?: RequestInit): Promise<postLoginResponse> => {
@@ -110,7 +110,7 @@ export type postTokenRefreshResponseError = postTokenRefreshResponse401 & {
 export type postTokenRefreshResponse = postTokenRefreshResponseSuccess | postTokenRefreshResponseError;
 
 export const getPostTokenRefreshUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/token/refresh`;
+    return `${env.API_EDITOR_URL}/api/token/refresh`;
 };
 
 export const postTokenRefresh = async (postTokenRefreshBody: PostTokenRefreshBody, options?: RequestInit): Promise<postTokenRefreshResponse> => {
@@ -178,7 +178,7 @@ export type postLogoutResponseError = postLogoutResponse401 & {
 export type postLogoutResponse = postLogoutResponseSuccess | postLogoutResponseError;
 
 export const getPostLogoutUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/logout`;
+    return `${env.API_EDITOR_URL}/api/logout`;
 };
 
 export const postLogout = async (options?: RequestInit): Promise<postLogoutResponse> => {

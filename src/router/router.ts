@@ -1,11 +1,11 @@
-import { createGroup, createRouter, defineRoute, param,  } from "type-route";
+import { createGroup, createRouter, defineRoute, param } from "type-route";
 
 export const appRoot = "";
 
 // Routes non protégées
 const publicRoutes = {
-    home: defineRoute(`${appRoot}/`),
-    dashboard: defineRoute(`/`),
+    // home: defineRoute(`${appRoot}/`),
+    // dashboard: defineRoute(`/`),
     discover_publish: defineRoute(
         {
             authentication_failed: param.query.optional.number,
@@ -38,7 +38,7 @@ const mapRoutes = {
             query: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => "/mes-cartes"
+        () => ["/mes-cartes", "/"]
     ),
     create_map: defineRoute(`${appRoot}/creer-une-carte`),
 }

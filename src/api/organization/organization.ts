@@ -75,7 +75,7 @@ export type getOrganizationsRolesResponseSuccess = getOrganizationsRolesResponse
 export type getOrganizationsRolesResponse = getOrganizationsRolesResponseSuccess;
 
 export const getGetOrganizationsRolesUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/organizations/roles`;
+    return `${env.API_EDITOR_URL}/api/organizations/roles`;
 };
 
 export const getOrganizationsRoles = async (options?: RequestInit): Promise<getOrganizationsRolesResponse> => {
@@ -86,7 +86,7 @@ export const getOrganizationsRoles = async (options?: RequestInit): Promise<getO
 };
 
 export const getGetOrganizationsRolesQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/roles`] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/roles`] as const;
 };
 
 export const getGetOrganizationsRolesQueryOptions = <TData = Awaited<ReturnType<typeof getOrganizationsRoles>>, TError = unknown>(options?: {
@@ -185,7 +185,7 @@ export type getOrganizationsMeResponseError = getOrganizationsMeResponse401 & {
 export type getOrganizationsMeResponse = getOrganizationsMeResponseSuccess | getOrganizationsMeResponseError;
 
 export const getGetOrganizationsMeUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/organizations/me`;
+    return `${env.API_EDITOR_URL}/api/organizations/me`;
 };
 
 export const getOrganizationsMe = async (options?: RequestInit): Promise<getOrganizationsMeResponse> => {
@@ -196,7 +196,7 @@ export const getOrganizationsMe = async (options?: RequestInit): Promise<getOrga
 };
 
 export const getGetOrganizationsMeQueryKey = () => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/me`] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/me`] as const;
 };
 
 export const getGetOrganizationsMeQueryOptions = <TData = Awaited<ReturnType<typeof getOrganizationsMe>>, TError = NotConnectedResponse>(options?: {
@@ -300,7 +300,7 @@ export type getOrganizationsByIdActivateResponseError = (getOrganizationsByIdAct
 export type getOrganizationsByIdActivateResponse = getOrganizationsByIdActivateResponseSuccess | getOrganizationsByIdActivateResponseError;
 
 export const getGetOrganizationsByIdActivateUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/activate`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/activate`;
 };
 
 /**
@@ -314,7 +314,7 @@ export const getOrganizationsByIdActivate = async (id: number | string, options?
 };
 
 export const getGetOrganizationsByIdActivateQueryKey = (id: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/${id}/activate`] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/${id}/activate`] as const;
 };
 
 export const getGetOrganizationsByIdActivateQueryOptions = <
@@ -450,7 +450,7 @@ export type getOrganizationsByIdResponseError = getOrganizationsByIdResponse404 
 export type getOrganizationsByIdResponse = getOrganizationsByIdResponseSuccess | getOrganizationsByIdResponseError;
 
 export const getGetOrganizationsByIdUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}`;
 };
 
 /**
@@ -464,7 +464,7 @@ export const getOrganizationsById = async (id: number | string, options?: Reques
 };
 
 export const getGetOrganizationsByIdQueryKey = (id: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/${id}`] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/${id}`] as const;
 };
 
 export const getGetOrganizationsByIdQueryOptions = <TData = Awaited<ReturnType<typeof getOrganizationsById>>, TError = NotFoundResponse>(
@@ -585,7 +585,7 @@ export type deleteOrganizationsByIdResponseError = (
 export type deleteOrganizationsByIdResponse = deleteOrganizationsByIdResponseSuccess | deleteOrganizationsByIdResponseError;
 
 export const getDeleteOrganizationsByIdUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}`;
 };
 
 /**
@@ -661,7 +661,7 @@ export type postOrganizationsResponseError = (postOrganizationsResponse400 | pos
 export type postOrganizationsResponse = postOrganizationsResponseSuccess | postOrganizationsResponseError;
 
 export const getPostOrganizationsUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/organizations`;
+    return `${env.API_EDITOR_URL}/api/organizations`;
 };
 
 /**
@@ -749,7 +749,7 @@ export type putOrganizationsByIdByAttributeResponseError = (
 export type putOrganizationsByIdByAttributeResponse = putOrganizationsByIdByAttributeResponseSuccess | putOrganizationsByIdByAttributeResponseError;
 
 export const getPutOrganizationsByIdByAttributeUrl = (id: number | string, attribute: string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/${attribute}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/${attribute}`;
 };
 
 /**
@@ -863,7 +863,7 @@ export type putOrganizationsByIdJoinLinkByRoleResponseError = (
 export type putOrganizationsByIdJoinLinkByRoleResponse = putOrganizationsByIdJoinLinkByRoleResponseSuccess | putOrganizationsByIdJoinLinkByRoleResponseError;
 
 export const getPutOrganizationsByIdJoinLinkByRoleUrl = (id: number | string, role: string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/join-link/${role}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/join-link/${role}`;
 };
 
 /**
@@ -990,8 +990,8 @@ export const getGetOrganizationsJoinByIdUrl = (id: number | string, params?: Get
     const stringifiedParams = normalizedParams.toString();
 
     return stringifiedParams.length > 0
-        ? `${env.API_EDITEUR_URL}/api/organizations/join/${id}?${stringifiedParams}`
-        : `${env.API_EDITEUR_URL}/api/organizations/join/${id}`;
+        ? `${env.API_EDITOR_URL}/api/organizations/join/${id}?${stringifiedParams}`
+        : `${env.API_EDITOR_URL}/api/organizations/join/${id}`;
 };
 
 /**
@@ -1009,7 +1009,7 @@ export const getOrganizationsJoinById = async (
 };
 
 export const getGetOrganizationsJoinByIdQueryKey = (id: number | string, params?: GetOrganizationsJoinByIdParams) => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/join/${id}`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/join/${id}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetOrganizationsJoinByIdQueryOptions = <
@@ -1155,7 +1155,7 @@ export type getOrganizationsLinksByIdResponseError = (
 export type getOrganizationsLinksByIdResponse = getOrganizationsLinksByIdResponseSuccess | getOrganizationsLinksByIdResponseError;
 
 export const getGetOrganizationsLinksByIdUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/links/${id}`;
+    return `${env.API_EDITOR_URL}/api/organizations/links/${id}`;
 };
 
 /**
@@ -1169,7 +1169,7 @@ export const getOrganizationsLinksById = async (id: number | string, options?: R
 };
 
 export const getGetOrganizationsLinksByIdQueryKey = (id: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/organizations/links/${id}`] as const;
+    return [`${env.API_EDITOR_URL}/api/organizations/links/${id}`] as const;
 };
 
 export const getGetOrganizationsLinksByIdQueryOptions = <
@@ -1314,7 +1314,7 @@ export type postOrganizationsByIdMembersByUseridResponse =
     postOrganizationsByIdMembersByUseridResponseSuccess | postOrganizationsByIdMembersByUseridResponseError;
 
 export const getPostOrganizationsByIdMembersByUseridUrl = (id: number | string, userId: string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/members/${userId}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}`;
 };
 
 /**
@@ -1426,7 +1426,7 @@ export type deleteOrganizationsByIdMembersByUseridResponse =
     deleteOrganizationsByIdMembersByUseridResponseSuccess | deleteOrganizationsByIdMembersByUseridResponseError;
 
 export const getDeleteOrganizationsByIdMembersByUseridUrl = (id: number | string, userId: string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/members/${userId}`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}`;
 };
 
 /**
@@ -1524,7 +1524,7 @@ export type putOrganizationsByIdMembersByUseridRoleResponse =
     putOrganizationsByIdMembersByUseridRoleResponseSuccess | putOrganizationsByIdMembersByUseridRoleResponseError;
 
 export const getPutOrganizationsByIdMembersByUseridRoleUrl = (id: number | string, userId: string) => {
-    return `${env.API_EDITEUR_URL}/api/organizations/${id}/members/${userId}/role`;
+    return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}/role`;
 };
 
 /**

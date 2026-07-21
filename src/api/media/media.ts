@@ -96,7 +96,7 @@ export const getGetMediasUrl = (params?: GetMediasParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/medias?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/medias`;
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/medias?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/medias`;
 };
 
 /**
@@ -110,7 +110,7 @@ export const getMedias = async (params?: GetMediasParams, options?: RequestInit)
 };
 
 export const getGetMediasQueryKey = (params?: GetMediasParams) => {
-    return [`${env.API_EDITEUR_URL}/api/medias`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/medias`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMediasQueryOptions = <TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
@@ -214,7 +214,7 @@ export type postMediasResponseError = (postMediasResponse400 | postMediasRespons
 export type postMediasResponse = postMediasResponseSuccess | postMediasResponseError;
 
 export const getPostMediasUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/medias`;
+    return `${env.API_EDITOR_URL}/api/medias`;
 };
 
 /**
@@ -306,7 +306,7 @@ export const getGetMediaFoldersUrl = (params?: GetMediaFoldersParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/medias/folders?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/medias/folders`;
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/medias/folders?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/medias/folders`;
 };
 
 /**
@@ -320,7 +320,7 @@ export const getMediaFolders = async (params?: GetMediaFoldersParams, options?: 
 };
 
 export const getGetMediaFoldersQueryKey = (params?: GetMediaFoldersParams) => {
-    return [`${env.API_EDITEUR_URL}/api/medias/folders`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/medias/folders`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMediaFoldersQueryOptions = <TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
@@ -414,7 +414,7 @@ export type getImageByFilenameResponseError = (getImageByFilenameResponse404 | g
 export type getImageByFilenameResponse = getImageByFilenameResponseSuccess | getImageByFilenameResponseError;
 
 export const getGetImageByFilenameUrl = (filename: string) => {
-    return `${env.API_EDITEUR_URL}/api/image/${filename}`;
+    return `${env.API_EDITOR_URL}/api/image/${filename}`;
 };
 
 /**
@@ -429,7 +429,7 @@ export const getImageByFilename = async (filename: string, options?: RequestInit
 };
 
 export const getGetImageByFilenameQueryKey = (filename: string) => {
-    return [`${env.API_EDITEUR_URL}/api/image/${filename}`] as const;
+    return [`${env.API_EDITOR_URL}/api/image/${filename}`] as const;
 };
 
 export const getGetImageByFilenameQueryOptions = <TData = Awaited<ReturnType<typeof getImageByFilename>>, TError = NotFoundResponse | InvalidResponse>(
@@ -555,7 +555,7 @@ export type deleteMediaByIdResponseError = (
 export type deleteMediaByIdResponse = deleteMediaByIdResponseSuccess | deleteMediaByIdResponseError;
 
 export const getDeleteMediaByIdUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/medias/${id}`;
+    return `${env.API_EDITOR_URL}/api/medias/${id}`;
 };
 
 /**
@@ -641,7 +641,7 @@ export type putMediasByIdByAttributeResponseError = (
 export type putMediasByIdByAttributeResponse = putMediasByIdByAttributeResponseSuccess | putMediasByIdByAttributeResponseError;
 
 export const getPutMediasByIdByAttributeUrl = (id: number | string, attribute: string) => {
-    return `${env.API_EDITEUR_URL}/api/medias/${id}/${attribute}`;
+    return `${env.API_EDITOR_URL}/api/medias/${id}/${attribute}`;
 };
 
 /**
@@ -762,7 +762,7 @@ export type postMediaFileByIdResponseError = (
 export type postMediaFileByIdResponse = postMediaFileByIdResponseSuccess | postMediaFileByIdResponseError;
 
 export const getPostMediaFileByIdUrl = (id: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/medias/${id}/file`;
+    return `${env.API_EDITOR_URL}/api/medias/${id}/file`;
 };
 
 /**

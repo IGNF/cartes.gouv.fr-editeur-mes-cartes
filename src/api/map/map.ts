@@ -104,7 +104,7 @@ export const getGetMapsUrl = (params?: GetMapsParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps`;
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/maps?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/maps`;
 };
 
 export const getMaps = async (params?: GetMapsParams, options?: RequestInit): Promise<getMapsResponse> => {
@@ -115,7 +115,7 @@ export const getMaps = async (params?: GetMapsParams, options?: RequestInit): Pr
 };
 
 export const getGetMapsQueryKey = (params?: GetMapsParams) => {
-    return [`${env.API_EDITEUR_URL}/api/maps`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/maps`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMapsQueryOptions = <TData = Awaited<ReturnType<typeof getMaps>>, TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse>(
@@ -214,7 +214,7 @@ export type postMapResponseError = (postMapResponse400 | postMapResponse401 | po
 export type postMapResponse = postMapResponseSuccess | postMapResponseError;
 
 export const getPostMapUrl = () => {
-    return `${env.API_EDITEUR_URL}/api/maps`;
+    return `${env.API_EDITOR_URL}/api/maps`;
 };
 
 export const postMap = async (postMapBody: PostMapBody, options?: RequestInit): Promise<postMapResponse> => {
@@ -292,7 +292,7 @@ export const getGetMapsUsersUrl = (params?: GetMapsUsersParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITEUR_URL}/api/maps/users?${stringifiedParams}` : `${env.API_EDITEUR_URL}/api/maps/users`;
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/maps/users?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/maps/users`;
 };
 
 /**
@@ -306,7 +306,7 @@ export const getMapsUsers = async (params?: GetMapsUsersParams, options?: Reques
 };
 
 export const getGetMapsUsersQueryKey = (params?: GetMapsUsersParams) => {
-    return [`${env.API_EDITEUR_URL}/api/maps/users`, ...(params ? [params] : [])] as const;
+    return [`${env.API_EDITOR_URL}/api/maps/users`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetMapsUsersQueryOptions = <TData = Awaited<ReturnType<typeof getMapsUsers>>, TError = NotFoundResponse>(
@@ -400,7 +400,7 @@ export type getMapByViewIdResponseError = (getMapByViewIdResponse404 | getMapByV
 export type getMapByViewIdResponse = getMapByViewIdResponseSuccess | getMapByViewIdResponseError;
 
 export const getGetMapByViewIdUrl = (viewId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${viewId}`;
+    return `${env.API_EDITOR_URL}/api/maps/${viewId}`;
 };
 
 /**
@@ -414,7 +414,7 @@ export const getMapByViewId = async (viewId: number | string, options?: RequestI
 };
 
 export const getGetMapByViewIdQueryKey = (viewId: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/maps/${viewId}`] as const;
+    return [`${env.API_EDITOR_URL}/api/maps/${viewId}`] as const;
 };
 
 export const getGetMapByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapByViewId>>, TError = NotFoundResponse | InvalidResponse>(
@@ -510,7 +510,7 @@ export type getMapEditByEditIdResponseError = (getMapEditByEditIdResponse404 | g
 export type getMapEditByEditIdResponse = getMapEditByEditIdResponseSuccess | getMapEditByEditIdResponseError;
 
 export const getGetMapEditByEditIdUrl = (editId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit`;
+    return `${env.API_EDITOR_URL}/api/maps/${editId}/edit`;
 };
 
 /**
@@ -524,7 +524,7 @@ export const getMapEditByEditId = async (editId: number | string, options?: Requ
 };
 
 export const getGetMapEditByEditIdQueryKey = (editId: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/maps/${editId}/edit`] as const;
+    return [`${env.API_EDITOR_URL}/api/maps/${editId}/edit`] as const;
 };
 
 export const getGetMapEditByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditByEditId>>, TError = NotFoundResponse | InvalidResponse>(
@@ -638,7 +638,7 @@ export type getMapFileByViewIdResponseError = (getMapFileByViewIdResponse404 | g
 export type getMapFileByViewIdResponse = getMapFileByViewIdResponseSuccess | getMapFileByViewIdResponseError;
 
 export const getGetMapFileByViewIdUrl = (viewId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${viewId}/file`;
+    return `${env.API_EDITOR_URL}/api/maps/${viewId}/file`;
 };
 
 /**
@@ -652,7 +652,7 @@ export const getMapFileByViewId = async (viewId: number | string, options?: Requ
 };
 
 export const getGetMapFileByViewIdQueryKey = (viewId: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/maps/${viewId}/file`] as const;
+    return [`${env.API_EDITOR_URL}/api/maps/${viewId}/file`] as const;
 };
 
 export const getGetMapFileByViewIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapFileByViewId>>, TError = NotFoundResponse | InvalidResponse>(
@@ -766,7 +766,7 @@ export type getMapEditFileByEditIdResponseError = (getMapEditFileByEditIdRespons
 export type getMapEditFileByEditIdResponse = getMapEditFileByEditIdResponseSuccess | getMapEditFileByEditIdResponseError;
 
 export const getGetMapEditFileByEditIdUrl = (editId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`;
+    return `${env.API_EDITOR_URL}/api/maps/${editId}/edit/file`;
 };
 
 /**
@@ -780,7 +780,7 @@ export const getMapEditFileByEditId = async (editId: number | string, options?: 
 };
 
 export const getGetMapEditFileByEditIdQueryKey = (editId: number | string) => {
-    return [`${env.API_EDITEUR_URL}/api/maps/${editId}/edit/file`] as const;
+    return [`${env.API_EDITOR_URL}/api/maps/${editId}/edit/file`] as const;
 };
 
 export const getGetMapEditFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
@@ -903,7 +903,7 @@ export type deleteMapByEditIdResponseError = (deleteMapByEditIdResponse401 | del
 export type deleteMapByEditIdResponse = deleteMapByEditIdResponseSuccess | deleteMapByEditIdResponseError;
 
 export const getDeleteMapByEditIdUrl = (editId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${editId}`;
+    return `${env.API_EDITOR_URL}/api/maps/${editId}`;
 };
 
 export const deleteMapByEditId = async (editId: number | string, options?: RequestInit): Promise<deleteMapByEditIdResponse> => {
@@ -983,7 +983,7 @@ export type patchMapByEditIdResponseError = (
 export type patchMapByEditIdResponse = patchMapByEditIdResponseSuccess | patchMapByEditIdResponseError;
 
 export const getPatchMapByEditIdUrl = (editId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${editId}`;
+    return `${env.API_EDITOR_URL}/api/maps/${editId}`;
 };
 
 export const patchMapByEditId = async (
@@ -1055,7 +1055,7 @@ export type postMapFileByEditIdResponseError = postMapFileByEditIdResponse404 & 
 export type postMapFileByEditIdResponse = postMapFileByEditIdResponseSuccess | postMapFileByEditIdResponseError;
 
 export const getPostMapFileByEditIdUrl = (editId: number | string) => {
-    return `${env.API_EDITEUR_URL}/api/maps/${editId}/file`;
+    return `${env.API_EDITOR_URL}/api/maps/${editId}/file`;
 };
 
 export const postMapFileByEditId = async (
