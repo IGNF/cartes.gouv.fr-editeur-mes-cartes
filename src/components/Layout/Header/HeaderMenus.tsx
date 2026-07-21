@@ -91,7 +91,7 @@ export function HeaderMenuServices() {
 export function HeaderMenuUser() {
     // const { t } = useTranslation({ HeaderMenus: HeaderMenuConnexion });
     const { t } = useTranslation("Layout");
-    const { logout, isUserLoggedIn, decodedIdToken, goToAuthServer } = useOidc();
+    const { logout, isUserLoggedIn, decodedIdToken } = useOidc();
 
     return (
         <>

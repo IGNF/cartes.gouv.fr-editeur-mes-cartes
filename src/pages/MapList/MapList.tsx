@@ -17,12 +17,11 @@ import { tss } from "tss-react";
 import MapListItem from "./MapListItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { Mutation, useMutation, usePrefetchQuery } from "@tanstack/react-query";
+import { usePrefetchQuery } from "@tanstack/react-query";
 import RQKeys from "@/modules/maps/RQKeys";
 import { type MapList as MapListType, Theme } from "@/api/model";
 import NoCorrespondingData from "./NoCorrespondingData";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
 import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
@@ -71,10 +70,11 @@ export default function MapList() {
     const { t } = useTranslation("MapList");
     const { t: tCommon } = useTranslation("Common");
 
+    
     // React states
     const [openedMap, setOpenedMap] = useState<MapListType>();
     const [mapCount, setMapCount] = useState(0);
-
+    
     // Appelé plus tard dans la modale
     const deleteMapMutation = api.map.useDeleteMapByEditId({
         mutation: {
@@ -401,9 +401,9 @@ export default function MapList() {
                     title={t("share_map")}
                 >
 
-                    <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={openedMap ? useMapLink(openedMap) : ""} className="fr-mb-1w" />
+                    <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={useMapLink(openedMap)} className="fr-mb-1w" />
 
-                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-map__iframe-hint")} text={openedMap ? useMapIframe(openedMap) : ""} textArea className="fr-mb-1w" />
+                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-map__iframe-hint")} text={useMapIframe(openedMap)} textArea className="fr-mb-1w" />
 
                     <div />
                 </shareMapModal.Component>,

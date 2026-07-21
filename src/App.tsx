@@ -8,7 +8,6 @@ import ErrorBoundary from "./components/Utils/ErrorBoundary";
 import { queryClient } from "./modules/queryClient";
 import { RouteProvider } from "./router/router";
 import RouterRenderer from "./router/RouterRenderer";
-import { bootstrapUser } from "./utils";
 
 import "./sass/helpers.scss";
 
@@ -17,8 +16,6 @@ const persister = createAsyncStoragePersister({
 });
 
 const maxAge = 1000 * 60 * 60 * 24; // 24h
-
-bootstrapUser();
 
 const App: FC = () => {
     return (

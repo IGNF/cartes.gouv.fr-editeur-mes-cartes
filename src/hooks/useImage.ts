@@ -4,7 +4,7 @@ import placeholder16x9 from "@/img/placeholder.16x9.png";
 // import { useQuery } from "@tanstack/react-query";
 
 // Permet récupèrer les thèmes des cartes (avec le nombre)
-export function useImage(uri?: string | null): any {
+export function useImage(uri?: string | null): string {
   const URL_REGEX = /[http]?s?:\/\/[^\s]+/g;
   if (!uri || uri === "") {
     // Image par défaut
@@ -25,6 +25,6 @@ export function useImage(uri?: string | null): any {
         },
       }
     });
-    return data;
+    return data as string;
   }
 }
