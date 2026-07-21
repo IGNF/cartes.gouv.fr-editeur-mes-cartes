@@ -1,34 +1,66 @@
-# React + TypeScript + Vite
+# Espace utilisateur de l'éditeur carto
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+`cartes.gouv.fr-editeur-mes-cartes` est l'interface utilisateur dédiée à la gestion des cartes d'un·e utilisateur·ice dans l'écosystème cartes.gouv.fr. Le projet couvre aujourd'hui la gestion des cartes, des médias (images de l'utilisateur·ice), aux notifications et aux organisations.
 
-Currently, two official plugins are available:
+L'application s'inscrit dans l'écosystème [cartes.gouv.fr](https://cartes.gouv.fr) et est notamment liée à :
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [cartes.gouv.fr-editeur-carto](https://github.com/IGNF/cartes.gouv.fr-editeur-carto) : éditeur cartographique utilisé pour créer ou modifier le contenu d'une carte.
+- [cartes.gouv.fr-visionneuse-carto](https://github.com/IGNF/cartes.gouv.fr-visionneuse-carto) : visionneuse utilisée pour afficher une carte publiée ou partagée.
 
-## React Compiler
+Ce dépôt vient s'ajouter à l'espace utilisateur global de cartes.gouv.fr.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Installation
 
-Note: This will impact Vite dev & build performances.
+### Prérequis
 
-## Expanding the Oxlint configuration
+- Node.js `^22.18.0 || >=24.0.0`
+- npm
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Installation locale
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Créer ou adapter le fichier `.env.local` à la racine du projet. Les variables les plus importantes sont :
+
+```dotenv
+API_EDITOR_URL=https://url.to/api/
+VITE_IAM_URL=https://url.to/sso
+VITE_IAM_REALM=geoplateforme
+VITE_IAM_CLIENT_ID=client_oidc
+VITE_EDITOR_URL=https://url.to/editor
+VITE_VIEWER_URL=https://url.to/viewer
+```
+
+Lancer le projet en local :
+
+```bash
+npm run dev
+```
+
+Le serveur Vite est alors disponible sur l'URL locale affichée dans le terminal.
+
+### Commandes utiles
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run generate-api
+```
+
+- `npm run dev` : démarre l'application en mode développement.
+- `npm run build` : lance le build TypeScript puis le bundle Vite.
+- `npm run lint` : exécute ESLint sur le code source.
+- `npm run generate-api` : régénère le client API, les types et les mocks à partir du contrat OpenAPI.
+
+## Documentation développeur
+
+Voir [DEVELOPER.MD](./docs/DEVELOPER.md).
+
+## Projet github liés
+
+- [Projet github cartes.gouv.fr](https://github.com/IGNF/cartes.gouv.fr)
+- [Projet github cartes.gouv.fr-editeur-carto](https://github.com/IGNF/cartes.gouv.fr-editeur-carto)
+- [Projet github cartes.gouv.fr-visionneuse-carto](https://github.com/IGNF/cartes.gouv.fr-visionneuse-carto)
