@@ -19,8 +19,6 @@ export default defineConfig({
       mock: true,
       override: {
         query: {
-          useMutation: false,
-          useQuery: true,
           usePrefetch: true,
         },
         mutator: {

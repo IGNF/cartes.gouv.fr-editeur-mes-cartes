@@ -5,15 +5,18 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
     DataTag,
     DefinedInitialDataOptions,
     DefinedUseQueryResult,
+    MutationFunction,
     QueryClient,
     QueryFunction,
     QueryKey,
     UndefinedInitialDataOptions,
+    UseMutationOptions,
+    UseMutationResult,
     UseQueryOptions,
     UseQueryResult,
 } from "@tanstack/react-query";
@@ -190,74 +193,34 @@ export const deleteMe = async (options?: RequestInit): Promise<deleteMeResponse>
     });
 };
 
-export const getDeleteMeQueryKey = () => {
-    return ["DELETE", `${env.API_EDITEUR_URL}/api/me`] as const;
-};
-
-export const getDeleteMeQueryOptions = <
-    TData = Awaited<ReturnType<typeof deleteMe>>,
-    TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse,
->(options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>;
+export const getDeleteMeMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError, void, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError, void, TContext> => {
+    const mutationKey = ["deleteMe"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
 
-    const queryKey = queryOptions?.queryKey ?? getDeleteMeQueryKey();
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof deleteMe>>> = ({ signal }) => deleteMe({ signal, ...requestOptions });
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMe>>, void> = () => {
+        return deleteMe(requestOptions);
     };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteMeQueryResult = NonNullable<Awaited<ReturnType<typeof deleteMe>>>;
-export type DeleteMeQueryError = NotConnectedResponse | ForbiddenResponse | InvalidResponse;
+export type DeleteMeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMe>>>;
 
-export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMe>>, TError, Awaited<ReturnType<typeof deleteMe>>>, "initialData">;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
+export type DeleteMeMutationError = NotConnectedResponse | ForbiddenResponse | InvalidResponse;
+
+export const useDeleteMe = <TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse, TContext = unknown>(
+    options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteMe>>, TError, void, TContext>; request?: SecondParameter<typeof fetchWithAuth> },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>> &
-            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMe>>, TError, Awaited<ReturnType<typeof deleteMe>>>, "initialData">;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function useDeleteMe<TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getDeleteMeQueryOptions(options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchDeleteMeQuery = async <TData = Awaited<ReturnType<typeof deleteMe>>, TError = NotConnectedResponse | ForbiddenResponse | InvalidResponse>(
-    queryClient: QueryClient,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-): Promise<QueryClient> => {
-    const queryOptions = getDeleteMeQueryOptions(options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
+): UseMutationResult<Awaited<ReturnType<typeof deleteMe>>, TError, void, TContext> => {
+    return useMutation(getDeleteMeMutationOptions(options), queryClient);
 };
-
 export type patchMeResponse200 = {
     data: UserView;
     status: 200;
@@ -298,76 +261,39 @@ export const patchMe = async (userMeEdit: UserMeEdit, options?: RequestInit): Pr
     });
 };
 
-export const getPatchMeQueryKey = (userMeEdit?: UserMeEdit) => {
-    return ["PATCH", `${env.API_EDITEUR_URL}/api/me`, userMeEdit] as const;
-};
+export const getPatchMeMutationOptions = <TError = BadRequestResponse | NotConnectedResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError, { data: UserMeEdit }, TContext>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError, { data: UserMeEdit }, TContext> => {
+    const mutationKey = ["patchMe"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
 
-export const getPatchMeQueryOptions = <TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    userMeEdit: UserMeEdit,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchMe>>, { data: UserMeEdit }> = (props) => {
+        const { data } = props ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getPatchMeQueryKey(userMeEdit);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof patchMe>>> = ({ signal }) => patchMe(userMeEdit, { signal, ...requestOptions });
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
+        return patchMe(data, requestOptions);
     };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export type PatchMeQueryResult = NonNullable<Awaited<ReturnType<typeof patchMe>>>;
-export type PatchMeQueryError = BadRequestResponse | NotConnectedResponse;
+export type PatchMeMutationResult = NonNullable<Awaited<ReturnType<typeof patchMe>>>;
+export type PatchMeMutationBody = UserMeEdit;
+export type PatchMeMutationError = BadRequestResponse | NotConnectedResponse;
 
-export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    userMeEdit: UserMeEdit,
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof patchMe>>, TError, Awaited<ReturnType<typeof patchMe>>>, "initialData">;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    userMeEdit: UserMeEdit,
+export const usePatchMe = <TError = BadRequestResponse | NotConnectedResponse, TContext = unknown>(
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>> &
-            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof patchMe>>, TError, Awaited<ReturnType<typeof patchMe>>>, "initialData">;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchMe>>, TError, { data: UserMeEdit }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    userMeEdit: UserMeEdit,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function usePatchMe<TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    userMeEdit: UserMeEdit,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getPatchMeQueryOptions(userMeEdit, options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchPatchMeQuery = async <TData = Awaited<ReturnType<typeof patchMe>>, TError = BadRequestResponse | NotConnectedResponse>(
-    queryClient: QueryClient,
-    userMeEdit: UserMeEdit,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMe>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-): Promise<QueryClient> => {
-    const queryOptions = getPatchMeQueryOptions(userMeEdit, options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
+): UseMutationResult<Awaited<ReturnType<typeof patchMe>>, TError, { data: UserMeEdit }, TContext> => {
+    return useMutation(getPatchMeMutationOptions(options), queryClient);
 };
-
 export type getUsersPublicByPublicidResponse200 = {
     data: UserPublic;
     status: 200;

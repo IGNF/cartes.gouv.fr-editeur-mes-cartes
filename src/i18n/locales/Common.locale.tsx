@@ -18,6 +18,13 @@ const { i18n } = declareComponentKeys<
     | "search"
     | "information"
     | "no_necessary_rights"
+    | "yes"
+    | "no"
+    | "cancel"
+    | "delete"
+    | "duplicate"
+    | "open"
+    | "share"
 >()("Common");
 export type I18n = typeof i18n;
 
@@ -41,6 +48,13 @@ export const commonFrTranslations: Translations<"fr">["Common"] = {
     search: "Rechercher",
     information: "Information",
     no_necessary_rights: "Vous n'avez pas les droits nécessaires pour afficher cette page.",
+    yes: "Oui",
+    no: "Non",
+    cancel: "Annuler",
+    delete: "Supprimer",
+    duplicate: "Dupliquer",
+    share: "Partager",
+    open: "Ouvrir",
 };
 
 export const commonEnTranslations: Translations<"en">["Common"] = {
@@ -59,4 +73,12 @@ export const commonEnTranslations: Translations<"en">["Common"] = {
     search: undefined,
     information: undefined,
     no_necessary_rights: undefined,
+    yes: undefined,
+    no: undefined,
+    cancel: undefined,
+    delete: undefined,
+    duplicate: undefined,
+    share: undefined,
+
+    open: undefined,
 };

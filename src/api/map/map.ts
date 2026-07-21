@@ -5,15 +5,18 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
     DataTag,
     DefinedInitialDataOptions,
     DefinedUseQueryResult,
+    MutationFunction,
     QueryClient,
     QueryFunction,
     QueryKey,
     UndefinedInitialDataOptions,
+    UseMutationOptions,
+    UseMutationResult,
     UseQueryOptions,
     UseQueryResult,
 } from "@tanstack/react-query";
@@ -226,76 +229,39 @@ export const postMap = async (postMapBody: PostMapBody, options?: RequestInit): 
     });
 };
 
-export const getPostMapQueryKey = (postMapBody?: PostMapBody) => {
-    return ["POST", `${env.API_EDITEUR_URL}/api/maps`, postMapBody] as const;
-};
+export const getPostMapMutationOptions = <TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError, { data: PostMapBody }, TContext>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError, { data: PostMapBody }, TContext> => {
+    const mutationKey = ["postMap"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
 
-export const getPostMapQueryOptions = <TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    postMapBody: PostMapBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMap>>, { data: PostMapBody }> = (props) => {
+        const { data } = props ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getPostMapQueryKey(postMapBody);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof postMap>>> = ({ signal }) => postMap(postMapBody, { signal, ...requestOptions });
-
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
+        return postMap(data, requestOptions);
     };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export type PostMapQueryResult = NonNullable<Awaited<ReturnType<typeof postMap>>>;
-export type PostMapQueryError = BadRequestResponse | NotConnectedResponse | NotFoundResponse;
+export type PostMapMutationResult = NonNullable<Awaited<ReturnType<typeof postMap>>>;
+export type PostMapMutationBody = PostMapBody;
+export type PostMapMutationError = BadRequestResponse | NotConnectedResponse | NotFoundResponse;
 
-export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    postMapBody: PostMapBody,
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof postMap>>, TError, Awaited<ReturnType<typeof postMap>>>, "initialData">;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    postMapBody: PostMapBody,
+export const usePostMap = <TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse, TContext = unknown>(
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>> &
-            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof postMap>>, TError, Awaited<ReturnType<typeof postMap>>>, "initialData">;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMap>>, TError, { data: PostMapBody }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    postMapBody: PostMapBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function usePostMap<TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    postMapBody: PostMapBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getPostMapQueryOptions(postMapBody, options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchPostMapQuery = async <TData = Awaited<ReturnType<typeof postMap>>, TError = BadRequestResponse | NotConnectedResponse | NotFoundResponse>(
-    queryClient: QueryClient,
-    postMapBody: PostMapBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMap>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-): Promise<QueryClient> => {
-    const queryOptions = getPostMapQueryOptions(postMapBody, options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
+): UseMutationResult<Awaited<ReturnType<typeof postMap>>, TError, { data: PostMapBody }, TContext> => {
+    return useMutation(getPostMapMutationOptions(options), queryClient);
 };
-
 export type getMapsUsersResponse200 = {
     data: string[];
     status: 200;
@@ -947,114 +913,39 @@ export const deleteMapByEditId = async (editId: number | string, options?: Reque
     });
 };
 
-export const getDeleteMapByEditIdQueryKey = (editId: number | string) => {
-    return ["DELETE", `${env.API_EDITEUR_URL}/api/maps/${editId}`] as const;
+export const getDeleteMapByEditIdMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, { editId: number | string }, TContext>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, { editId: number | string }, TContext> => {
+    const mutationKey = ["deleteMapByEditId"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMapByEditId>>, { editId: number | string }> = (props) => {
+        const { editId } = props ?? {};
+
+        return deleteMapByEditId(editId, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export const getDeleteMapByEditIdQueryOptions = <
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
+export type DeleteMapByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMapByEditId>>>;
+
+export type DeleteMapByEditIdMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+
+export const useDeleteMapByEditId = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, { editId: number | string }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
-    }
-) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getDeleteMapByEditIdQueryKey(editId);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof deleteMapByEditId>>> = ({ signal }) => deleteMapByEditId(editId, { signal, ...requestOptions });
-
-    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof deleteMapByEditId>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, { editId: number | string }, TContext> => {
+    return useMutation(getDeleteMapByEditIdMutationOptions(options), queryClient);
 };
-
-export type DeleteMapByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof deleteMapByEditId>>>;
-export type DeleteMapByEditIdQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
-
-export function useDeleteMapByEditId<
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>> &
-            Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, Awaited<ReturnType<typeof deleteMapByEditId>>>,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDeleteMapByEditId<
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>> &
-            Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, Awaited<ReturnType<typeof deleteMapByEditId>>>,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDeleteMapByEditId<
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function useDeleteMapByEditId<
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getDeleteMapByEditIdQueryOptions(editId, options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchDeleteMapByEditIdQuery = async <
-    TData = Awaited<ReturnType<typeof deleteMapByEditId>>,
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    queryClient: QueryClient,
-    editId: number | string,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof deleteMapByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    }
-): Promise<QueryClient> => {
-    const queryOptions = getDeleteMapByEditIdQueryOptions(editId, options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
-};
-
 export type patchMapByEditIdResponse200 = {
     data: MapView;
     status: 200;
@@ -1108,112 +999,42 @@ export const patchMapByEditId = async (
     });
 };
 
-export const getPatchMapByEditIdQueryKey = (editId: number | string, patchMapByEditIdBody?: PatchMapByEditIdBody) => {
-    return ["PATCH", `${env.API_EDITEUR_URL}/api/maps/${editId}`, patchMapByEditIdBody] as const;
+export const getPatchMapByEditIdMutationOptions = <
+    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, { editId: number | string; data: PatchMapByEditIdBody }, TContext>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, { editId: number | string; data: PatchMapByEditIdBody }, TContext> => {
+    const mutationKey = ["patchMapByEditId"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchMapByEditId>>, { editId: number | string; data: PatchMapByEditIdBody }> = (props) => {
+        const { editId, data } = props ?? {};
+
+        return patchMapByEditId(editId, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export const getPatchMapByEditIdQueryOptions = <
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
+export type PatchMapByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof patchMapByEditId>>>;
+export type PatchMapByEditIdMutationBody = PatchMapByEditIdBody;
+export type PatchMapByEditIdMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-    const queryKey = queryOptions?.queryKey ?? getPatchMapByEditIdQueryKey(editId, patchMapByEditIdBody);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof patchMapByEditId>>> = ({ signal }) =>
-        patchMapByEditId(editId, patchMapByEditIdBody, { signal, ...requestOptions });
-
-    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof patchMapByEditId>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+export const usePatchMapByEditId = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, { editId: number | string; data: PatchMapByEditIdBody }, TContext>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof patchMapByEditId>>, TError, { editId: number | string; data: PatchMapByEditIdBody }, TContext> => {
+    return useMutation(getPatchMapByEditIdMutationOptions(options), queryClient);
 };
-
-export type PatchMapByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof patchMapByEditId>>>;
-export type PatchMapByEditIdQueryError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
-
-export function usePatchMapByEditId<
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, Awaited<ReturnType<typeof patchMapByEditId>>>, "initialData">;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePatchMapByEditId<
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>> &
-            Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, Awaited<ReturnType<typeof patchMapByEditId>>>,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePatchMapByEditId<
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function usePatchMapByEditId<
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getPatchMapByEditIdQueryOptions(editId, patchMapByEditIdBody, options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchPatchMapByEditIdQuery = async <
-    TData = Awaited<ReturnType<typeof patchMapByEditId>>,
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
->(
-    queryClient: QueryClient,
-    editId: number | string,
-    patchMapByEditIdBody: PatchMapByEditIdBody,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof patchMapByEditId>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
-): Promise<QueryClient> => {
-    const queryOptions = getPatchMapByEditIdQueryOptions(editId, patchMapByEditIdBody, options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
-};
-
 export type postMapFileByEditIdResponse200 = {
     data: void;
     status: 200;
@@ -1252,99 +1073,48 @@ export const postMapFileByEditId = async (
     });
 };
 
-export const getPostMapFileByEditIdQueryKey = (editId: number | string, postMapFileByEditIdBody?: PostMapFileByEditIdBody) => {
-    return ["POST", `${env.API_EDITEUR_URL}/api/maps/${editId}/file`, postMapFileByEditIdBody] as const;
-};
-
-export const getPostMapFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    }
-) => {
-    const { query: queryOptions, request: requestOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getPostMapFileByEditIdQueryKey(editId, postMapFileByEditIdBody);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof postMapFileByEditId>>> = ({ signal }) =>
-        postMapFileByEditId(editId, postMapFileByEditIdBody, { signal, ...requestOptions });
-
-    return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
+export const getPostMapFileByEditIdMutationOptions = <TError = NotFoundResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof postMapFileByEditId>>,
         TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+        { editId: number | string; data: PostMapFileByEditIdBody },
+        TContext
+    >;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, { editId: number | string; data: PostMapFileByEditIdBody }, TContext> => {
+    const mutationKey = ["postMapFileByEditId"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMapFileByEditId>>, { editId: number | string; data: PostMapFileByEditIdBody }> = (
+        props
+    ) => {
+        const { editId, data } = props ?? {};
+
+        return postMapFileByEditId(editId, data, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export type PostMapFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof postMapFileByEditId>>>;
-export type PostMapFileByEditIdQueryError = NotFoundResponse;
+export type PostMapFileByEditIdMutationResult = NonNullable<Awaited<ReturnType<typeof postMapFileByEditId>>>;
+export type PostMapFileByEditIdMutationBody = PostMapFileByEditIdBody;
+export type PostMapFileByEditIdMutationError = NotFoundResponse;
 
-export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>> &
-            Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, Awaited<ReturnType<typeof postMapFileByEditId>>>,
-                "initialData"
-            >;
+export const usePostMapFileByEditId = <TError = NotFoundResponse, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof postMapFileByEditId>>,
+            TError,
+            { editId: number | string; data: PostMapFileByEditIdBody },
+            TContext
+        >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>> &
-            Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, Awaited<ReturnType<typeof postMapFileByEditId>>>,
-                "initialData"
-            >;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function usePostMapFileByEditId<TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getPostMapFileByEditIdQueryOptions(editId, postMapFileByEditIdBody, options);
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-    return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const prefetchPostMapFileByEditIdQuery = async <TData = Awaited<ReturnType<typeof postMapFileByEditId>>, TError = NotFoundResponse>(
-    queryClient: QueryClient,
-    editId: number | string,
-    postMapFileByEditIdBody: PostMapFileByEditIdBody,
-    options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, TData>>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    }
-): Promise<QueryClient> => {
-    const queryOptions = getPostMapFileByEditIdQueryOptions(editId, postMapFileByEditIdBody, options);
-
-    await queryClient.prefetchQuery(queryOptions);
-
-    return queryClient;
+): UseMutationResult<Awaited<ReturnType<typeof postMapFileByEditId>>, TError, { editId: number | string; data: PostMapFileByEditIdBody }, TContext> => {
+    return useMutation(getPostMapFileByEditIdMutationOptions(options), queryClient);
 };

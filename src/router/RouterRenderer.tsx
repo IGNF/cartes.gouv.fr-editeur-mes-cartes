@@ -4,7 +4,7 @@ import AppLayout from "../components/Layout/AppLayout";
 import Main from "../components/Layout/Main";
 import LoadingText from "../components/Utils/LoadingText";
 import GroupMap from "./GroupMap";
-import { groups, knownRoutes, useRoute } from "./router";
+import { groups, knownRoutes, routes, useRoute } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import GroupApp from "./GroupApp";
 
@@ -16,16 +16,19 @@ const RouterRenderer: FC = () => {
         if (route.name === false || !knownRoutes.includes(route.name) || route.name === "page_not_found") {
             return <PageNotFoundWithLayout />;
         }
-
         // // vérifier si l'utilisateur est authentifié et éventuellement ses droits à la ressource demandée
         // if (!groups.public.has(route) && !user) {
         //     return <RedirectToLogin />;
         // }
-
+        if (route.name === "home") {
+            return <GroupMap route={routes.home()} />;
+        }
 
         if (groups.map.has(route)) {
             return <GroupMap route={route} />;
         }
+
+        console.log(route.name)
 
         return <GroupApp route={route} />;
     }, [route]);

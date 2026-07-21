@@ -1,4 +1,4 @@
-import { createGroup, createRouter, defineRoute, param } from "type-route";
+import { createGroup, createRouter, defineRoute, param,  } from "type-route";
 
 export const appRoot = "";
 

@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import SearchBar from "@codegouvfr/react-dsfr/SearchBar";
 import SelectNext from "@codegouvfr/react-dsfr/SelectNext";
-import { FC } from "react";
+import { useEffect, useState } from "react";
 
 import { useToggle } from "@mantine/hooks";
 import MapMain from "@/components/Layout/MapMain";
@@ -17,11 +17,13 @@ import { tss } from "tss-react";
 import MapListItem from "./MapListItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { usePrefetchQuery } from "@tanstack/react-query";
+import { Mutation, useMutation, usePrefetchQuery } from "@tanstack/react-query";
 import RQKeys from "@/modules/maps/RQKeys";
-import { type MapList, MapResearch, Theme } from "@/api/model";
+import { type MapList as MapListType, Theme } from "@/api/model";
 import NoCorrespondingData from "./NoCorrespondingData";
-
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import { createPortal } from "react-dom";
 
 /**
  * Élément dans l'URL de recherche
@@ -32,6 +34,21 @@ type MapRouteParams = {
     theme: string,
     query: string,
 }
+
+const confirmDeleteMapModal = createModal({
+    id: "confirm-delete-map-modal",
+    isOpenedByDefault: false,
+});
+
+const shareMapModal = createModal({
+    id: "share-map-modal",
+    isOpenedByDefault: false,
+});
+
+const confirmCopyMapModal = createModal({
+    id: "confirm-copy-map-modal",
+    isOpenedByDefault: false,
+});
 
 /** 
  * Permet de récupérer les paramètres dans l'URL
@@ -47,11 +64,32 @@ function useMapRouteParams(): MapRouteParams {
     return { page, limit, theme, query };
 };
 
-const MapList: FC = () => {
+export default function MapList() {
     // Traduction
     const { t } = useTranslation("MapList");
     const { t: tCommon } = useTranslation("Common");
 
+    // React states
+    const [openedMap, setOpenedMap] = useState<MapListType>();
+    const [mapCount, setMapCount] = useState(0);
+
+    // Appelé plus tard dans la modale
+    const deleteMapMutation = api.map.useDeleteMapByEditId({
+        mutation: {
+            onSuccess: () => {
+                refetch();
+                confirmDeleteMapModal.close();
+            },
+            onError: error => {
+                console.error(error);
+            },
+            onMutate: (args) => {
+                console.log(args);
+            }
+        },
+    });
+
+    // const confirmCopyMutation = useMutation();
     // Param dans l'URL
     const routeParams = useMapRouteParams();
     const offset = (routeParams.page - 1) * (routeParams.limit);
@@ -75,7 +113,7 @@ const MapList: FC = () => {
         },
     );
 
-    // useAccessToken().then(r => console.log(r))
+
 
     // Va chercher les cartes de la page d'après
     // TODO : améliorer cela car pas l'air de fonctionner
@@ -103,8 +141,13 @@ const MapList: FC = () => {
     const themes = (themesResponse || []) as Theme[]
 
     // Cartes et nombre total de cartes
-    const maps = (mapsResponse?.maps ?? []) as MapList[];
-    const mapCount = mapsResponse?.count ?? 0;
+    const maps = (mapsResponse?.maps ?? []);
+
+    useEffect(() => {
+        if (mapsResponse?.count !== undefined) {
+            setMapCount(mapsResponse.count);
+        }
+    }, [mapsResponse?.count]);
 
     // Permet d'activer / désactiver l'affichage des filtres
     const [showFilters, toggleShowFilters] = useToggle();
@@ -237,7 +280,51 @@ const MapList: FC = () => {
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                                 {maps.map((map) => (
                                     <div className={fr.cx("fr-col-12")} key={map.view_id}>
-                                        <MapListItem map={map} />
+                                        <MapListItem map={map}
+                                            footer={
+                                                <div className={cx(classes.footerBtnGroup)}>
+
+                                                    <Button
+                                                        title={tCommon("delete")}
+                                                        iconId='fr-icon-delete-bin-line'
+                                                        size="small"
+                                                        priority="tertiary"
+                                                        onClick={() => {
+                                                            setOpenedMap(map);
+                                                            confirmDeleteMapModal.open()
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        title={tCommon("duplicate")}
+                                                        iconId='ri-file-copy-line'
+                                                        size="small"
+                                                        priority="tertiary"
+                                                        onClick={() => {
+                                                            setOpenedMap(map);
+                                                            confirmCopyMapModal.open()
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        title={tCommon("share")}
+                                                        iconId='ri-share-2-line'
+                                                        size="small"
+                                                        priority="tertiary"
+                                                        onClick={() => {
+                                                            setOpenedMap(map);
+                                                            shareMapModal.open()
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        iconId="fr-icon-arrow-right-s-line"
+                                                        size="small"
+                                                        iconPosition="right"
+                                                        linkProps={routes.view_map({ mapId: map.view_id || "", }).link}
+                                                    >
+                                                        {tCommon("open")}
+                                                    </Button>
+                                                </div>
+                                            }
+                                        />
                                     </div>
                                 ))}
                             </div>
@@ -263,11 +350,64 @@ const MapList: FC = () => {
                     )}
                 </>
             )}
+            {createPortal(
+                <confirmDeleteMapModal.Component
+                    title={t("delete_map")}
+                    buttons={[
+                        {
+                            children: tCommon("cancel"),
+                            priority: "secondary",
+                        },
+                        {
+                            children: tCommon("delete"),
+                            onClick: () => {
+                                if (openedMap?.edit_id === undefined) {
+                                    return;
+                                }
+                                deleteMapMutation.mutate({ editId: openedMap.edit_id });
+                            },
+                            priority: "primary",
+                            doClosesModal: true,
+                        },
+                    ]}
+                >
+                    {t('delete_map--message', { fileName: openedMap?.title })}
+                </confirmDeleteMapModal.Component>,
+                document.body
+            )}
+
+            {createPortal(
+                <shareMapModal.Component
+                    title={t("share_map")}
+                >
+                    <div />
+                </shareMapModal.Component>,
+                document.body
+            )}
+
+            {createPortal(
+                <confirmCopyMapModal.Component
+                    title={t("copy_map")}
+                    buttons={[
+                        {
+                            children: tCommon("cancel"),
+                            priority: "secondary",
+                        },
+                        {
+                            children: tCommon("duplicate"),
+                            priority: "primary",
+                            doClosesModal: false,
+                        },
+                    ]}
+                >
+
+                    <div />
+                </confirmCopyMapModal.Component>,
+                document.body
+            )}
         </MapMain>
     );
 };
-
-export default MapList;
 
 const useStyles = tss.withName({ MapList }).create({
     filterRoot: {
@@ -286,6 +426,11 @@ const useStyles = tss.withName({ MapList }).create({
             flex: 1,
         },
     },
+    footerBtnGroup: {
+        display: "flex",
+        gap: fr.spacing("4v"),
+    },
+
     // filterApplyBtn: {
     //     [fr.breakpoints.up("sm")]: {
     //         flex: 0,
@@ -293,3 +438,10 @@ const useStyles = tss.withName({ MapList }).create({
     //     },
     // },
 });
+
+//  const useStyles = tss.withName({ MapListItem }).create({
+//     footerBtnGroup: {
+//         display: "flex",
+//         gap: fr.spacing("4v"),
+//     },
+// });
