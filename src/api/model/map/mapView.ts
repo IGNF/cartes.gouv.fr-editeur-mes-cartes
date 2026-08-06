@@ -8,7 +8,7 @@
 import type { MapList } from "./mapList";
 
 /**
- * Carte
+ * Description d'une carte avec ses métadonnées et les liens de modification / visualisation
  */
 export type MapView = MapList & {
     /** lien vers le contenu de la carte */

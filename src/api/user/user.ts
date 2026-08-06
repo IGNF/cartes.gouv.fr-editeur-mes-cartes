@@ -150,9 +150,9 @@ export const prefetchGetMeQuery = async <TData = Awaited<ReturnType<typeof getMe
     return queryClient;
 };
 
-export type deleteMeResponse206 = {
+export type deleteMeResponse204 = {
     data: void;
-    status: 206;
+    status: 204;
 };
 
 export type deleteMeResponse401 = {
@@ -170,7 +170,7 @@ export type deleteMeResponse451 = {
     status: 451;
 };
 
-export type deleteMeResponseSuccess = deleteMeResponse206 & {
+export type deleteMeResponseSuccess = deleteMeResponse204 & {
     headers: Headers;
 };
 export type deleteMeResponseError = (deleteMeResponse401 | deleteMeResponse403 | deleteMeResponse451) & {
@@ -250,7 +250,8 @@ export const getPatchMeUrl = () => {
 };
 
 /**
- * parameter **current_password** is required to patch username, email and new_password<br>username, email et public_name sont uniques, la réponse 400 "... already used" peut être renvoyée
+ * Le paramètre **current_password** est nécessaire pour modifier les paramètres username, email et new_password
+ * username, email et public_name sont uniques, la réponse 400 '... already used' peut être renvoyée
  */
 export const patchMe = async (userMeEdit: UserMeEdit, options?: RequestInit): Promise<patchMeResponse> => {
     return fetchWithAuth<patchMeResponse>(getPatchMeUrl(), {
@@ -294,121 +295,120 @@ export const usePatchMe = <TError = BadRequestResponse | NotConnectedResponse, T
 ): UseMutationResult<Awaited<ReturnType<typeof patchMe>>, TError, { data: UserMeEdit }, TContext> => {
     return useMutation(getPatchMeMutationOptions(options), queryClient);
 };
-export type getUsersPublicByPublicidResponse200 = {
+export type getUserByPublicidResponse200 = {
     data: UserPublic;
     status: 200;
 };
 
-export type getUsersPublicByPublicidResponse404 = {
+export type getUserByPublicidResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type getUsersPublicByPublicidResponseSuccess = getUsersPublicByPublicidResponse200 & {
+export type getUserByPublicidResponseSuccess = getUserByPublicidResponse200 & {
     headers: Headers;
 };
-export type getUsersPublicByPublicidResponseError = getUsersPublicByPublicidResponse404 & {
+export type getUserByPublicidResponseError = getUserByPublicidResponse404 & {
     headers: Headers;
 };
 
-export type getUsersPublicByPublicidResponse = getUsersPublicByPublicidResponseSuccess | getUsersPublicByPublicidResponseError;
+export type getUserByPublicidResponse = getUserByPublicidResponseSuccess | getUserByPublicidResponseError;
 
-export const getGetUsersPublicByPublicidUrl = (publicId: string) => {
+export const getGetUserByPublicidUrl = (publicId: string) => {
     return `${env.API_EDITOR_URL}/api/users/public/${publicId}`;
 };
 
-export const getUsersPublicByPublicid = async (publicId: string, options?: RequestInit): Promise<getUsersPublicByPublicidResponse> => {
-    return fetchWithAuth<getUsersPublicByPublicidResponse>(getGetUsersPublicByPublicidUrl(publicId), {
+export const getUserByPublicid = async (publicId: string, options?: RequestInit): Promise<getUserByPublicidResponse> => {
+    return fetchWithAuth<getUserByPublicidResponse>(getGetUserByPublicidUrl(publicId), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetUsersPublicByPublicidQueryKey = (publicId: string) => {
+export const getGetUserByPublicidQueryKey = (publicId: string) => {
     return [`${env.API_EDITOR_URL}/api/users/public/${publicId}`] as const;
 };
 
-export const getGetUsersPublicByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export const getGetUserByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     publicId: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetUsersPublicByPublicidQueryKey(publicId);
+    const queryKey = queryOptions?.queryKey ?? getGetUserByPublicidQueryKey(publicId);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsersPublicByPublicid>>> = ({ signal }) =>
-        getUsersPublicByPublicid(publicId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserByPublicid>>> = ({ signal }) => getUserByPublicid(publicId, { signal, ...requestOptions });
 
     return { queryKey, queryFn, enabled: publicId !== null && publicId !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getUsersPublicByPublicid>>,
+        Awaited<ReturnType<typeof getUserByPublicid>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetUsersPublicByPublicidQueryResult = NonNullable<Awaited<ReturnType<typeof getUsersPublicByPublicid>>>;
-export type GetUsersPublicByPublicidQueryError = NotFoundResponse;
+export type GetUserByPublicidQueryResult = NonNullable<Awaited<ReturnType<typeof getUserByPublicid>>>;
+export type GetUserByPublicidQueryError = NotFoundResponse;
 
-export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export function useGetUserByPublicid<TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     publicId: string,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> &
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>> &
             Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, Awaited<ReturnType<typeof getUsersPublicByPublicid>>>,
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, Awaited<ReturnType<typeof getUserByPublicid>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export function useGetUserByPublicid<TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     publicId: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>> &
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>> &
             Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, Awaited<ReturnType<typeof getUsersPublicByPublicid>>>,
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, Awaited<ReturnType<typeof getUserByPublicid>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export function useGetUserByPublicid<TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     publicId: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetUsersPublicByPublicid<TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export function useGetUserByPublicid<TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     publicId: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId, options);
+    const queryOptions = getGetUserByPublicidQueryOptions(publicId, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetUsersPublicByPublicidQuery = async <TData = Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError = NotFoundResponse>(
+export const prefetchGetUserByPublicidQuery = async <TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
     queryClient: QueryClient,
     publicId: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUsersPublicByPublicid>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserByPublicid>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetUsersPublicByPublicidQueryOptions(publicId, options);
+    const queryOptions = getGetUserByPublicidQueryOptions(publicId, options);
 
     await queryClient.prefetchQuery(queryOptions);
 

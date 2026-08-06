@@ -30,8 +30,8 @@ export interface MapResearch {
     query?: string;
     /** Nombre de cartes correspondant à la recherche */
     count?: number;
-    /** Nombre de cartes recues dans la requete */
+    /** Nombre de cartes reçues dans la requete */
     limit?: number;
-    /** Nombre de cartes à passer avant de ls inclure dans la requete */
+    /** Nombre de cartes à passer avant de les inclure dans la requete */
     offset?: number;
 }

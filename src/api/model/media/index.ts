@@ -6,13 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./getMediaFoldersParams";
-export * from "./getMediasParams";
+export * from "./getUserMediaFoldersParams";
+export * from "./getUserMediasParams";
 export * from "./media";
 export * from "./mediaList";
+export * from "./postMediaBody";
 export * from "./postMediaFileById200";
 export * from "./postMediaFileByIdBody";
-export * from "./postMediasBody";
-export * from "./putMediasByIdByAttribute200";
-export * from "./putMediasByIdByAttributeBody";
+export * from "./putMediaAttribute200";
+export * from "./putMediaAttributeBody";
 export * from "./tooLargeResponse";

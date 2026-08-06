@@ -34,7 +34,6 @@ import type {
     MapView,
     NotConnectedResponse,
     NotFoundResponse,
-    PartialContentResponse,
     PatchMapByEditIdBody,
     PostMapBody,
     PostMapFileByEditIdBody,
@@ -65,7 +64,7 @@ export type getMapsResponse200 = {
 };
 
 export type getMapsResponse206 = {
-    data: PartialContentResponse;
+    data: MapResearch;
     status: 206;
 };
 
@@ -741,132 +740,128 @@ export const prefetchGetMapFileByViewIdQuery = async <TData = Awaited<ReturnType
     return queryClient;
 };
 
-export type getMapEditFileByEditIdResponse200 = {
+export type getMapFileByEditIdResponse200 = {
     data: unknown;
     status: 200;
 };
 
-export type getMapEditFileByEditIdResponse404 = {
+export type getMapFileByEditIdResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type getMapEditFileByEditIdResponse451 = {
+export type getMapFileByEditIdResponse451 = {
     data: InvalidResponse;
     status: 451;
 };
 
-export type getMapEditFileByEditIdResponseSuccess = getMapEditFileByEditIdResponse200 & {
+export type getMapFileByEditIdResponseSuccess = getMapFileByEditIdResponse200 & {
     headers: Headers;
 };
-export type getMapEditFileByEditIdResponseError = (getMapEditFileByEditIdResponse404 | getMapEditFileByEditIdResponse451) & {
+export type getMapFileByEditIdResponseError = (getMapFileByEditIdResponse404 | getMapFileByEditIdResponse451) & {
     headers: Headers;
 };
 
-export type getMapEditFileByEditIdResponse = getMapEditFileByEditIdResponseSuccess | getMapEditFileByEditIdResponseError;
+export type getMapFileByEditIdResponse = getMapFileByEditIdResponseSuccess | getMapFileByEditIdResponseError;
 
-export const getGetMapEditFileByEditIdUrl = (editId: number | string) => {
+export const getGetMapFileByEditIdUrl = (editId: number | string) => {
     return `${env.API_EDITOR_URL}/api/maps/${editId}/edit/file`;
 };
 
 /**
  * Récupérer les data de la carte par son identifiant d'édition
  */
-export const getMapEditFileByEditId = async (editId: number | string, options?: RequestInit): Promise<getMapEditFileByEditIdResponse> => {
-    return fetchWithAuth<getMapEditFileByEditIdResponse>(getGetMapEditFileByEditIdUrl(editId), {
+export const getMapFileByEditId = async (editId: number | string, options?: RequestInit): Promise<getMapFileByEditIdResponse> => {
+    return fetchWithAuth<getMapFileByEditIdResponse>(getGetMapFileByEditIdUrl(editId), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetMapEditFileByEditIdQueryKey = (editId: number | string) => {
+export const getGetMapFileByEditIdQueryKey = (editId: number | string) => {
     return [`${env.API_EDITOR_URL}/api/maps/${editId}/edit/file`] as const;
 };
 
-export const getGetMapEditFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+export const getGetMapFileByEditIdQueryOptions = <TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     editId: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetMapEditFileByEditIdQueryKey(editId);
+    const queryKey = queryOptions?.queryKey ?? getGetMapFileByEditIdQueryKey(editId);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapEditFileByEditId>>> = ({ signal }) =>
-        getMapEditFileByEditId(editId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMapFileByEditId>>> = ({ signal }) => getMapFileByEditId(editId, { signal, ...requestOptions });
 
     return { queryKey, queryFn, enabled: editId !== null && editId !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getMapEditFileByEditId>>,
+        Awaited<ReturnType<typeof getMapFileByEditId>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetMapEditFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapEditFileByEditId>>>;
-export type GetMapEditFileByEditIdQueryError = NotFoundResponse | InvalidResponse;
+export type GetMapFileByEditIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMapFileByEditId>>>;
+export type GetMapFileByEditIdQueryError = NotFoundResponse | InvalidResponse;
 
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+export function useGetMapFileByEditId<TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     editId: number | string,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> &
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>> &
             Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, Awaited<ReturnType<typeof getMapEditFileByEditId>>>,
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, Awaited<ReturnType<typeof getMapFileByEditId>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+export function useGetMapFileByEditId<TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     editId: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>> &
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>> &
             Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, Awaited<ReturnType<typeof getMapEditFileByEditId>>>,
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, Awaited<ReturnType<typeof getMapFileByEditId>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+export function useGetMapFileByEditId<TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     editId: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetMapEditFileByEditId<TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
+export function useGetMapFileByEditId<TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     editId: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId, options);
+    const queryOptions = getGetMapFileByEditIdQueryOptions(editId, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetMapEditFileByEditIdQuery = async <
-    TData = Awaited<ReturnType<typeof getMapEditFileByEditId>>,
-    TError = NotFoundResponse | InvalidResponse,
->(
+export const prefetchGetMapFileByEditIdQuery = async <TData = Awaited<ReturnType<typeof getMapFileByEditId>>, TError = NotFoundResponse | InvalidResponse>(
     queryClient: QueryClient,
     editId: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapEditFileByEditId>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMapFileByEditId>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetMapEditFileByEditIdQueryOptions(editId, options);
+    const queryOptions = getGetMapFileByEditIdQueryOptions(editId, options);
 
     await queryClient.prefetchQuery(queryOptions);
 

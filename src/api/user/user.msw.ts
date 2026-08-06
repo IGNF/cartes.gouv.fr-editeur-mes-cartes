@@ -70,7 +70,7 @@ export const getPatchMeResponseMock = (): UserView => ({
     },
 });
 
-export const getGetUsersPublicByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({
+export const getGetUserByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     twitter_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -120,7 +120,7 @@ export const getDeleteMeMockHandler = (
                 await overrideResponse(info);
             }
 
-            return new HttpResponse(null, { status: 206 });
+            return new HttpResponse(null, { status: 204 });
         },
         options
     );
@@ -146,7 +146,7 @@ export const getPatchMeMockHandler = (
     );
 };
 
-export const getGetUsersPublicByPublicidMockHandler = (
+export const getGetUserByPublicidMockHandler = (
     overrideResponse?: UserPublic | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserPublic> | UserPublic),
     options?: RequestHandlerOptions
 ) => {
@@ -158,7 +158,7 @@ export const getGetUsersPublicByPublicidMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getGetUsersPublicByPublicidResponseMock(),
+                    : getGetUserByPublicidResponseMock(),
                 { status: 200 }
             );
         },
@@ -189,6 +189,6 @@ export const getUserMock = () => [
     getGetMeMockHandler(),
     getDeleteMeMockHandler(),
     getPatchMeMockHandler(),
-    getGetUsersPublicByPublicidMockHandler(),
+    getGetUserByPublicidMockHandler(),
     getGetUsersMockHandler(),
 ];

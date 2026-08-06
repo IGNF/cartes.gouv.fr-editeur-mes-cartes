@@ -10,12 +10,85 @@ import type { MutationFunction, QueryClient, UseMutationOptions, UseMutationResu
 
 import { env } from "../../env";
 
-import type { Login, NotConnectedResponse, PostLogin401, PostLogin429, PostLoginBody, PostTokenRefresh401, PostTokenRefreshBody } from "../model";
+import type { Login, NotConnectedResponse, PostLogin401, PostLogin429, PostLoginParams, RefreshToken401, RefreshTokenParams } from "../model";
 
 import { fetchWithAuth } from ".././fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+export type refreshTokenResponse200 = {
+    data: Login;
+    status: 200;
+};
+
+export type refreshTokenResponse401 = {
+    data: RefreshToken401;
+    status: 401;
+};
+
+export type refreshTokenResponseSuccess = refreshTokenResponse200 & {
+    headers: Headers;
+};
+export type refreshTokenResponseError = refreshTokenResponse401 & {
+    headers: Headers;
+};
+
+export type refreshTokenResponse = refreshTokenResponseSuccess | refreshTokenResponseError;
+
+export const getRefreshTokenUrl = (params: RefreshTokenParams) => {
+    const normalizedParams = new URLSearchParams();
+
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+            normalizedParams.append(key, value === null ? "null" : String(value));
+        }
+    });
+
+    const stringifiedParams = normalizedParams.toString();
+
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/token/refresh?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/token/refresh`;
+};
+
+export const refreshToken = async (params: RefreshTokenParams, options?: RequestInit): Promise<refreshTokenResponse> => {
+    return fetchWithAuth<refreshTokenResponse>(getRefreshTokenUrl(params), {
+        ...options,
+        method: "POST",
+    });
+};
+
+export const getRefreshTokenMutationOptions = <TError = RefreshToken401, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof refreshToken>>, TError, { params: RefreshTokenParams }, TContext>;
+    request?: SecondParameter<typeof fetchWithAuth>;
+}): UseMutationOptions<Awaited<ReturnType<typeof refreshToken>>, TError, { params: RefreshTokenParams }, TContext> => {
+    const mutationKey = ["refreshToken"];
+    const { mutation: mutationOptions, request: requestOptions } = options
+        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey }, request: undefined };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshToken>>, { params: RefreshTokenParams }> = (props) => {
+        const { params } = props ?? {};
+
+        return refreshToken(params, requestOptions);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RefreshTokenMutationResult = NonNullable<Awaited<ReturnType<typeof refreshToken>>>;
+
+export type RefreshTokenMutationError = RefreshToken401;
+
+export const useRefreshToken = <TError = RefreshToken401, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof refreshToken>>, TError, { params: RefreshTokenParams }, TContext>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof refreshToken>>, TError, { params: RefreshTokenParams }, TContext> => {
+    return useMutation(getRefreshTokenMutationOptions(options), queryClient);
+};
 export type postLoginResponse200 = {
     data: Login;
     status: 200;
@@ -40,27 +113,31 @@ export type postLoginResponseError = (postLoginResponse401 | postLoginResponse42
 
 export type postLoginResponse = postLoginResponseSuccess | postLoginResponseError;
 
-export const getPostLoginUrl = () => {
-    return `${env.API_EDITOR_URL}/api/login`;
+export const getPostLoginUrl = (params: PostLoginParams) => {
+    const normalizedParams = new URLSearchParams();
+
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value !== undefined) {
+            normalizedParams.append(key, value === null ? "null" : String(value));
+        }
+    });
+
+    const stringifiedParams = normalizedParams.toString();
+
+    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/login?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/login`;
 };
 
-export const postLogin = async (postLoginBody: PostLoginBody, options?: RequestInit): Promise<postLoginResponse> => {
-    const formUrlEncoded = new URLSearchParams();
-    formUrlEncoded.append(`username`, postLoginBody.username);
-    formUrlEncoded.append(`password`, postLoginBody.password);
-
-    return fetchWithAuth<postLoginResponse>(getPostLoginUrl(), {
+export const postLogin = async (params: PostLoginParams, options?: RequestInit): Promise<postLoginResponse> => {
+    return fetchWithAuth<postLoginResponse>(getPostLoginUrl(params), {
         ...options,
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", ...options?.headers },
-        body: formUrlEncoded,
     });
 };
 
 export const getPostLoginMutationOptions = <TError = PostLogin401 | PostLogin429, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { data: PostLoginBody }, TContext>;
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { params: PostLoginParams }, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { data: PostLoginBody }, TContext> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { params: PostLoginParams }, TContext> => {
     const mutationKey = ["postLogin"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
@@ -68,95 +145,27 @@ export const getPostLoginMutationOptions = <TError = PostLogin401 | PostLogin429
             : { ...options, mutation: { ...options.mutation, mutationKey } }
         : { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, { data: PostLoginBody }> = (props) => {
-        const { data } = props ?? {};
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLogin>>, { params: PostLoginParams }> = (props) => {
+        const { params } = props ?? {};
 
-        return postLogin(data, requestOptions);
+        return postLogin(params, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
 export type PostLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postLogin>>>;
-export type PostLoginMutationBody = PostLoginBody;
+
 export type PostLoginMutationError = PostLogin401 | PostLogin429;
 
 export const usePostLogin = <TError = PostLogin401 | PostLogin429, TContext = unknown>(
     options?: {
-        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { data: PostLoginBody }, TContext>;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postLogin>>, TError, { params: PostLoginParams }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof postLogin>>, TError, { data: PostLoginBody }, TContext> => {
+): UseMutationResult<Awaited<ReturnType<typeof postLogin>>, TError, { params: PostLoginParams }, TContext> => {
     return useMutation(getPostLoginMutationOptions(options), queryClient);
-};
-export type postTokenRefreshResponse200 = {
-    data: Login;
-    status: 200;
-};
-
-export type postTokenRefreshResponse401 = {
-    data: PostTokenRefresh401;
-    status: 401;
-};
-
-export type postTokenRefreshResponseSuccess = postTokenRefreshResponse200 & {
-    headers: Headers;
-};
-export type postTokenRefreshResponseError = postTokenRefreshResponse401 & {
-    headers: Headers;
-};
-
-export type postTokenRefreshResponse = postTokenRefreshResponseSuccess | postTokenRefreshResponseError;
-
-export const getPostTokenRefreshUrl = () => {
-    return `${env.API_EDITOR_URL}/api/token/refresh`;
-};
-
-export const postTokenRefresh = async (postTokenRefreshBody: PostTokenRefreshBody, options?: RequestInit): Promise<postTokenRefreshResponse> => {
-    const formUrlEncoded = new URLSearchParams();
-    formUrlEncoded.append(`refresh_token`, postTokenRefreshBody.refresh_token);
-
-    return fetchWithAuth<postTokenRefreshResponse>(getPostTokenRefreshUrl(), {
-        ...options,
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded", ...options?.headers },
-        body: formUrlEncoded,
-    });
-};
-
-export const getPostTokenRefreshMutationOptions = <TError = PostTokenRefresh401, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, { data: PostTokenRefreshBody }, TContext>;
-    request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, { data: PostTokenRefreshBody }, TContext> => {
-    const mutationKey = ["postTokenRefresh"];
-    const { mutation: mutationOptions, request: requestOptions } = options
-        ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey }, request: undefined };
-
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postTokenRefresh>>, { data: PostTokenRefreshBody }> = (props) => {
-        const { data } = props ?? {};
-
-        return postTokenRefresh(data, requestOptions);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type PostTokenRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof postTokenRefresh>>>;
-export type PostTokenRefreshMutationBody = PostTokenRefreshBody;
-export type PostTokenRefreshMutationError = PostTokenRefresh401;
-
-export const usePostTokenRefresh = <TError = PostTokenRefresh401, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postTokenRefresh>>, TError, { data: PostTokenRefreshBody }, TContext>;
-        request?: SecondParameter<typeof fetchWithAuth>;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof postTokenRefresh>>, TError, { data: PostTokenRefreshBody }, TContext> => {
-    return useMutation(getPostTokenRefreshMutationOptions(options), queryClient);
 };
 export type postLogoutResponse200 = {
     data: void;

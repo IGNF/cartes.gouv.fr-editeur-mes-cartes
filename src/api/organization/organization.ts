@@ -24,25 +24,24 @@ import type {
 import { env } from "../../env";
 
 import type {
+    AddMemberToOrganization200,
+    AddMemberToOrganizationBody,
     BadRequestResponse,
     DeletedResponse,
     ForbiddenResponse,
-    GetOrganizationsJoinByIdParams,
-    GetOrganizationsLinksById200,
+    GetOrganizationLinksById200,
     GetOrganizationsMe200Item,
     GetOrganizationsRoles200Item,
     NotConnectedResponse,
     NotFoundResponse,
     Organization,
-    PostOrganizationsBody,
-    PostOrganizationsByIdMembersByUserid200,
-    PostOrganizationsByIdMembersByUseridBody,
-    PutOrganizationsByIdByAttribute200,
-    PutOrganizationsByIdByAttributeBody,
-    PutOrganizationsByIdJoinLinkByRole200,
-    PutOrganizationsByIdJoinLinkByRoleBody,
-    PutOrganizationsByIdMembersByUseridRole200,
-    PutOrganizationsByIdMembersByUseridRoleBody,
+    PostOrganizationBody,
+    PutOrganizationAttribute200,
+    PutOrganizationAttributeBody,
+    PutOrganizationJoinLinkRole200,
+    PutOrganizationJoinLinkRoleBody,
+    PutOrganizationMemberRole200,
+    PutOrganizationMemberRoleBody,
 } from "../model";
 
 import { fetchWithAuth } from ".././fetchWithAuth";
@@ -553,240 +552,235 @@ export const prefetchGetOrganizationsByIdQuery = async <TData = Awaited<ReturnTy
     return queryClient;
 };
 
-export type deleteOrganizationsByIdResponse204 = {
+export type deleteOrganizationResponse204 = {
     data: DeletedResponse;
     status: 204;
 };
 
-export type deleteOrganizationsByIdResponse401 = {
+export type deleteOrganizationResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type deleteOrganizationsByIdResponse403 = {
+export type deleteOrganizationResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type deleteOrganizationsByIdResponse404 = {
+export type deleteOrganizationResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type deleteOrganizationsByIdResponseSuccess = deleteOrganizationsByIdResponse204 & {
+export type deleteOrganizationResponseSuccess = deleteOrganizationResponse204 & {
     headers: Headers;
 };
-export type deleteOrganizationsByIdResponseError = (
-    deleteOrganizationsByIdResponse401 | deleteOrganizationsByIdResponse403 | deleteOrganizationsByIdResponse404
-) & {
+export type deleteOrganizationResponseError = (deleteOrganizationResponse401 | deleteOrganizationResponse403 | deleteOrganizationResponse404) & {
     headers: Headers;
 };
 
-export type deleteOrganizationsByIdResponse = deleteOrganizationsByIdResponseSuccess | deleteOrganizationsByIdResponseError;
+export type deleteOrganizationResponse = deleteOrganizationResponseSuccess | deleteOrganizationResponseError;
 
-export const getDeleteOrganizationsByIdUrl = (id: number | string) => {
+export const getDeleteOrganizationUrl = (id: number | string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}`;
 };
 
 /**
  * Supprime l'organisation d'identifiant id
  */
-export const deleteOrganizationsById = async (id: number | string, options?: RequestInit): Promise<deleteOrganizationsByIdResponse> => {
-    return fetchWithAuth<deleteOrganizationsByIdResponse>(getDeleteOrganizationsByIdUrl(id), {
+export const deleteOrganization = async (id: number | string, options?: RequestInit): Promise<deleteOrganizationResponse> => {
+    return fetchWithAuth<deleteOrganizationResponse>(getDeleteOrganizationUrl(id), {
         ...options,
         method: "DELETE",
     });
 };
 
-export const getDeleteOrganizationsByIdMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationsById>>, TError, { id: number | string }, TContext>;
+export const getDeleteOrganizationMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganization>>, TError, { id: number | string }, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationsById>>, TError, { id: number | string }, TContext> => {
-    const mutationKey = ["deleteOrganizationsById"];
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteOrganization>>, TError, { id: number | string }, TContext> => {
+    const mutationKey = ["deleteOrganization"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
             : { ...options, mutation: { ...options.mutation, mutationKey } }
         : { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrganizationsById>>, { id: number | string }> = (props) => {
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrganization>>, { id: number | string }> = (props) => {
         const { id } = props ?? {};
 
-        return deleteOrganizationsById(id, requestOptions);
+        return deleteOrganization(id, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteOrganizationsByIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrganizationsById>>>;
+export type DeleteOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrganization>>>;
 
-export type DeleteOrganizationsByIdMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type DeleteOrganizationMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const useDeleteOrganizationsById = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const useDeleteOrganization = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
-        mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationsById>>, TError, { id: number | string }, TContext>;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganization>>, TError, { id: number | string }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof deleteOrganizationsById>>, TError, { id: number | string }, TContext> => {
-    return useMutation(getDeleteOrganizationsByIdMutationOptions(options), queryClient);
+): UseMutationResult<Awaited<ReturnType<typeof deleteOrganization>>, TError, { id: number | string }, TContext> => {
+    return useMutation(getDeleteOrganizationMutationOptions(options), queryClient);
 };
-export type postOrganizationsResponse201 = {
+export type postOrganizationResponse201 = {
     data: Organization;
     status: 201;
 };
 
-export type postOrganizationsResponse400 = {
+export type postOrganizationResponse400 = {
     data: BadRequestResponse;
     status: 400;
 };
 
-export type postOrganizationsResponse401 = {
+export type postOrganizationResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type postOrganizationsResponse403 = {
+export type postOrganizationResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type postOrganizationsResponseSuccess = postOrganizationsResponse201 & {
+export type postOrganizationResponseSuccess = postOrganizationResponse201 & {
     headers: Headers;
 };
-export type postOrganizationsResponseError = (postOrganizationsResponse400 | postOrganizationsResponse401 | postOrganizationsResponse403) & {
+export type postOrganizationResponseError = (postOrganizationResponse400 | postOrganizationResponse401 | postOrganizationResponse403) & {
     headers: Headers;
 };
 
-export type postOrganizationsResponse = postOrganizationsResponseSuccess | postOrganizationsResponseError;
+export type postOrganizationResponse = postOrganizationResponseSuccess | postOrganizationResponseError;
 
-export const getPostOrganizationsUrl = () => {
+export const getPostOrganizationUrl = () => {
     return `${env.API_EDITOR_URL}/api/organizations`;
 };
 
 /**
  * Créer une organisation - L'utilisateur connecté devient un propriétaire
  */
-export const postOrganizations = async (postOrganizationsBody: PostOrganizationsBody, options?: RequestInit): Promise<postOrganizationsResponse> => {
-    return fetchWithAuth<postOrganizationsResponse>(getPostOrganizationsUrl(), {
+export const postOrganization = async (postOrganizationBody: PostOrganizationBody, options?: RequestInit): Promise<postOrganizationResponse> => {
+    return fetchWithAuth<postOrganizationResponse>(getPostOrganizationUrl(), {
         ...options,
         method: "POST",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(postOrganizationsBody),
+        body: JSON.stringify(postOrganizationBody),
     });
 };
 
-export const getPostOrganizationsMutationOptions = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse, TContext = unknown>(options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postOrganizations>>, TError, { data: PostOrganizationsBody }, TContext>;
+export const getPostOrganizationMutationOptions = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postOrganization>>, TError, { data: PostOrganizationBody }, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof postOrganizations>>, TError, { data: PostOrganizationsBody }, TContext> => {
-    const mutationKey = ["postOrganizations"];
+}): UseMutationOptions<Awaited<ReturnType<typeof postOrganization>>, TError, { data: PostOrganizationBody }, TContext> => {
+    const mutationKey = ["postOrganization"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
             : { ...options, mutation: { ...options.mutation, mutationKey } }
         : { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postOrganizations>>, { data: PostOrganizationsBody }> = (props) => {
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postOrganization>>, { data: PostOrganizationBody }> = (props) => {
         const { data } = props ?? {};
 
-        return postOrganizations(data, requestOptions);
+        return postOrganization(data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PostOrganizationsMutationResult = NonNullable<Awaited<ReturnType<typeof postOrganizations>>>;
-export type PostOrganizationsMutationBody = PostOrganizationsBody;
-export type PostOrganizationsMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse;
+export type PostOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof postOrganization>>>;
+export type PostOrganizationMutationBody = PostOrganizationBody;
+export type PostOrganizationMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse;
 
-export const usePostOrganizations = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse, TContext = unknown>(
+export const usePostOrganization = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse, TContext = unknown>(
     options?: {
-        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postOrganizations>>, TError, { data: PostOrganizationsBody }, TContext>;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postOrganization>>, TError, { data: PostOrganizationBody }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof postOrganizations>>, TError, { data: PostOrganizationsBody }, TContext> => {
-    return useMutation(getPostOrganizationsMutationOptions(options), queryClient);
+): UseMutationResult<Awaited<ReturnType<typeof postOrganization>>, TError, { data: PostOrganizationBody }, TContext> => {
+    return useMutation(getPostOrganizationMutationOptions(options), queryClient);
 };
-export type putOrganizationsByIdByAttributeResponse200 = {
-    data: PutOrganizationsByIdByAttribute200;
+export type putOrganizationAttributeResponse200 = {
+    data: PutOrganizationAttribute200;
     status: 200;
 };
 
-export type putOrganizationsByIdByAttributeResponse400 = {
+export type putOrganizationAttributeResponse400 = {
     data: BadRequestResponse;
     status: 400;
 };
 
-export type putOrganizationsByIdByAttributeResponse401 = {
+export type putOrganizationAttributeResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type putOrganizationsByIdByAttributeResponse403 = {
+export type putOrganizationAttributeResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type putOrganizationsByIdByAttributeResponse404 = {
+export type putOrganizationAttributeResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type putOrganizationsByIdByAttributeResponseSuccess = putOrganizationsByIdByAttributeResponse200 & {
+export type putOrganizationAttributeResponseSuccess = putOrganizationAttributeResponse200 & {
     headers: Headers;
 };
-export type putOrganizationsByIdByAttributeResponseError = (
-    | putOrganizationsByIdByAttributeResponse400
-    | putOrganizationsByIdByAttributeResponse401
-    | putOrganizationsByIdByAttributeResponse403
-    | putOrganizationsByIdByAttributeResponse404
+export type putOrganizationAttributeResponseError = (
+    putOrganizationAttributeResponse400 | putOrganizationAttributeResponse401 | putOrganizationAttributeResponse403 | putOrganizationAttributeResponse404
 ) & {
     headers: Headers;
 };
 
-export type putOrganizationsByIdByAttributeResponse = putOrganizationsByIdByAttributeResponseSuccess | putOrganizationsByIdByAttributeResponseError;
+export type putOrganizationAttributeResponse = putOrganizationAttributeResponseSuccess | putOrganizationAttributeResponseError;
 
-export const getPutOrganizationsByIdByAttributeUrl = (id: number | string, attribute: string) => {
+export const getPutOrganizationAttributeUrl = (id: number | string, attribute: string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}/${attribute}`;
 };
 
 /**
  * Affecte value à l'attribut de l'organisation d'identifiant public_id
  */
-export const putOrganizationsByIdByAttribute = async (
+export const putOrganizationAttribute = async (
     id: number | string,
     attribute: string,
-    putOrganizationsByIdByAttributeBody: PutOrganizationsByIdByAttributeBody,
+    putOrganizationAttributeBody: PutOrganizationAttributeBody,
     options?: RequestInit
-): Promise<putOrganizationsByIdByAttributeResponse> => {
-    return fetchWithAuth<putOrganizationsByIdByAttributeResponse>(getPutOrganizationsByIdByAttributeUrl(id, attribute), {
+): Promise<putOrganizationAttributeResponse> => {
+    return fetchWithAuth<putOrganizationAttributeResponse>(getPutOrganizationAttributeUrl(id, attribute), {
         ...options,
         method: "PUT",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(putOrganizationsByIdByAttributeBody),
+        body: JSON.stringify(putOrganizationAttributeBody),
     });
 };
 
-export const getPutOrganizationsByIdByAttributeMutationOptions = <
+export const getPutOrganizationAttributeMutationOptions = <
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>,
+        Awaited<ReturnType<typeof putOrganizationAttribute>>,
         TError,
-        { id: number | string; attribute: string; data: PutOrganizationsByIdByAttributeBody },
+        { id: number | string; attribute: string; data: PutOrganizationAttributeBody },
         TContext
     >;
     request?: SecondParameter<typeof fetchWithAuth>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>,
+    Awaited<ReturnType<typeof putOrganizationAttribute>>,
     TError,
-    { id: number | string; attribute: string; data: PutOrganizationsByIdByAttributeBody },
+    { id: number | string; attribute: string; data: PutOrganizationAttributeBody },
     TContext
 > => {
-    const mutationKey = ["putOrganizationsByIdByAttribute"];
+    const mutationKey = ["putOrganizationAttribute"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
@@ -794,113 +788,110 @@ export const getPutOrganizationsByIdByAttributeMutationOptions = <
         : { mutation: { mutationKey }, request: undefined };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>,
-        { id: number | string; attribute: string; data: PutOrganizationsByIdByAttributeBody }
+        Awaited<ReturnType<typeof putOrganizationAttribute>>,
+        { id: number | string; attribute: string; data: PutOrganizationAttributeBody }
     > = (props) => {
         const { id, attribute, data } = props ?? {};
 
-        return putOrganizationsByIdByAttribute(id, attribute, data, requestOptions);
+        return putOrganizationAttribute(id, attribute, data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PutOrganizationsByIdByAttributeMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>>;
-export type PutOrganizationsByIdByAttributeMutationBody = PutOrganizationsByIdByAttributeBody;
-export type PutOrganizationsByIdByAttributeMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type PutOrganizationAttributeMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationAttribute>>>;
+export type PutOrganizationAttributeMutationBody = PutOrganizationAttributeBody;
+export type PutOrganizationAttributeMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const usePutOrganizationsByIdByAttribute = <
-    TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown,
->(
+export const usePutOrganizationAttribute = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>,
+            Awaited<ReturnType<typeof putOrganizationAttribute>>,
             TError,
-            { id: number | string; attribute: string; data: PutOrganizationsByIdByAttributeBody },
+            { id: number | string; attribute: string; data: PutOrganizationAttributeBody },
             TContext
         >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putOrganizationsByIdByAttribute>>,
+    Awaited<ReturnType<typeof putOrganizationAttribute>>,
     TError,
-    { id: number | string; attribute: string; data: PutOrganizationsByIdByAttributeBody },
+    { id: number | string; attribute: string; data: PutOrganizationAttributeBody },
     TContext
 > => {
-    return useMutation(getPutOrganizationsByIdByAttributeMutationOptions(options), queryClient);
+    return useMutation(getPutOrganizationAttributeMutationOptions(options), queryClient);
 };
-export type putOrganizationsByIdJoinLinkByRoleResponse200 = {
-    data: PutOrganizationsByIdJoinLinkByRole200;
+export type putOrganizationJoinLinkRoleResponse200 = {
+    data: PutOrganizationJoinLinkRole200;
     status: 200;
 };
 
-export type putOrganizationsByIdJoinLinkByRoleResponse401 = {
+export type putOrganizationJoinLinkRoleResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type putOrganizationsByIdJoinLinkByRoleResponse403 = {
+export type putOrganizationJoinLinkRoleResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type putOrganizationsByIdJoinLinkByRoleResponse404 = {
+export type putOrganizationJoinLinkRoleResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type putOrganizationsByIdJoinLinkByRoleResponseSuccess = putOrganizationsByIdJoinLinkByRoleResponse200 & {
+export type putOrganizationJoinLinkRoleResponseSuccess = putOrganizationJoinLinkRoleResponse200 & {
     headers: Headers;
 };
-export type putOrganizationsByIdJoinLinkByRoleResponseError = (
-    putOrganizationsByIdJoinLinkByRoleResponse401 | putOrganizationsByIdJoinLinkByRoleResponse403 | putOrganizationsByIdJoinLinkByRoleResponse404
+export type putOrganizationJoinLinkRoleResponseError = (
+    putOrganizationJoinLinkRoleResponse401 | putOrganizationJoinLinkRoleResponse403 | putOrganizationJoinLinkRoleResponse404
 ) & {
     headers: Headers;
 };
 
-export type putOrganizationsByIdJoinLinkByRoleResponse = putOrganizationsByIdJoinLinkByRoleResponseSuccess | putOrganizationsByIdJoinLinkByRoleResponseError;
+export type putOrganizationJoinLinkRoleResponse = putOrganizationJoinLinkRoleResponseSuccess | putOrganizationJoinLinkRoleResponseError;
 
-export const getPutOrganizationsByIdJoinLinkByRoleUrl = (id: number | string, role: string) => {
+export const getPutOrganizationJoinLinkRoleUrl = (id: number | string, role: string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}/join-link/${role}`;
 };
 
 /**
  * Modifie le lien d'accès à l'organisation
  */
-export const putOrganizationsByIdJoinLinkByRole = async (
+export const putOrganizationJoinLinkRole = async (
     id: number | string,
     role: string,
-    putOrganizationsByIdJoinLinkByRoleBody: PutOrganizationsByIdJoinLinkByRoleBody,
+    putOrganizationJoinLinkRoleBody: PutOrganizationJoinLinkRoleBody,
     options?: RequestInit
-): Promise<putOrganizationsByIdJoinLinkByRoleResponse> => {
-    return fetchWithAuth<putOrganizationsByIdJoinLinkByRoleResponse>(getPutOrganizationsByIdJoinLinkByRoleUrl(id, role), {
+): Promise<putOrganizationJoinLinkRoleResponse> => {
+    return fetchWithAuth<putOrganizationJoinLinkRoleResponse>(getPutOrganizationJoinLinkRoleUrl(id, role), {
         ...options,
         method: "PUT",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(putOrganizationsByIdJoinLinkByRoleBody),
+        body: JSON.stringify(putOrganizationJoinLinkRoleBody),
     });
 };
 
-export const getPutOrganizationsByIdJoinLinkByRoleMutationOptions = <
+export const getPutOrganizationJoinLinkRoleMutationOptions = <
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>,
+        Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>,
         TError,
-        { id: number | string; role: string; data: PutOrganizationsByIdJoinLinkByRoleBody },
+        { id: number | string; role: string; data: PutOrganizationJoinLinkRoleBody },
         TContext
     >;
     request?: SecondParameter<typeof fetchWithAuth>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>,
+    Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>,
     TError,
-    { id: number | string; role: string; data: PutOrganizationsByIdJoinLinkByRoleBody },
+    { id: number | string; role: string; data: PutOrganizationJoinLinkRoleBody },
     TContext
 > => {
-    const mutationKey = ["putOrganizationsByIdJoinLinkByRole"];
+    const mutationKey = ["putOrganizationJoinLinkRole"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
@@ -908,450 +899,419 @@ export const getPutOrganizationsByIdJoinLinkByRoleMutationOptions = <
         : { mutation: { mutationKey }, request: undefined };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>,
-        { id: number | string; role: string; data: PutOrganizationsByIdJoinLinkByRoleBody }
+        Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>,
+        { id: number | string; role: string; data: PutOrganizationJoinLinkRoleBody }
     > = (props) => {
         const { id, role, data } = props ?? {};
 
-        return putOrganizationsByIdJoinLinkByRole(id, role, data, requestOptions);
+        return putOrganizationJoinLinkRole(id, role, data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PutOrganizationsByIdJoinLinkByRoleMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>>;
-export type PutOrganizationsByIdJoinLinkByRoleMutationBody = PutOrganizationsByIdJoinLinkByRoleBody;
-export type PutOrganizationsByIdJoinLinkByRoleMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type PutOrganizationJoinLinkRoleMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>>;
+export type PutOrganizationJoinLinkRoleMutationBody = PutOrganizationJoinLinkRoleBody;
+export type PutOrganizationJoinLinkRoleMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const usePutOrganizationsByIdJoinLinkByRole = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const usePutOrganizationJoinLinkRole = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>,
+            Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>,
             TError,
-            { id: number | string; role: string; data: PutOrganizationsByIdJoinLinkByRoleBody },
+            { id: number | string; role: string; data: PutOrganizationJoinLinkRoleBody },
             TContext
         >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putOrganizationsByIdJoinLinkByRole>>,
+    Awaited<ReturnType<typeof putOrganizationJoinLinkRole>>,
     TError,
-    { id: number | string; role: string; data: PutOrganizationsByIdJoinLinkByRoleBody },
+    { id: number | string; role: string; data: PutOrganizationJoinLinkRoleBody },
     TContext
 > => {
-    return useMutation(getPutOrganizationsByIdJoinLinkByRoleMutationOptions(options), queryClient);
+    return useMutation(getPutOrganizationJoinLinkRoleMutationOptions(options), queryClient);
 };
-export type getOrganizationsJoinByIdResponse200 = {
+export type joinOrganizationByIdResponse200 = {
     data: Organization;
     status: 200;
 };
 
-export type getOrganizationsJoinByIdResponse400 = {
+export type joinOrganizationByIdResponse400 = {
     data: BadRequestResponse;
     status: 400;
 };
 
-export type getOrganizationsJoinByIdResponse401 = {
+export type joinOrganizationByIdResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type getOrganizationsJoinByIdResponse403 = {
+export type joinOrganizationByIdResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type getOrganizationsJoinByIdResponse404 = {
+export type joinOrganizationByIdResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type getOrganizationsJoinByIdResponseSuccess = getOrganizationsJoinByIdResponse200 & {
+export type joinOrganizationByIdResponseSuccess = joinOrganizationByIdResponse200 & {
     headers: Headers;
 };
-export type getOrganizationsJoinByIdResponseError = (
-    getOrganizationsJoinByIdResponse400 | getOrganizationsJoinByIdResponse401 | getOrganizationsJoinByIdResponse403 | getOrganizationsJoinByIdResponse404
+export type joinOrganizationByIdResponseError = (
+    joinOrganizationByIdResponse400 | joinOrganizationByIdResponse401 | joinOrganizationByIdResponse403 | joinOrganizationByIdResponse404
 ) & {
     headers: Headers;
 };
 
-export type getOrganizationsJoinByIdResponse = getOrganizationsJoinByIdResponseSuccess | getOrganizationsJoinByIdResponseError;
+export type joinOrganizationByIdResponse = joinOrganizationByIdResponseSuccess | joinOrganizationByIdResponseError;
 
-export const getGetOrganizationsJoinByIdUrl = (id: number | string, params?: GetOrganizationsJoinByIdParams) => {
-    const normalizedParams = new URLSearchParams();
-
-    Object.entries(params || {}).forEach(([key, value]) => {
-        if (value !== undefined) {
-            normalizedParams.append(key, value === null ? "null" : String(value));
-        }
-    });
-
-    const stringifiedParams = normalizedParams.toString();
-
-    return stringifiedParams.length > 0
-        ? `${env.API_EDITOR_URL}/api/organizations/join/${id}?${stringifiedParams}`
-        : `${env.API_EDITOR_URL}/api/organizations/join/${id}`;
+export const getJoinOrganizationByIdUrl = (id: number | string) => {
+    return `${env.API_EDITOR_URL}/api/organizations/join/${id}`;
 };
 
 /**
  * L'utilisateur s'ajoute à l'organisation via le jeton id
  */
-export const getOrganizationsJoinById = async (
-    id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
-    options?: RequestInit
-): Promise<getOrganizationsJoinByIdResponse> => {
-    return fetchWithAuth<getOrganizationsJoinByIdResponse>(getGetOrganizationsJoinByIdUrl(id, params), {
+export const joinOrganizationById = async (id: number | string, options?: RequestInit): Promise<joinOrganizationByIdResponse> => {
+    return fetchWithAuth<joinOrganizationByIdResponse>(getJoinOrganizationByIdUrl(id), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetOrganizationsJoinByIdQueryKey = (id: number | string, params?: GetOrganizationsJoinByIdParams) => {
-    return [`${env.API_EDITOR_URL}/api/organizations/join/${id}`, ...(params ? [params] : [])] as const;
+export const getJoinOrganizationByIdQueryKey = (id: number | string) => {
+    return [`${env.API_EDITOR_URL}/api/organizations/join/${id}`] as const;
 };
 
-export const getGetOrganizationsJoinByIdQueryOptions = <
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export const getJoinOrganizationByIdQueryOptions = <
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetOrganizationsJoinByIdQueryKey(id, params);
+    const queryKey = queryOptions?.queryKey ?? getJoinOrganizationByIdQueryKey(id);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationsJoinById>>> = ({ signal }) =>
-        getOrganizationsJoinById(id, params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof joinOrganizationById>>> = ({ signal }) => joinOrganizationById(id, { signal, ...requestOptions });
 
     return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+        Awaited<ReturnType<typeof joinOrganizationById>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetOrganizationsJoinByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganizationsJoinById>>>;
-export type GetOrganizationsJoinByIdQueryError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type JoinOrganizationByIdQueryResult = NonNullable<Awaited<ReturnType<typeof joinOrganizationById>>>;
+export type JoinOrganizationByIdQueryError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export function useGetOrganizationsJoinById<
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export function useJoinOrganizationById<
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
-    params: undefined | GetOrganizationsJoinByIdParams,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>> &
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>> &
             Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, Awaited<ReturnType<typeof getOrganizationsJoinById>>>,
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, Awaited<ReturnType<typeof joinOrganizationById>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetOrganizationsJoinById<
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export function useJoinOrganizationById<
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>> &
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>> &
             Pick<
-                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, Awaited<ReturnType<typeof getOrganizationsJoinById>>>,
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, Awaited<ReturnType<typeof joinOrganizationById>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetOrganizationsJoinById<
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export function useJoinOrganizationById<
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetOrganizationsJoinById<
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export function useJoinOrganizationById<
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetOrganizationsJoinByIdQueryOptions(id, params, options);
+    const queryOptions = getJoinOrganizationByIdQueryOptions(id, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetOrganizationsJoinByIdQuery = async <
-    TData = Awaited<ReturnType<typeof getOrganizationsJoinById>>,
+export const prefetchJoinOrganizationByIdQuery = async <
+    TData = Awaited<ReturnType<typeof joinOrganizationById>>,
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     queryClient: QueryClient,
     id: number | string,
-    params?: GetOrganizationsJoinByIdParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsJoinById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof joinOrganizationById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetOrganizationsJoinByIdQueryOptions(id, params, options);
+    const queryOptions = getJoinOrganizationByIdQueryOptions(id, options);
 
     await queryClient.prefetchQuery(queryOptions);
 
     return queryClient;
 };
 
-export type getOrganizationsLinksByIdResponse200 = {
-    data: GetOrganizationsLinksById200;
+export type getOrganizationLinksByIdResponse200 = {
+    data: GetOrganizationLinksById200;
     status: 200;
 };
 
-export type getOrganizationsLinksByIdResponse401 = {
+export type getOrganizationLinksByIdResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type getOrganizationsLinksByIdResponse403 = {
+export type getOrganizationLinksByIdResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type getOrganizationsLinksByIdResponse404 = {
+export type getOrganizationLinksByIdResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type getOrganizationsLinksByIdResponseSuccess = getOrganizationsLinksByIdResponse200 & {
+export type getOrganizationLinksByIdResponseSuccess = getOrganizationLinksByIdResponse200 & {
     headers: Headers;
 };
-export type getOrganizationsLinksByIdResponseError = (
-    getOrganizationsLinksByIdResponse401 | getOrganizationsLinksByIdResponse403 | getOrganizationsLinksByIdResponse404
+export type getOrganizationLinksByIdResponseError = (
+    getOrganizationLinksByIdResponse401 | getOrganizationLinksByIdResponse403 | getOrganizationLinksByIdResponse404
 ) & {
     headers: Headers;
 };
 
-export type getOrganizationsLinksByIdResponse = getOrganizationsLinksByIdResponseSuccess | getOrganizationsLinksByIdResponseError;
+export type getOrganizationLinksByIdResponse = getOrganizationLinksByIdResponseSuccess | getOrganizationLinksByIdResponseError;
 
-export const getGetOrganizationsLinksByIdUrl = (id: number | string) => {
+export const getGetOrganizationLinksByIdUrl = (id: number | string) => {
     return `${env.API_EDITOR_URL}/api/organizations/links/${id}`;
 };
 
 /**
  * Récupère les liens d'invitation de l'organisation. Seuls les propriétaires peuvent accéder à cette ressource.
  */
-export const getOrganizationsLinksById = async (id: number | string, options?: RequestInit): Promise<getOrganizationsLinksByIdResponse> => {
-    return fetchWithAuth<getOrganizationsLinksByIdResponse>(getGetOrganizationsLinksByIdUrl(id), {
+export const getOrganizationLinksById = async (id: number | string, options?: RequestInit): Promise<getOrganizationLinksByIdResponse> => {
+    return fetchWithAuth<getOrganizationLinksByIdResponse>(getGetOrganizationLinksByIdUrl(id), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetOrganizationsLinksByIdQueryKey = (id: number | string) => {
+export const getGetOrganizationLinksByIdQueryKey = (id: number | string) => {
     return [`${env.API_EDITOR_URL}/api/organizations/links/${id}`] as const;
 };
 
-export const getGetOrganizationsLinksByIdQueryOptions = <
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export const getGetOrganizationLinksByIdQueryOptions = <
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetOrganizationsLinksByIdQueryKey(id);
+    const queryKey = queryOptions?.queryKey ?? getGetOrganizationLinksByIdQueryKey(id);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationsLinksById>>> = ({ signal }) =>
-        getOrganizationsLinksById(id, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganizationLinksById>>> = ({ signal }) =>
+        getOrganizationLinksById(id, { signal, ...requestOptions });
 
     return { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+        Awaited<ReturnType<typeof getOrganizationLinksById>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetOrganizationsLinksByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganizationsLinksById>>>;
-export type GetOrganizationsLinksByIdQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type GetOrganizationLinksByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganizationLinksById>>>;
+export type GetOrganizationLinksByIdQueryError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export function useGetOrganizationsLinksById<
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export function useGetOrganizationLinksById<
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>> &
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>> &
             Pick<
-                DefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, Awaited<ReturnType<typeof getOrganizationsLinksById>>>,
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, Awaited<ReturnType<typeof getOrganizationLinksById>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetOrganizationsLinksById<
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export function useGetOrganizationLinksById<
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>> &
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>> &
             Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getOrganizationsLinksById>>,
-                    TError,
-                    Awaited<ReturnType<typeof getOrganizationsLinksById>>
-                >,
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, Awaited<ReturnType<typeof getOrganizationLinksById>>>,
                 "initialData"
             >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetOrganizationsLinksById<
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export function useGetOrganizationLinksById<
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetOrganizationsLinksById<
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export function useGetOrganizationLinksById<
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     id: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetOrganizationsLinksByIdQueryOptions(id, options);
+    const queryOptions = getGetOrganizationLinksByIdQueryOptions(id, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetOrganizationsLinksByIdQuery = async <
-    TData = Awaited<ReturnType<typeof getOrganizationsLinksById>>,
+export const prefetchGetOrganizationLinksByIdQuery = async <
+    TData = Awaited<ReturnType<typeof getOrganizationLinksById>>,
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
 >(
     queryClient: QueryClient,
     id: number | string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationsLinksById>>, TError, TData>>;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganizationLinksById>>, TError, TData>>;
         request?: SecondParameter<typeof fetchWithAuth>;
     }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetOrganizationsLinksByIdQueryOptions(id, options);
+    const queryOptions = getGetOrganizationLinksByIdQueryOptions(id, options);
 
     await queryClient.prefetchQuery(queryOptions);
 
     return queryClient;
 };
 
-export type postOrganizationsByIdMembersByUseridResponse200 = {
-    data: PostOrganizationsByIdMembersByUserid200;
+export type addMemberToOrganizationResponse200 = {
+    data: AddMemberToOrganization200;
     status: 200;
 };
 
-export type postOrganizationsByIdMembersByUseridResponse401 = {
+export type addMemberToOrganizationResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type postOrganizationsByIdMembersByUseridResponse403 = {
+export type addMemberToOrganizationResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type postOrganizationsByIdMembersByUseridResponse404 = {
+export type addMemberToOrganizationResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type postOrganizationsByIdMembersByUseridResponseSuccess = postOrganizationsByIdMembersByUseridResponse200 & {
+export type addMemberToOrganizationResponseSuccess = addMemberToOrganizationResponse200 & {
     headers: Headers;
 };
-export type postOrganizationsByIdMembersByUseridResponseError = (
-    postOrganizationsByIdMembersByUseridResponse401 | postOrganizationsByIdMembersByUseridResponse403 | postOrganizationsByIdMembersByUseridResponse404
+export type addMemberToOrganizationResponseError = (
+    addMemberToOrganizationResponse401 | addMemberToOrganizationResponse403 | addMemberToOrganizationResponse404
 ) & {
     headers: Headers;
 };
 
-export type postOrganizationsByIdMembersByUseridResponse =
-    postOrganizationsByIdMembersByUseridResponseSuccess | postOrganizationsByIdMembersByUseridResponseError;
+export type addMemberToOrganizationResponse = addMemberToOrganizationResponseSuccess | addMemberToOrganizationResponseError;
 
-export const getPostOrganizationsByIdMembersByUseridUrl = (id: number | string, userId: string) => {
+export const getAddMemberToOrganizationUrl = (id: number | string, userId: string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}`;
 };
 
 /**
  * Ajoute un membre à l'organisation
  */
-export const postOrganizationsByIdMembersByUserid = async (
+export const addMemberToOrganization = async (
     id: number | string,
     userId: string,
-    postOrganizationsByIdMembersByUseridBody: PostOrganizationsByIdMembersByUseridBody,
+    addMemberToOrganizationBody: AddMemberToOrganizationBody,
     options?: RequestInit
-): Promise<postOrganizationsByIdMembersByUseridResponse> => {
-    return fetchWithAuth<postOrganizationsByIdMembersByUseridResponse>(getPostOrganizationsByIdMembersByUseridUrl(id, userId), {
+): Promise<addMemberToOrganizationResponse> => {
+    return fetchWithAuth<addMemberToOrganizationResponse>(getAddMemberToOrganizationUrl(id, userId), {
         ...options,
         method: "POST",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(postOrganizationsByIdMembersByUseridBody),
+        body: JSON.stringify(addMemberToOrganizationBody),
     });
 };
 
-export const getPostOrganizationsByIdMembersByUseridMutationOptions = <
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown,
->(options?: {
+export const getAddMemberToOrganizationMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>,
+        Awaited<ReturnType<typeof addMemberToOrganization>>,
         TError,
-        { id: number | string; userId: string; data: PostOrganizationsByIdMembersByUseridBody },
+        { id: number | string; userId: string; data: AddMemberToOrganizationBody },
         TContext
     >;
     request?: SecondParameter<typeof fetchWithAuth>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>,
+    Awaited<ReturnType<typeof addMemberToOrganization>>,
     TError,
-    { id: number | string; userId: string; data: PostOrganizationsByIdMembersByUseridBody },
+    { id: number | string; userId: string; data: AddMemberToOrganizationBody },
     TContext
 > => {
-    const mutationKey = ["postOrganizationsByIdMembersByUserid"];
+    const mutationKey = ["addMemberToOrganization"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
@@ -1359,209 +1319,188 @@ export const getPostOrganizationsByIdMembersByUseridMutationOptions = <
         : { mutation: { mutationKey }, request: undefined };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>,
-        { id: number | string; userId: string; data: PostOrganizationsByIdMembersByUseridBody }
+        Awaited<ReturnType<typeof addMemberToOrganization>>,
+        { id: number | string; userId: string; data: AddMemberToOrganizationBody }
     > = (props) => {
         const { id, userId, data } = props ?? {};
 
-        return postOrganizationsByIdMembersByUserid(id, userId, data, requestOptions);
+        return addMemberToOrganization(id, userId, data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PostOrganizationsByIdMembersByUseridMutationResult = NonNullable<Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>>;
-export type PostOrganizationsByIdMembersByUseridMutationBody = PostOrganizationsByIdMembersByUseridBody;
-export type PostOrganizationsByIdMembersByUseridMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type AddMemberToOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof addMemberToOrganization>>>;
+export type AddMemberToOrganizationMutationBody = AddMemberToOrganizationBody;
+export type AddMemberToOrganizationMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const usePostOrganizationsByIdMembersByUserid = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const useAddMemberToOrganization = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>,
+            Awaited<ReturnType<typeof addMemberToOrganization>>,
             TError,
-            { id: number | string; userId: string; data: PostOrganizationsByIdMembersByUseridBody },
+            { id: number | string; userId: string; data: AddMemberToOrganizationBody },
             TContext
         >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof postOrganizationsByIdMembersByUserid>>,
+    Awaited<ReturnType<typeof addMemberToOrganization>>,
     TError,
-    { id: number | string; userId: string; data: PostOrganizationsByIdMembersByUseridBody },
+    { id: number | string; userId: string; data: AddMemberToOrganizationBody },
     TContext
 > => {
-    return useMutation(getPostOrganizationsByIdMembersByUseridMutationOptions(options), queryClient);
+    return useMutation(getAddMemberToOrganizationMutationOptions(options), queryClient);
 };
-export type deleteOrganizationsByIdMembersByUseridResponse204 = {
+export type deleteOrganizationMemberResponse204 = {
     data: DeletedResponse;
     status: 204;
 };
 
-export type deleteOrganizationsByIdMembersByUseridResponse401 = {
+export type deleteOrganizationMemberResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type deleteOrganizationsByIdMembersByUseridResponse403 = {
+export type deleteOrganizationMemberResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type deleteOrganizationsByIdMembersByUseridResponse404 = {
+export type deleteOrganizationMemberResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type deleteOrganizationsByIdMembersByUseridResponseSuccess = deleteOrganizationsByIdMembersByUseridResponse204 & {
+export type deleteOrganizationMemberResponseSuccess = deleteOrganizationMemberResponse204 & {
     headers: Headers;
 };
-export type deleteOrganizationsByIdMembersByUseridResponseError = (
-    deleteOrganizationsByIdMembersByUseridResponse401 | deleteOrganizationsByIdMembersByUseridResponse403 | deleteOrganizationsByIdMembersByUseridResponse404
+export type deleteOrganizationMemberResponseError = (
+    deleteOrganizationMemberResponse401 | deleteOrganizationMemberResponse403 | deleteOrganizationMemberResponse404
 ) & {
     headers: Headers;
 };
 
-export type deleteOrganizationsByIdMembersByUseridResponse =
-    deleteOrganizationsByIdMembersByUseridResponseSuccess | deleteOrganizationsByIdMembersByUseridResponseError;
+export type deleteOrganizationMemberResponse = deleteOrganizationMemberResponseSuccess | deleteOrganizationMemberResponseError;
 
-export const getDeleteOrganizationsByIdMembersByUseridUrl = (id: number | string, userId: string) => {
+export const getDeleteOrganizationMemberUrl = (id: number | string, userId: string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}`;
 };
 
 /**
  * Enlève un membre de l'organisation. Un utilisateur peut se retirer lui-même, sinon un owner doit effectuer cette action.
  */
-export const deleteOrganizationsByIdMembersByUserid = async (
-    id: number | string,
-    userId: string,
-    options?: RequestInit
-): Promise<deleteOrganizationsByIdMembersByUseridResponse> => {
-    return fetchWithAuth<deleteOrganizationsByIdMembersByUseridResponse>(getDeleteOrganizationsByIdMembersByUseridUrl(id, userId), {
+export const deleteOrganizationMember = async (id: number | string, userId: string, options?: RequestInit): Promise<deleteOrganizationMemberResponse> => {
+    return fetchWithAuth<deleteOrganizationMemberResponse>(getDeleteOrganizationMemberUrl(id, userId), {
         ...options,
         method: "DELETE",
     });
 };
 
-export const getDeleteOrganizationsByIdMembersByUseridMutationOptions = <
-    TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>,
-        TError,
-        { id: number | string; userId: string },
-        TContext
-    >;
+export const getDeleteOrganizationMemberMutationOptions = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationMember>>, TError, { id: number | string; userId: string }, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>, TError, { id: number | string; userId: string }, TContext> => {
-    const mutationKey = ["deleteOrganizationsByIdMembersByUserid"];
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationMember>>, TError, { id: number | string; userId: string }, TContext> => {
+    const mutationKey = ["deleteOrganizationMember"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
             : { ...options, mutation: { ...options.mutation, mutationKey } }
         : { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>, { id: number | string; userId: string }> = (
-        props
-    ) => {
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteOrganizationMember>>, { id: number | string; userId: string }> = (props) => {
         const { id, userId } = props ?? {};
 
-        return deleteOrganizationsByIdMembersByUserid(id, userId, requestOptions);
+        return deleteOrganizationMember(id, userId, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteOrganizationsByIdMembersByUseridMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>>;
+export type DeleteOrganizationMemberMutationResult = NonNullable<Awaited<ReturnType<typeof deleteOrganizationMember>>>;
 
-export type DeleteOrganizationsByIdMembersByUseridMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type DeleteOrganizationMemberMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const useDeleteOrganizationsByIdMembersByUserid = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const useDeleteOrganizationMember = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>,
-            TError,
-            { id: number | string; userId: string },
-            TContext
-        >;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteOrganizationMember>>, TError, { id: number | string; userId: string }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof deleteOrganizationsByIdMembersByUserid>>, TError, { id: number | string; userId: string }, TContext> => {
-    return useMutation(getDeleteOrganizationsByIdMembersByUseridMutationOptions(options), queryClient);
+): UseMutationResult<Awaited<ReturnType<typeof deleteOrganizationMember>>, TError, { id: number | string; userId: string }, TContext> => {
+    return useMutation(getDeleteOrganizationMemberMutationOptions(options), queryClient);
 };
-export type putOrganizationsByIdMembersByUseridRoleResponse200 = {
-    data: PutOrganizationsByIdMembersByUseridRole200;
+export type putOrganizationMemberRoleResponse200 = {
+    data: PutOrganizationMemberRole200;
     status: 200;
 };
 
-export type putOrganizationsByIdMembersByUseridRoleResponse401 = {
+export type putOrganizationMemberRoleResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type putOrganizationsByIdMembersByUseridRoleResponse403 = {
+export type putOrganizationMemberRoleResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type putOrganizationsByIdMembersByUseridRoleResponse404 = {
+export type putOrganizationMemberRoleResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type putOrganizationsByIdMembersByUseridRoleResponseSuccess = putOrganizationsByIdMembersByUseridRoleResponse200 & {
+export type putOrganizationMemberRoleResponseSuccess = putOrganizationMemberRoleResponse200 & {
     headers: Headers;
 };
-export type putOrganizationsByIdMembersByUseridRoleResponseError = (
-    putOrganizationsByIdMembersByUseridRoleResponse401 | putOrganizationsByIdMembersByUseridRoleResponse403 | putOrganizationsByIdMembersByUseridRoleResponse404
+export type putOrganizationMemberRoleResponseError = (
+    putOrganizationMemberRoleResponse401 | putOrganizationMemberRoleResponse403 | putOrganizationMemberRoleResponse404
 ) & {
     headers: Headers;
 };
 
-export type putOrganizationsByIdMembersByUseridRoleResponse =
-    putOrganizationsByIdMembersByUseridRoleResponseSuccess | putOrganizationsByIdMembersByUseridRoleResponseError;
+export type putOrganizationMemberRoleResponse = putOrganizationMemberRoleResponseSuccess | putOrganizationMemberRoleResponseError;
 
-export const getPutOrganizationsByIdMembersByUseridRoleUrl = (id: number | string, userId: string) => {
+export const getPutOrganizationMemberRoleUrl = (id: number | string, userId: string) => {
     return `${env.API_EDITOR_URL}/api/organizations/${id}/members/${userId}/role`;
 };
 
 /**
- * Modifie le role d'un membre dans l'organisation
+ * Modifie le rôle d'un membre dans l'organisation
  */
-export const putOrganizationsByIdMembersByUseridRole = async (
+export const putOrganizationMemberRole = async (
     id: number | string,
     userId: string,
-    putOrganizationsByIdMembersByUseridRoleBody: PutOrganizationsByIdMembersByUseridRoleBody,
+    putOrganizationMemberRoleBody: PutOrganizationMemberRoleBody,
     options?: RequestInit
-): Promise<putOrganizationsByIdMembersByUseridRoleResponse> => {
-    return fetchWithAuth<putOrganizationsByIdMembersByUseridRoleResponse>(getPutOrganizationsByIdMembersByUseridRoleUrl(id, userId), {
+): Promise<putOrganizationMemberRoleResponse> => {
+    return fetchWithAuth<putOrganizationMemberRoleResponse>(getPutOrganizationMemberRoleUrl(id, userId), {
         ...options,
         method: "PUT",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(putOrganizationsByIdMembersByUseridRoleBody),
+        body: JSON.stringify(putOrganizationMemberRoleBody),
     });
 };
 
-export const getPutOrganizationsByIdMembersByUseridRoleMutationOptions = <
+export const getPutOrganizationMemberRoleMutationOptions = <
     TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>,
+        Awaited<ReturnType<typeof putOrganizationMemberRole>>,
         TError,
-        { id: number | string; userId: string; data: PutOrganizationsByIdMembersByUseridRoleBody },
+        { id: number | string; userId: string; data: PutOrganizationMemberRoleBody },
         TContext
     >;
     request?: SecondParameter<typeof fetchWithAuth>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>,
+    Awaited<ReturnType<typeof putOrganizationMemberRole>>,
     TError,
-    { id: number | string; userId: string; data: PutOrganizationsByIdMembersByUseridRoleBody },
+    { id: number | string; userId: string; data: PutOrganizationMemberRoleBody },
     TContext
 > => {
-    const mutationKey = ["putOrganizationsByIdMembersByUseridRole"];
+    const mutationKey = ["putOrganizationMemberRole"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
@@ -1569,37 +1508,37 @@ export const getPutOrganizationsByIdMembersByUseridRoleMutationOptions = <
         : { mutation: { mutationKey }, request: undefined };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>,
-        { id: number | string; userId: string; data: PutOrganizationsByIdMembersByUseridRoleBody }
+        Awaited<ReturnType<typeof putOrganizationMemberRole>>,
+        { id: number | string; userId: string; data: PutOrganizationMemberRoleBody }
     > = (props) => {
         const { id, userId, data } = props ?? {};
 
-        return putOrganizationsByIdMembersByUseridRole(id, userId, data, requestOptions);
+        return putOrganizationMemberRole(id, userId, data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PutOrganizationsByIdMembersByUseridRoleMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>>;
-export type PutOrganizationsByIdMembersByUseridRoleMutationBody = PutOrganizationsByIdMembersByUseridRoleBody;
-export type PutOrganizationsByIdMembersByUseridRoleMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type PutOrganizationMemberRoleMutationResult = NonNullable<Awaited<ReturnType<typeof putOrganizationMemberRole>>>;
+export type PutOrganizationMemberRoleMutationBody = PutOrganizationMemberRoleBody;
+export type PutOrganizationMemberRoleMutationError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const usePutOrganizationsByIdMembersByUseridRole = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const usePutOrganizationMemberRole = <TError = NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>,
+            Awaited<ReturnType<typeof putOrganizationMemberRole>>,
             TError,
-            { id: number | string; userId: string; data: PutOrganizationsByIdMembersByUseridRoleBody },
+            { id: number | string; userId: string; data: PutOrganizationMemberRoleBody },
             TContext
         >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putOrganizationsByIdMembersByUseridRole>>,
+    Awaited<ReturnType<typeof putOrganizationMemberRole>>,
     TError,
-    { id: number | string; userId: string; data: PutOrganizationsByIdMembersByUseridRoleBody },
+    { id: number | string; userId: string; data: PutOrganizationMemberRoleBody },
     TContext
 > => {
-    return useMutation(getPutOrganizationsByIdMembersByUseridRoleMutationOptions(options), queryClient);
+    return useMutation(getPutOrganizationMemberRoleMutationOptions(options), queryClient);
 };

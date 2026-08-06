@@ -19,7 +19,6 @@ export * from "./mapResearchTypesItem";
 export * from "./mapResearchUsersItem";
 export * from "./mapResearchValidesItem";
 export * from "./mapView";
-export * from "./partialContentResponse";
 export * from "./patchMapByEditIdBody";
 export * from "./postMapBody";
 export * from "./postMapFileByEditIdBody";

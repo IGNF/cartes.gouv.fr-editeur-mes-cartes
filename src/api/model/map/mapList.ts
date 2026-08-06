@@ -8,35 +8,56 @@
 import type { Bbox } from "./bbox";
 
 /**
- * Carte
+ * Description d'une carte avec ses métadonnées
  */
 export interface MapList {
+    /** Titre de la carte */
     title?: string;
     /** Titre de la carte, adapté pour etre utilisé dans les url */
     title_url?: string;
-    /** @nullable */
+    /**
+     * Description de la carte
+     * @nullable
+     */
     description?: string | null;
-    /** @nullable */
+    /**
+     * Thème lié à la carte
+     * @nullable
+     */
     theme?: string | null;
-    /** @nullable */
+    /**
+     * Id du thème
+     * @nullable
+     */
     theme_id?: number | null;
-    /** identifiant de l'organisation */
+    /** Identifiant de l'organisation */
     organization_id?: string;
     /** Nom de l'organisation */
     organization_name?: string;
+    /** Type de la carte ('macarte', 'mesadresses', statistic', storymap') */
     type?: string;
+    /** Premium de la carte ('default', 'edugeo') */
     premium?: string;
+    /** Date de création de la carte */
     created_at?: string;
+    /** Dernière date de mise à jour de la carte */
     updated_at?: string;
+    /** Nombre total de vues */
     nb_view?: number;
-    /** @nullable */
+    /**
+     * URI de l'image
+     * @nullable
+     */
     img_url?: string | null;
+    /** Publication de la carte ('atlas', 'public', 'private') */
     share?: string;
     bbox?: Bbox;
+    /** Id utilisé pour la visualisation */
     view_id?: string;
-    /** lien vers la visualisation de la carte */
+    /** Lien vers la visualisation de la carte */
     view_url?: string;
-    /** si auteur de la carte */
+    /** Si auteur de la carte */
     edit_id?: string;
+    /** Public_id de l'auteur de la carte */
     author?: string;
 }

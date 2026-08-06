@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * Emprise visible de la carte (haut, droite, bas, gauche)
- * @minItems 4
- * @maxItems 4
- */
-export type Bbox = number[];
+export type PutOrganizationMemberRoleBody = {
+    /** nouveau rôle, parmi ['member', 'editor', 'owner'] */
+    value?: string;
+};

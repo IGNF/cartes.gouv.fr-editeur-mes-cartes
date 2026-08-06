@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * Emprise visible de la carte (haut, droite, bas, gauche)
- * @minItems 4
- * @maxItems 4
- */
-export type Bbox = number[];
+export type PutMediaAttributeBody = {
+    /** valeur à affecter à l'attribut [folder => peut être null] */
+    value?: string;
+};

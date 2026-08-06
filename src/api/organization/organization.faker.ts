@@ -8,15 +8,15 @@
 import { faker } from "@faker-js/faker";
 
 import type {
+    AddMemberToOrganization200,
     DeletedResponse,
-    GetOrganizationsLinksById200,
+    GetOrganizationLinksById200,
     GetOrganizationsMe200Item,
     GetOrganizationsRoles200Item,
     Organization,
-    PostOrganizationsByIdMembersByUserid200,
-    PutOrganizationsByIdByAttribute200,
-    PutOrganizationsByIdJoinLinkByRole200,
-    PutOrganizationsByIdMembersByUseridRole200,
+    PutOrganizationAttribute200,
+    PutOrganizationJoinLinkRole200,
+    PutOrganizationMemberRole200,
 } from "../model";
 
 export const getGetOrganizationsRolesResponseMock = (): GetOrganizationsRoles200Item[] =>
@@ -95,13 +95,13 @@ export const getGetOrganizationsByIdResponseMock = (overrideResponse: Partial<Ex
     ...overrideResponse,
 });
 
-export const getDeleteOrganizationsByIdResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
+export const getDeleteOrganizationResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
     code: faker.helpers.arrayElement([faker.number.int(), undefined]),
     message: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPostOrganizationsResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
+export const getPostOrganizationResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     presentation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
@@ -131,25 +131,25 @@ export const getPostOrganizationsResponseMock = (overrideResponse: Partial<Extra
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdByAttributeResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdByAttribute200, object>> = {}
-): PutOrganizationsByIdByAttribute200 => ({
+export const getPutOrganizationAttributeResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationAttribute200, object>> = {}
+): PutOrganizationAttribute200 => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdJoinLinkByRoleResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdJoinLinkByRole200, object>> = {}
-): PutOrganizationsByIdJoinLinkByRole200 => ({
+export const getPutOrganizationJoinLinkRoleResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationJoinLinkRole200, object>> = {}
+): PutOrganizationJoinLinkRole200 => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getGetOrganizationsJoinByIdResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
+export const getJoinOrganizationByIdResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     presentation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
@@ -179,18 +179,18 @@ export const getGetOrganizationsJoinByIdResponseMock = (overrideResponse: Partia
     ...overrideResponse,
 });
 
-export const getGetOrganizationsLinksByIdResponseMock = (
-    overrideResponse: Partial<Extract<GetOrganizationsLinksById200, object>> = {}
-): GetOrganizationsLinksById200 => ({
+export const getGetOrganizationLinksByIdResponseMock = (
+    overrideResponse: Partial<Extract<GetOrganizationLinksById200, object>> = {}
+): GetOrganizationLinksById200 => ({
     link_as_member: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     link_as_editor: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     mail_pattern: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     ...overrideResponse,
 });
 
-export const getPostOrganizationsByIdMembersByUseridResponseMock = (
-    overrideResponse: Partial<Extract<PostOrganizationsByIdMembersByUserid200, object>> = {}
-): PostOrganizationsByIdMembersByUserid200 => ({
+export const getAddMemberToOrganizationResponseMock = (
+    overrideResponse: Partial<Extract<AddMemberToOrganization200, object>> = {}
+): AddMemberToOrganization200 => ({
     organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -199,15 +199,15 @@ export const getPostOrganizationsByIdMembersByUseridResponseMock = (
     ...overrideResponse,
 });
 
-export const getDeleteOrganizationsByIdMembersByUseridResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
+export const getDeleteOrganizationMemberResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
     code: faker.helpers.arrayElement([faker.number.int(), undefined]),
     message: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdMembersByUseridRoleResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdMembersByUseridRole200, object>> = {}
-): PutOrganizationsByIdMembersByUseridRole200 => ({
+export const getPutOrganizationMemberRoleResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationMemberRole200, object>> = {}
+): PutOrganizationMemberRole200 => ({
     organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),

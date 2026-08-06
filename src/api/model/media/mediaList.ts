@@ -12,10 +12,10 @@ import type { Media } from "./media";
  */
 export interface MediaList {
     medias?: Media[];
-    /** Nombre de cartes correspondant à la recherche */
+    /** Nombre de média correspondant à la recherche */
     count?: number;
-    /** Nombre de cartes recues dans la requete */
+    /** Nombre de média recues dans la requete */
     limit?: number;
-    /** Nombre de cartes à passer avant de ls inclure dans la requete */
+    /** Nombre de média à passer avant de ls inclure dans la requete */
     offset?: number;
 }

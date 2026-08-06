@@ -8,7 +8,7 @@
 import type { Bbox } from "./bbox";
 
 /**
- * Carte
+ * Objet carte à envoyer lors d'ajout / modification d'une carte
  */
 export interface MapAdd {
     /** Titre de la carte */
@@ -32,8 +32,8 @@ export interface MapAdd {
     /** Carte active (par ex : terminée ou non) */
     active?: boolean;
     /**
-     * Publication de la carte ('atlas', 'public', 'private'). <br>
-     * Si une 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner
+     * Publication de la carte ('atlas', 'public', 'private').
+     * Si 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner
      */
     share?: string;
     bbox?: Bbox;

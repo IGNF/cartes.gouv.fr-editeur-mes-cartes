@@ -6,18 +6,17 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./getOrganizationsJoinByIdParams";
-export * from "./getOrganizationsLinksById200";
+export * from "./addMemberToOrganization200";
+export * from "./addMemberToOrganizationBody";
+export * from "./getOrganizationLinksById200";
 export * from "./getOrganizationsMe200Item";
 export * from "./getOrganizationsRoles200Item";
 export * from "./organization";
 export * from "./organizationMembersItem";
-export * from "./postOrganizationsBody";
-export * from "./postOrganizationsByIdMembersByUserid200";
-export * from "./postOrganizationsByIdMembersByUseridBody";
-export * from "./putOrganizationsByIdByAttribute200";
-export * from "./putOrganizationsByIdByAttributeBody";
-export * from "./putOrganizationsByIdJoinLinkByRole200";
-export * from "./putOrganizationsByIdJoinLinkByRoleBody";
-export * from "./putOrganizationsByIdMembersByUseridRole200";
-export * from "./putOrganizationsByIdMembersByUseridRoleBody";
+export * from "./postOrganizationBody";
+export * from "./putOrganizationAttribute200";
+export * from "./putOrganizationAttributeBody";
+export * from "./putOrganizationJoinLinkRole200";
+export * from "./putOrganizationJoinLinkRoleBody";
+export * from "./putOrganizationMemberRole200";
+export * from "./putOrganizationMemberRoleBody";

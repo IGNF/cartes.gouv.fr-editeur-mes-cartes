@@ -7,8 +7,6 @@
  */
 
 /**
- * Emprise visible de la carte (haut, droite, bas, gauche)
- * @minItems 4
- * @maxItems 4
+ * Contenu partiel des ressources recherchées
  */
-export type Bbox = number[];
+export type PartialContentResponse = void;

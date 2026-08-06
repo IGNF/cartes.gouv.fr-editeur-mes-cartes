@@ -182,13 +182,17 @@ paths:
           $ref: '#/components/parameters/offset'
       responses:
         '200':
-          description: 'Liste des cartes (tout ou partie), recherchées selon les critères définis dans le query'
+          description: 'Liste des cartes recherchées selon les critères définis dans la query'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Map_research'
         '206':
-          $ref: '#/components/responses/PartialContent'
+          description: 'Contenu partiel de la liste des cartes recherchées selon les critères définis dans la query'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Map_research'
         '401':
           $ref: '#/components/responses/NotConnected'
         '403':
@@ -339,7 +343,7 @@ paths:
       tags:
         - Map
       description: "Récupérer les data de la carte par son identifiant d'édition"
-      operationId: getMapEditFileByEditId
+      operationId: getMapFileByEditId
       parameters:
         -
           $ref: '#/components/parameters/edit_id'
@@ -466,7 +470,7 @@ paths:
       description: "Supprime en douceur (https://phpreaction.com/support/suppression-en-douceur-soft-delete/) le compte de l'utilisateur connecté"
       operationId: deleteMe
       responses:
-        '206':
+        '204':
           description: "L'utilisateur a été supprimé"
         '401':
           $ref: '#/components/responses/NotConnected'
@@ -480,7 +484,7 @@ paths:
     patch:
       tags:
         - User
-      description: 'parameter **current_password** is required to patch username, email and new_password<br>username, email et public_name sont uniques, la réponse 400 "... already used" peut être renvoyée'
+      description: "Le paramètre **current_password** est nécessaire pour modifier les paramètres username, email et new_password\nusername, email et public_name sont uniques, la réponse 400 '... already used' peut être renvoyée"
       operationId: patchMe
       requestBody:
         required: true
@@ -507,7 +511,7 @@ paths:
       tags:
         - Media
       description: "Renvoie les medias de l'utilisateur connecté"
-      operationId: getMedias
+      operationId: getUserMedias
       parameters:
         -
           name: name
@@ -555,9 +559,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Media_list'
+                $ref: '#/components/schemas/Media_list'
+        '206':
+          description: 'Contenu partiel des medias'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media_list'
         '401':
           $ref: '#/components/responses/NotConnected'
         '403':
@@ -569,7 +577,7 @@ paths:
       tags:
         - Media
       description: "Ajoute un media à l'utilisateur connecté ou à l'organisation d'identifiant organization_id si renseigné"
-      operationId: postMedias
+      operationId: postMedia
       requestBody:
         required: true
         content:
@@ -616,8 +624,8 @@ paths:
     get:
       tags:
         - Media
-      description: "Renvoie dossiers d'images de l'utilisateur"
-      operationId: getMediaFolders
+      description: "Renvoie les dossiers d'images de l'utilisateur"
+      operationId: getUserMediaFolders
       parameters:
         -
           name: organization_id
@@ -690,7 +698,7 @@ paths:
       tags:
         - Media
       description: "Affecte value à l'attribut du media d'identifiant id (attribute dans ['folder', 'name'])"
-      operationId: putMediasByIdByAttribute
+      operationId: putMediaAttribute
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -801,13 +809,13 @@ paths:
       operationId: getOrganizationsRoles
       responses:
         '200':
-          description: 'Liste des roles'
+          description: 'Liste des rôles'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  properties: { key: { description: 'clé du role', type: string }, value: { description: 'Nom du role', type: string } }
+                  properties: { key: { description: 'clé du rôle', type: string }, value: { description: 'Nom du rôle', type: string } }
                   type: object
   /api/organizations/me:
     get:
@@ -822,7 +830,7 @@ paths:
               schema:
                 type: array
                 items:
-                  properties: { public_id: { description: "identifiant de l'organisation", type: string }, name: { description: "Nom de l'organisation", type: string }, profile_picture: { description: "Logo de l'organisation", type: string }, cover_picture: { description: 'Image de couverture', type: string }, user_role: { description: "Role de l'utilisateur dans l'organisation", type: string }, active: { description: "l'utilisateur est actif dans l'organisation", type: boolean } }
+                  properties: { public_id: { description: "identifiant de l'organisation", type: string }, name: { description: "Nom de l'organisation", type: string }, profile_picture: { description: "Logo de l'organisation", type: string }, cover_picture: { description: 'Image de couverture', type: string }, user_role: { description: "Rôle de l'utilisateur dans l'organisation", type: string }, active: { description: "l'utilisateur est actif dans l'organisation", type: boolean } }
                   type: object
         '401':
           $ref: '#/components/responses/NotConnected'
@@ -874,7 +882,7 @@ paths:
       tags:
         - Organization
       description: "Supprime l'organisation d'identifiant id"
-      operationId: deleteOrganizationsById
+      operationId: deleteOrganization
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -895,7 +903,7 @@ paths:
       tags:
         - Organization
       description: "Créer une organisation - L'utilisateur connecté devient un propriétaire"
-      operationId: postOrganizations
+      operationId: postOrganization
       requestBody:
         required: true
         content:
@@ -943,7 +951,7 @@ paths:
       tags:
         - Organization
       description: "Affecte value à l'attribut de l'organisation d'identifiant public_id"
-      operationId: putOrganizationsByIdByAttribute
+      operationId: putOrganizationAttribute
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -991,14 +999,14 @@ paths:
       tags:
         - Organization
       description: "Modifie le lien d'accès à l'organisation"
-      operationId: putOrganizationsByIdJoinLinkByRole
+      operationId: putOrganizationJoinLinkRole
       parameters:
         -
           $ref: '#/components/parameters/id'
         -
           name: role
           in: path
-          description: "role que donne le lien, parmi ['member', 'editor']"
+          description: "rôle que donne le lien, parmi ['member', 'editor']"
           required: true
           schema:
             type: string
@@ -1037,17 +1045,10 @@ paths:
       tags:
         - Organization
       description: "L'utilisateur s'ajoute à l'organisation via le jeton id"
-      operationId: getOrganizationsJoinById
+      operationId: joinOrganizationById
       parameters:
         -
           $ref: '#/components/parameters/id'
-        -
-          name: role
-          in: query
-          description: "role que donne le lien, parmi ['member', 'editor']"
-          required: false
-          schema:
-            type: string
       responses:
         '200':
           description: "Attributs de l'organisation"
@@ -1071,7 +1072,7 @@ paths:
       tags:
         - Organization
       description: "Récupère les liens d'invitation de l'organisation. Seuls les propriétaires peuvent accéder à cette ressource."
-      operationId: getOrganizationsLinksById
+      operationId: getOrganizationLinksById
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -1100,7 +1101,7 @@ paths:
       tags:
         - Organization
       description: "Ajoute un membre à l'organisation"
-      operationId: postOrganizationsByIdMembersByUserid
+      operationId: addMemberToOrganization
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -1118,12 +1119,12 @@ paths:
             schema:
               properties:
                 role:
-                  description: "role de l'utilisateur, parmi ['member', 'editor', 'owner']"
+                  description: "rôle de l'utilisateur, parmi ['member', 'editor', 'owner']"
                   type: string
               type: object
       responses:
         '200':
-          description: "Description du role de l'utilisateur"
+          description: "Description du rôle de l'utilisateur"
           content:
             application/json:
               schema:
@@ -1131,7 +1132,7 @@ paths:
                   organization_id: { description: "Identifiant public de l'organisation", type: string }
                   user_id: { description: "Identifiant public de l'utilisateur", type: string }
                   user_public_name: { description: "Nom public de l'utilisateur", type: string }
-                  user_role: { description: "Role de l'utilisateur dans l'organisation", type: string }
+                  user_role: { description: "Rôle de l'utilisateur dans l'organisation", type: string }
                   mail_sent: { description: "si false, l'opération a été effectuée, mais le mail d'information n'a pas été envoyé à l'utilisateur", type: boolean }
                 type: object
         '401':
@@ -1147,7 +1148,7 @@ paths:
       tags:
         - Organization
       description: "Enlève un membre de l'organisation. Un utilisateur peut se retirer lui-même, sinon un owner doit effectuer cette action."
-      operationId: deleteOrganizationsByIdMembersByUserid
+      operationId: deleteOrganizationMember
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -1174,8 +1175,8 @@ paths:
     put:
       tags:
         - Organization
-      description: "Modifie le role d'un membre dans l'organisation"
-      operationId: putOrganizationsByIdMembersByUseridRole
+      description: "Modifie le rôle d'un membre dans l'organisation"
+      operationId: putOrganizationMemberRole
       parameters:
         -
           $ref: '#/components/parameters/id'
@@ -1193,12 +1194,12 @@ paths:
             schema:
               properties:
                 value:
-                  description: "nouveau role, parmi ['member', 'editor', 'owner']"
+                  description: "nouveau rôle, parmi ['member', 'editor', 'owner']"
                   type: string
               type: object
       responses:
         '200':
-          description: "Description du role de l'utilisateur"
+          description: "Description du rôle de l'utilisateur"
           content:
             application/json:
               schema:
@@ -1206,8 +1207,8 @@ paths:
                   organization_id: { description: "Identifiant public de l'organisation", type: string }
                   user_id: { description: "Identifiant public de l'utilisateur", type: string }
                   user_public_name: { description: "Nom public de l'utilisateur", type: string }
-                  user_role: { description: "Role de l'utilisateur dans l'organisation", type: string }
-                  mail_sent: { description: "false si le mail d'information n'a pas pu être envoyé", type: boolean }
+                  user_role: { description: "Rôle de l'utilisateur dans l'organisation", type: string }
+                  mail_sent: { description: "si false, l'opération a été effectuée, mais le mail d'information n'a pas été envoyé à l'utilisateur", type: boolean }
                 type: object
         '401':
           $ref: '#/components/responses/NotConnected'
@@ -1218,25 +1219,52 @@ paths:
       security:
         -
           bearer: []
+  /api/token/refresh:
+    post:
+      tags:
+        - Login
+      operationId: refreshToken
+      parameters:
+        -
+          name: refresh_token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Jeton JWT et refresh'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+        '401':
+          description: 'An authentication exception occurred'
+          content:
+            application/json:
+              schema:
+                properties:
+                  code: { type: integer, example: 401 }
+                  message: { type: string, example: 'An authentication exception occurred' }
+                type: object
   /api/login:
     post:
       tags:
         - Login
       operationId: postLogin
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              required:
-                - username
-                - password
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              type: object
+      parameters:
+        -
+          name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        -
+          name: password
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: 'Jeton Jwt et rafraichissement'
@@ -1261,38 +1289,6 @@ paths:
                 properties:
                   code: { type: integer, example: 429 }
                   message: { type: string, example: '5 tentatives de connexion échouées, allez sur /debloquer-mon-compte' }
-                type: object
-  /api/token/refresh:
-    post:
-      tags:
-        - Login
-      operationId: postTokenRefresh
-      requestBody:
-        required: true
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              required:
-                - refresh_token
-              properties:
-                refresh_token:
-                  type: string
-              type: object
-      responses:
-        '200':
-          description: 'Jeton JWT et refresh'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Login'
-        '401':
-          description: 'An authentication exception occurred'
-          content:
-            application/json:
-              schema:
-                properties:
-                  code: { type: integer, example: 401 }
-                  message: { type: string, example: 'An authentication exception occurred' }
                 type: object
   /api/logout:
     post:
@@ -1325,7 +1321,7 @@ paths:
     get:
       tags:
         - User
-      operationId: getUsersPublicByPublicid
+      operationId: getUserByPublicid
       parameters:
         -
           name: publicId
@@ -1359,7 +1355,7 @@ paths:
             type: string
       responses:
         '200':
-          description: "Attributs publics de l'utilisateur"
+          description: 'Liste des utilisateurs correspondants'
           content:
             application/json:
               schema:
@@ -1377,7 +1373,7 @@ components:
           description: "Identifiant de l'article"
           type: integer
         category:
-          description: "Categorie de l'article"
+          description: "Catégorie de l'article"
           type: string
         position:
           description: "Ordre d'affichage de l'article"
@@ -1413,14 +1409,14 @@ components:
           format: uri
       type: object
     Bbox:
-      description: 'Emprise visible de la carte (Haut, droite, bas, gauche)'
+      description: 'Emprise visible de la carte (haut, droite, bas, gauche)'
       type: array
       items:
         type: number
       maxItems: 4
       minItems: 4
     Map_add:
-      description: Carte
+      description: "Objet carte à envoyer lors d'ajout / modification d'une carte"
       properties:
         title:
           description: 'Titre de la carte'
@@ -1448,7 +1444,7 @@ components:
           description: 'Carte active (par ex : terminée ou non)'
           type: boolean
         share:
-          description: "Publication de la carte ('atlas', 'public', 'private'). <br>\nSi une 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner"
+          description: "Publication de la carte ('atlas', 'public', 'private').\nSi 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner"
           type: string
           default: private
         bbox:
@@ -1463,61 +1459,74 @@ components:
           type: string
       type: object
     Map_list:
-      description: Carte
+      description: "Description d'une carte avec ses métadonnées"
       properties:
         title:
+          description: 'Titre de la carte'
           type: string
         title_url:
           description: 'Titre de la carte, adapté pour etre utilisé dans les url'
           type: string
         description:
+          description: 'Description de la carte'
           type: string
           nullable: true
         theme:
+          description: 'Thème lié à la carte'
           type: string
           nullable: true
         theme_id:
+          description: 'Id du thème'
           type: integer
           nullable: true
         organization_id:
-          description: "identifiant de l'organisation"
+          description: "Identifiant de l'organisation"
           type: string
         organization_name:
           description: "Nom de l'organisation"
           type: string
         type:
+          description: "Type de la carte ('macarte', 'mesadresses', statistic', storymap')"
           type: string
         premium:
+          description: "Premium de la carte ('default', 'edugeo')"
           type: string
         created_at:
+          description: 'Date de création de la carte'
           type: string
           format: date-time
         updated_at:
+          description: 'Dernière date de mise à jour de la carte'
           type: string
           format: date-time
         nb_view:
+          description: 'Nombre total de vues'
           type: integer
         img_url:
+          description: "URI de l'image"
           type: string
           format: uri
           nullable: true
         share:
+          description: "Publication de la carte ('atlas', 'public', 'private')"
           type: string
         bbox:
           $ref: '#/components/schemas/Bbox'
         view_id:
+          description: 'Id utilisé pour la visualisation'
           type: string
         view_url:
-          description: 'lien vers la visualisation de la carte'
+          description: 'Lien vers la visualisation de la carte'
           type: string
         edit_id:
-          description: 'si auteur de la carte'
+          description: 'Si auteur de la carte'
           type: string
         author:
+          description: "Public_id de l'auteur de la carte"
           type: string
       type: object
     Map_view:
-      description: Carte
+      description: "Description d'une carte avec ses métadonnées et les liens de modification / visualisation"
       type: object
       allOf:
         -
@@ -1548,7 +1557,7 @@ components:
         name:
           description: "nom de l'image originale"
           type: string
-        file:
+        fileName:
           description: 'nom du fichier enregistré'
           type: string
         owner:
@@ -1590,13 +1599,13 @@ components:
           items:
             $ref: '#/components/schemas/Media'
         count:
-          description: 'Nombre de cartes correspondant à la recherche'
+          description: 'Nombre de média correspondant à la recherche'
           type: integer
         limit:
-          description: 'Nombre de cartes recues dans la requete'
+          description: 'Nombre de média recues dans la requete'
           type: integer
         offset:
-          description: 'Nombre de cartes à passer avant de ls inclure dans la requete'
+          description: 'Nombre de média à passer avant de ls inclure dans la requete'
           type: integer
       type: object
     Notification:
@@ -1786,18 +1795,20 @@ components:
           description: 'Nombre de cartes correspondant à la recherche'
           type: integer
         limit:
-          description: 'Nombre de cartes recues dans la requete'
+          description: 'Nombre de cartes reçues dans la requete'
           type: integer
         offset:
-          description: 'Nombre de cartes à passer avant de ls inclure dans la requete'
+          description: 'Nombre de cartes à passer avant de les inclure dans la requete'
           type: integer
       type: object
     Theme:
       description: Theme
       properties:
         id:
+          description: 'Id du thème'
           type: integer
         name:
+          description: 'Nom complet du thème'
           type: string
       type: object
     Login:
@@ -1884,6 +1895,7 @@ components:
               description: 'Taille globale des images uploadées (en octet)'
               type: integer
             roles:
+              description: "Rôle(s) de l'utilisateur"
               type: array
               items:
                 type: string
@@ -1915,8 +1927,6 @@ components:
                 type: string
                 example: 'La ressource a été supprimée'
             type: object
-    PartialContent:
-      description: 'Contenu partiel des ressources recherchées'
     BadRequest:
       description: "La requête n'est pas correcte"
       content:

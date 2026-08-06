@@ -12,17 +12,37 @@ import type { RequestHandlerOptions } from "msw";
 
 import type { Login } from "../model";
 
+export const getRefreshTokenResponseMock = (overrideResponse: Partial<Extract<Login, object>> = {}): Login => ({
+    token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    refresh_token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    ...overrideResponse,
+});
+
 export const getPostLoginResponseMock = (overrideResponse: Partial<Extract<Login, object>> = {}): Login => ({
     token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     refresh_token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPostTokenRefreshResponseMock = (overrideResponse: Partial<Extract<Login, object>> = {}): Login => ({
-    token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-    refresh_token: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-    ...overrideResponse,
-});
+export const getRefreshTokenMockHandler = (
+    overrideResponse?: Login | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Login> | Login),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        "*/api/token/refresh",
+        async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
+            return HttpResponse.json(
+                overrideResponse !== undefined
+                    ? typeof overrideResponse === "function"
+                        ? await overrideResponse(info)
+                        : overrideResponse
+                    : getRefreshTokenResponseMock(),
+                { status: 200 }
+            );
+        },
+        options
+    );
+};
 
 export const getPostLoginMockHandler = (
     overrideResponse?: Login | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Login> | Login),
@@ -37,26 +57,6 @@ export const getPostLoginMockHandler = (
                         ? await overrideResponse(info)
                         : overrideResponse
                     : getPostLoginResponseMock(),
-                { status: 200 }
-            );
-        },
-        options
-    );
-};
-
-export const getPostTokenRefreshMockHandler = (
-    overrideResponse?: Login | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Login> | Login),
-    options?: RequestHandlerOptions
-) => {
-    return http.post(
-        "*/api/token/refresh",
-        async (info: Parameters<Parameters<typeof http.post>[1]>[0]) => {
-            return HttpResponse.json(
-                overrideResponse !== undefined
-                    ? typeof overrideResponse === "function"
-                        ? await overrideResponse(info)
-                        : overrideResponse
-                    : getPostTokenRefreshResponseMock(),
                 { status: 200 }
             );
         },
@@ -80,4 +80,4 @@ export const getPostLogoutMockHandler = (
         options
     );
 };
-export const getLoginMock = () => [getPostLoginMockHandler(), getPostTokenRefreshMockHandler(), getPostLogoutMockHandler()];
+export const getLoginMock = () => [getRefreshTokenMockHandler(), getPostLoginMockHandler(), getPostLogoutMockHandler()];

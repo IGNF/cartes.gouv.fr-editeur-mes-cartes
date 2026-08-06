@@ -11,15 +11,15 @@ import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
 import type {
+    AddMemberToOrganization200,
     DeletedResponse,
-    GetOrganizationsLinksById200,
+    GetOrganizationLinksById200,
     GetOrganizationsMe200Item,
     GetOrganizationsRoles200Item,
     Organization,
-    PostOrganizationsByIdMembersByUserid200,
-    PutOrganizationsByIdByAttribute200,
-    PutOrganizationsByIdJoinLinkByRole200,
-    PutOrganizationsByIdMembersByUseridRole200,
+    PutOrganizationAttribute200,
+    PutOrganizationJoinLinkRole200,
+    PutOrganizationMemberRole200,
 } from "../model";
 
 export const getGetOrganizationsRolesResponseMock = (): GetOrganizationsRoles200Item[] =>
@@ -98,13 +98,13 @@ export const getGetOrganizationsByIdResponseMock = (overrideResponse: Partial<Ex
     ...overrideResponse,
 });
 
-export const getDeleteOrganizationsByIdResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
+export const getDeleteOrganizationResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
     code: faker.helpers.arrayElement([faker.number.int(), undefined]),
     message: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPostOrganizationsResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
+export const getPostOrganizationResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     presentation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
@@ -134,25 +134,25 @@ export const getPostOrganizationsResponseMock = (overrideResponse: Partial<Extra
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdByAttributeResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdByAttribute200, object>> = {}
-): PutOrganizationsByIdByAttribute200 => ({
+export const getPutOrganizationAttributeResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationAttribute200, object>> = {}
+): PutOrganizationAttribute200 => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdJoinLinkByRoleResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdJoinLinkByRole200, object>> = {}
-): PutOrganizationsByIdJoinLinkByRole200 => ({
+export const getPutOrganizationJoinLinkRoleResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationJoinLinkRole200, object>> = {}
+): PutOrganizationJoinLinkRole200 => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getGetOrganizationsJoinByIdResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
+export const getJoinOrganizationByIdResponseMock = (overrideResponse: Partial<Extract<Organization, object>> = {}): Organization => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     presentation: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
@@ -182,18 +182,18 @@ export const getGetOrganizationsJoinByIdResponseMock = (overrideResponse: Partia
     ...overrideResponse,
 });
 
-export const getGetOrganizationsLinksByIdResponseMock = (
-    overrideResponse: Partial<Extract<GetOrganizationsLinksById200, object>> = {}
-): GetOrganizationsLinksById200 => ({
+export const getGetOrganizationLinksByIdResponseMock = (
+    overrideResponse: Partial<Extract<GetOrganizationLinksById200, object>> = {}
+): GetOrganizationLinksById200 => ({
     link_as_member: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     link_as_editor: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     mail_pattern: faker.helpers.arrayElement([faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]), undefined]),
     ...overrideResponse,
 });
 
-export const getPostOrganizationsByIdMembersByUseridResponseMock = (
-    overrideResponse: Partial<Extract<PostOrganizationsByIdMembersByUserid200, object>> = {}
-): PostOrganizationsByIdMembersByUserid200 => ({
+export const getAddMemberToOrganizationResponseMock = (
+    overrideResponse: Partial<Extract<AddMemberToOrganization200, object>> = {}
+): AddMemberToOrganization200 => ({
     organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -202,15 +202,15 @@ export const getPostOrganizationsByIdMembersByUseridResponseMock = (
     ...overrideResponse,
 });
 
-export const getDeleteOrganizationsByIdMembersByUseridResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
+export const getDeleteOrganizationMemberResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
     code: faker.helpers.arrayElement([faker.number.int(), undefined]),
     message: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     ...overrideResponse,
 });
 
-export const getPutOrganizationsByIdMembersByUseridRoleResponseMock = (
-    overrideResponse: Partial<Extract<PutOrganizationsByIdMembersByUseridRole200, object>> = {}
-): PutOrganizationsByIdMembersByUseridRole200 => ({
+export const getPutOrganizationMemberRoleResponseMock = (
+    overrideResponse: Partial<Extract<PutOrganizationMemberRole200, object>> = {}
+): PutOrganizationMemberRole200 => ({
     organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     user_public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -303,7 +303,7 @@ export const getGetOrganizationsByIdMockHandler = (
     );
 };
 
-export const getDeleteOrganizationsByIdMockHandler = (
+export const getDeleteOrganizationMockHandler = (
     overrideResponse?: DeletedResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<DeletedResponse> | DeletedResponse),
     options?: RequestHandlerOptions
 ) => {
@@ -315,7 +315,7 @@ export const getDeleteOrganizationsByIdMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getDeleteOrganizationsByIdResponseMock(),
+                    : getDeleteOrganizationResponseMock(),
                 { status: 204 }
             );
         },
@@ -323,7 +323,7 @@ export const getDeleteOrganizationsByIdMockHandler = (
     );
 };
 
-export const getPostOrganizationsMockHandler = (
+export const getPostOrganizationMockHandler = (
     overrideResponse?: Organization | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Organization> | Organization),
     options?: RequestHandlerOptions
 ) => {
@@ -335,7 +335,7 @@ export const getPostOrganizationsMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPostOrganizationsResponseMock(),
+                    : getPostOrganizationResponseMock(),
                 { status: 201 }
             );
         },
@@ -343,10 +343,10 @@ export const getPostOrganizationsMockHandler = (
     );
 };
 
-export const getPutOrganizationsByIdByAttributeMockHandler = (
+export const getPutOrganizationAttributeMockHandler = (
     overrideResponse?:
-        | PutOrganizationsByIdByAttribute200
-        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutOrganizationsByIdByAttribute200> | PutOrganizationsByIdByAttribute200),
+        | PutOrganizationAttribute200
+        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutOrganizationAttribute200> | PutOrganizationAttribute200),
     options?: RequestHandlerOptions
 ) => {
     return http.put(
@@ -357,7 +357,7 @@ export const getPutOrganizationsByIdByAttributeMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPutOrganizationsByIdByAttributeResponseMock(),
+                    : getPutOrganizationAttributeResponseMock(),
                 { status: 200 }
             );
         },
@@ -365,10 +365,10 @@ export const getPutOrganizationsByIdByAttributeMockHandler = (
     );
 };
 
-export const getPutOrganizationsByIdJoinLinkByRoleMockHandler = (
+export const getPutOrganizationJoinLinkRoleMockHandler = (
     overrideResponse?:
-        | PutOrganizationsByIdJoinLinkByRole200
-        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutOrganizationsByIdJoinLinkByRole200> | PutOrganizationsByIdJoinLinkByRole200),
+        | PutOrganizationJoinLinkRole200
+        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutOrganizationJoinLinkRole200> | PutOrganizationJoinLinkRole200),
     options?: RequestHandlerOptions
 ) => {
     return http.put(
@@ -379,7 +379,7 @@ export const getPutOrganizationsByIdJoinLinkByRoleMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPutOrganizationsByIdJoinLinkByRoleResponseMock(),
+                    : getPutOrganizationJoinLinkRoleResponseMock(),
                 { status: 200 }
             );
         },
@@ -387,7 +387,7 @@ export const getPutOrganizationsByIdJoinLinkByRoleMockHandler = (
     );
 };
 
-export const getGetOrganizationsJoinByIdMockHandler = (
+export const getJoinOrganizationByIdMockHandler = (
     overrideResponse?: Organization | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<Organization> | Organization),
     options?: RequestHandlerOptions
 ) => {
@@ -399,7 +399,7 @@ export const getGetOrganizationsJoinByIdMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getGetOrganizationsJoinByIdResponseMock(),
+                    : getJoinOrganizationByIdResponseMock(),
                 { status: 200 }
             );
         },
@@ -407,10 +407,10 @@ export const getGetOrganizationsJoinByIdMockHandler = (
     );
 };
 
-export const getGetOrganizationsLinksByIdMockHandler = (
+export const getGetOrganizationLinksByIdMockHandler = (
     overrideResponse?:
-        | GetOrganizationsLinksById200
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetOrganizationsLinksById200> | GetOrganizationsLinksById200),
+        | GetOrganizationLinksById200
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<GetOrganizationLinksById200> | GetOrganizationLinksById200),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -421,7 +421,7 @@ export const getGetOrganizationsLinksByIdMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getGetOrganizationsLinksByIdResponseMock(),
+                    : getGetOrganizationLinksByIdResponseMock(),
                 { status: 200 }
             );
         },
@@ -429,12 +429,10 @@ export const getGetOrganizationsLinksByIdMockHandler = (
     );
 };
 
-export const getPostOrganizationsByIdMembersByUseridMockHandler = (
+export const getAddMemberToOrganizationMockHandler = (
     overrideResponse?:
-        | PostOrganizationsByIdMembersByUserid200
-        | ((
-              info: Parameters<Parameters<typeof http.post>[1]>[0]
-          ) => Promise<PostOrganizationsByIdMembersByUserid200> | PostOrganizationsByIdMembersByUserid200),
+        | AddMemberToOrganization200
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<AddMemberToOrganization200> | AddMemberToOrganization200),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
@@ -445,7 +443,7 @@ export const getPostOrganizationsByIdMembersByUseridMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPostOrganizationsByIdMembersByUseridResponseMock(),
+                    : getAddMemberToOrganizationResponseMock(),
                 { status: 200 }
             );
         },
@@ -453,7 +451,7 @@ export const getPostOrganizationsByIdMembersByUseridMockHandler = (
     );
 };
 
-export const getDeleteOrganizationsByIdMembersByUseridMockHandler = (
+export const getDeleteOrganizationMemberMockHandler = (
     overrideResponse?: DeletedResponse | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<DeletedResponse> | DeletedResponse),
     options?: RequestHandlerOptions
 ) => {
@@ -465,7 +463,7 @@ export const getDeleteOrganizationsByIdMembersByUseridMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getDeleteOrganizationsByIdMembersByUseridResponseMock(),
+                    : getDeleteOrganizationMemberResponseMock(),
                 { status: 204 }
             );
         },
@@ -473,12 +471,10 @@ export const getDeleteOrganizationsByIdMembersByUseridMockHandler = (
     );
 };
 
-export const getPutOrganizationsByIdMembersByUseridRoleMockHandler = (
+export const getPutOrganizationMemberRoleMockHandler = (
     overrideResponse?:
-        | PutOrganizationsByIdMembersByUseridRole200
-        | ((
-              info: Parameters<Parameters<typeof http.put>[1]>[0]
-          ) => Promise<PutOrganizationsByIdMembersByUseridRole200> | PutOrganizationsByIdMembersByUseridRole200),
+        | PutOrganizationMemberRole200
+        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutOrganizationMemberRole200> | PutOrganizationMemberRole200),
     options?: RequestHandlerOptions
 ) => {
     return http.put(
@@ -489,7 +485,7 @@ export const getPutOrganizationsByIdMembersByUseridRoleMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPutOrganizationsByIdMembersByUseridRoleResponseMock(),
+                    : getPutOrganizationMemberRoleResponseMock(),
                 { status: 200 }
             );
         },
@@ -501,13 +497,13 @@ export const getOrganizationMock = () => [
     getGetOrganizationsMeMockHandler(),
     getGetOrganizationsByIdActivateMockHandler(),
     getGetOrganizationsByIdMockHandler(),
-    getDeleteOrganizationsByIdMockHandler(),
-    getPostOrganizationsMockHandler(),
-    getPutOrganizationsByIdByAttributeMockHandler(),
-    getPutOrganizationsByIdJoinLinkByRoleMockHandler(),
-    getGetOrganizationsJoinByIdMockHandler(),
-    getGetOrganizationsLinksByIdMockHandler(),
-    getPostOrganizationsByIdMembersByUseridMockHandler(),
-    getDeleteOrganizationsByIdMembersByUseridMockHandler(),
-    getPutOrganizationsByIdMembersByUseridRoleMockHandler(),
+    getDeleteOrganizationMockHandler(),
+    getPostOrganizationMockHandler(),
+    getPutOrganizationAttributeMockHandler(),
+    getPutOrganizationJoinLinkRoleMockHandler(),
+    getJoinOrganizationByIdMockHandler(),
+    getGetOrganizationLinksByIdMockHandler(),
+    getAddMemberToOrganizationMockHandler(),
+    getDeleteOrganizationMemberMockHandler(),
+    getPutOrganizationMemberRoleMockHandler(),
 ];

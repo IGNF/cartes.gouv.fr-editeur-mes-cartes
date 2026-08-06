@@ -27,18 +27,18 @@ import type {
     BadRequestResponse,
     DeletedResponse,
     ForbiddenResponse,
-    GetMediaFoldersParams,
-    GetMediasParams,
+    GetUserMediaFoldersParams,
+    GetUserMediasParams,
     InvalidResponse,
     Media,
     MediaList,
     NotConnectedResponse,
     NotFoundResponse,
+    PostMediaBody,
     PostMediaFileById200,
     PostMediaFileByIdBody,
-    PostMediasBody,
-    PutMediasByIdByAttribute200,
-    PutMediasByIdByAttributeBody,
+    PutMediaAttribute200,
+    PutMediaAttributeBody,
     TooLargeResponse,
 } from "../model";
 
@@ -61,31 +61,36 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
     return result;
 };
 
-export type getMediasResponse200 = {
-    data: MediaList[];
+export type getUserMediasResponse200 = {
+    data: MediaList;
     status: 200;
 };
 
-export type getMediasResponse401 = {
+export type getUserMediasResponse206 = {
+    data: MediaList;
+    status: 206;
+};
+
+export type getUserMediasResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type getMediasResponse403 = {
+export type getUserMediasResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type getMediasResponseSuccess = getMediasResponse200 & {
+export type getUserMediasResponseSuccess = (getUserMediasResponse200 | getUserMediasResponse206) & {
     headers: Headers;
 };
-export type getMediasResponseError = (getMediasResponse401 | getMediasResponse403) & {
+export type getUserMediasResponseError = (getUserMediasResponse401 | getUserMediasResponse403) & {
     headers: Headers;
 };
 
-export type getMediasResponse = getMediasResponseSuccess | getMediasResponseError;
+export type getUserMediasResponse = getUserMediasResponseSuccess | getUserMediasResponseError;
 
-export const getGetMediasUrl = (params?: GetMediasParams) => {
+export const getGetUserMediasUrl = (params?: GetUserMediasParams) => {
     const normalizedParams = new URLSearchParams();
 
     Object.entries(params || {}).forEach(([key, value]) => {
@@ -102,200 +107,200 @@ export const getGetMediasUrl = (params?: GetMediasParams) => {
 /**
  * Renvoie les medias de l'utilisateur connecté
  */
-export const getMedias = async (params?: GetMediasParams, options?: RequestInit): Promise<getMediasResponse> => {
-    return fetchWithAuth<getMediasResponse>(getGetMediasUrl(params), {
+export const getUserMedias = async (params?: GetUserMediasParams, options?: RequestInit): Promise<getUserMediasResponse> => {
+    return fetchWithAuth<getUserMediasResponse>(getGetUserMediasUrl(params), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetMediasQueryKey = (params?: GetMediasParams) => {
+export const getGetUserMediasQueryKey = (params?: GetUserMediasParams) => {
     return [`${env.API_EDITOR_URL}/api/medias`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetMediasQueryOptions = <TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
-    params?: GetMediasParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+export const getGetUserMediasQueryOptions = <TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+    params?: GetUserMediasParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetMediasQueryKey(params);
+    const queryKey = queryOptions?.queryKey ?? getGetUserMediasQueryKey(params);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMedias>>> = ({ signal }) => getMedias(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserMedias>>> = ({ signal }) => getUserMedias(params, { signal, ...requestOptions });
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData> & {
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData> & {
         queryKey: DataTag<QueryKey, TData, TError>;
     };
 };
 
-export type GetMediasQueryResult = NonNullable<Awaited<ReturnType<typeof getMedias>>>;
-export type GetMediasQueryError = NotConnectedResponse | ForbiddenResponse;
+export type GetUserMediasQueryResult = NonNullable<Awaited<ReturnType<typeof getUserMedias>>>;
+export type GetUserMediasQueryError = NotConnectedResponse | ForbiddenResponse;
 
-export function useGetMedias<TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
-    params: undefined | GetMediasParams,
+export function useGetUserMedias<TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+    params: undefined | GetUserMediasParams,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMedias>>, TError, Awaited<ReturnType<typeof getMedias>>>, "initialData">;
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>> &
+            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, Awaited<ReturnType<typeof getUserMedias>>>, "initialData">;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMedias<TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
-    params?: GetMediasParams,
+export function useGetUserMedias<TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+    params?: GetUserMediasParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>> &
-            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMedias>>, TError, Awaited<ReturnType<typeof getMedias>>>, "initialData">;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>> &
+            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, Awaited<ReturnType<typeof getUserMedias>>>, "initialData">;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMedias<TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
-    params?: GetMediasParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+export function useGetUserMedias<TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+    params?: GetUserMediasParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetMedias<TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
-    params?: GetMediasParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+export function useGetUserMedias<TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+    params?: GetUserMediasParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetMediasQueryOptions(params, options);
+    const queryOptions = getGetUserMediasQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetMediasQuery = async <TData = Awaited<ReturnType<typeof getMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
+export const prefetchGetUserMediasQuery = async <TData = Awaited<ReturnType<typeof getUserMedias>>, TError = NotConnectedResponse | ForbiddenResponse>(
     queryClient: QueryClient,
-    params?: GetMediasParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+    params?: GetUserMediasParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMedias>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetMediasQueryOptions(params, options);
+    const queryOptions = getGetUserMediasQueryOptions(params, options);
 
     await queryClient.prefetchQuery(queryOptions);
 
     return queryClient;
 };
 
-export type postMediasResponse201 = {
+export type postMediaResponse201 = {
     data: Media;
     status: 201;
 };
 
-export type postMediasResponse400 = {
+export type postMediaResponse400 = {
     data: BadRequestResponse;
     status: 400;
 };
 
-export type postMediasResponse401 = {
+export type postMediaResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type postMediasResponse403 = {
+export type postMediaResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type postMediasResponse413 = {
+export type postMediaResponse413 = {
     data: TooLargeResponse;
     status: 413;
 };
 
-export type postMediasResponseSuccess = postMediasResponse201 & {
+export type postMediaResponseSuccess = postMediaResponse201 & {
     headers: Headers;
 };
-export type postMediasResponseError = (postMediasResponse400 | postMediasResponse401 | postMediasResponse403 | postMediasResponse413) & {
+export type postMediaResponseError = (postMediaResponse400 | postMediaResponse401 | postMediaResponse403 | postMediaResponse413) & {
     headers: Headers;
 };
 
-export type postMediasResponse = postMediasResponseSuccess | postMediasResponseError;
+export type postMediaResponse = postMediaResponseSuccess | postMediaResponseError;
 
-export const getPostMediasUrl = () => {
+export const getPostMediaUrl = () => {
     return `${env.API_EDITOR_URL}/api/medias`;
 };
 
 /**
  * Ajoute un media à l'utilisateur connecté ou à l'organisation d'identifiant organization_id si renseigné
  */
-export const postMedias = async (postMediasBody: PostMediasBody, options?: RequestInit): Promise<postMediasResponse> => {
+export const postMedia = async (postMediaBody: PostMediaBody, options?: RequestInit): Promise<postMediaResponse> => {
     const formData = new FormData();
-    formData.append(`file`, postMediasBody.file);
-    if (postMediasBody.folder !== undefined) {
-        formData.append(`folder`, postMediasBody.folder);
+    formData.append(`file`, postMediaBody.file);
+    if (postMediaBody.folder !== undefined) {
+        formData.append(`folder`, postMediaBody.folder);
     }
-    if (postMediasBody.name !== undefined) {
-        formData.append(`name`, postMediasBody.name);
+    if (postMediaBody.name !== undefined) {
+        formData.append(`name`, postMediaBody.name);
     }
-    if (postMediasBody.organization_id !== undefined && postMediasBody.organization_id !== null) {
-        formData.append(`organization_id`, postMediasBody.organization_id);
+    if (postMediaBody.organization_id !== undefined && postMediaBody.organization_id !== null) {
+        formData.append(`organization_id`, postMediaBody.organization_id);
     }
 
-    return fetchWithAuth<postMediasResponse>(getPostMediasUrl(), {
+    return fetchWithAuth<postMediaResponse>(getPostMediaUrl(), {
         ...options,
         method: "POST",
         body: formData,
     });
 };
 
-export const getPostMediasMutationOptions = <
+export const getPostMediaMutationOptions = <
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | TooLargeResponse,
     TContext = unknown,
 >(options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMedias>>, TError, { data: PostMediasBody }, TContext>;
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMedia>>, TError, { data: PostMediaBody }, TContext>;
     request?: SecondParameter<typeof fetchWithAuth>;
-}): UseMutationOptions<Awaited<ReturnType<typeof postMedias>>, TError, { data: PostMediasBody }, TContext> => {
-    const mutationKey = ["postMedias"];
+}): UseMutationOptions<Awaited<ReturnType<typeof postMedia>>, TError, { data: PostMediaBody }, TContext> => {
+    const mutationKey = ["postMedia"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
             : { ...options, mutation: { ...options.mutation, mutationKey } }
         : { mutation: { mutationKey }, request: undefined };
 
-    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMedias>>, { data: PostMediasBody }> = (props) => {
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMedia>>, { data: PostMediaBody }> = (props) => {
         const { data } = props ?? {};
 
-        return postMedias(data, requestOptions);
+        return postMedia(data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PostMediasMutationResult = NonNullable<Awaited<ReturnType<typeof postMedias>>>;
-export type PostMediasMutationBody = PostMediasBody;
-export type PostMediasMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | TooLargeResponse;
+export type PostMediaMutationResult = NonNullable<Awaited<ReturnType<typeof postMedia>>>;
+export type PostMediaMutationBody = PostMediaBody;
+export type PostMediaMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | TooLargeResponse;
 
-export const usePostMedias = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | TooLargeResponse, TContext = unknown>(
+export const usePostMedia = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | TooLargeResponse, TContext = unknown>(
     options?: {
-        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMedias>>, TError, { data: PostMediasBody }, TContext>;
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof postMedia>>, TError, { data: PostMediaBody }, TContext>;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
-): UseMutationResult<Awaited<ReturnType<typeof postMedias>>, TError, { data: PostMediasBody }, TContext> => {
-    return useMutation(getPostMediasMutationOptions(options), queryClient);
+): UseMutationResult<Awaited<ReturnType<typeof postMedia>>, TError, { data: PostMediaBody }, TContext> => {
+    return useMutation(getPostMediaMutationOptions(options), queryClient);
 };
-export type getMediaFoldersResponse200 = {
+export type getUserMediaFoldersResponse200 = {
     data: string[];
     status: 200;
 };
 
-export type getMediaFoldersResponse401 = {
+export type getUserMediaFoldersResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type getMediaFoldersResponseSuccess = getMediaFoldersResponse200 & {
+export type getUserMediaFoldersResponseSuccess = getUserMediaFoldersResponse200 & {
     headers: Headers;
 };
-export type getMediaFoldersResponseError = getMediaFoldersResponse401 & {
+export type getUserMediaFoldersResponseError = getUserMediaFoldersResponse401 & {
     headers: Headers;
 };
 
-export type getMediaFoldersResponse = getMediaFoldersResponseSuccess | getMediaFoldersResponseError;
+export type getUserMediaFoldersResponse = getUserMediaFoldersResponseSuccess | getUserMediaFoldersResponseError;
 
-export const getGetMediaFoldersUrl = (params?: GetMediaFoldersParams) => {
+export const getGetUserMediaFoldersUrl = (params?: GetUserMediaFoldersParams) => {
     const normalizedParams = new URLSearchParams();
 
     Object.entries(params || {}).forEach(([key, value]) => {
@@ -310,79 +315,97 @@ export const getGetMediaFoldersUrl = (params?: GetMediaFoldersParams) => {
 };
 
 /**
- * Renvoie dossiers d'images de l'utilisateur
+ * Renvoie les dossiers d'images de l'utilisateur
  */
-export const getMediaFolders = async (params?: GetMediaFoldersParams, options?: RequestInit): Promise<getMediaFoldersResponse> => {
-    return fetchWithAuth<getMediaFoldersResponse>(getGetMediaFoldersUrl(params), {
+export const getUserMediaFolders = async (params?: GetUserMediaFoldersParams, options?: RequestInit): Promise<getUserMediaFoldersResponse> => {
+    return fetchWithAuth<getUserMediaFoldersResponse>(getGetUserMediaFoldersUrl(params), {
         ...options,
         method: "GET",
     });
 };
 
-export const getGetMediaFoldersQueryKey = (params?: GetMediaFoldersParams) => {
+export const getGetUserMediaFoldersQueryKey = (params?: GetUserMediaFoldersParams) => {
     return [`${env.API_EDITOR_URL}/api/medias/folders`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetMediaFoldersQueryOptions = <TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
-    params?: GetMediaFoldersParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+export const getGetUserMediaFoldersQueryOptions = <TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
+    params?: GetUserMediaFoldersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
 ) => {
     const { query: queryOptions, request: requestOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetMediaFoldersQueryKey(params);
+    const queryKey = queryOptions?.queryKey ?? getGetUserMediaFoldersQueryKey(params);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMediaFolders>>> = ({ signal }) => getMediaFolders(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserMediaFolders>>> = ({ signal }) => getUserMediaFolders(params, { signal, ...requestOptions });
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData> & {
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData> & {
         queryKey: DataTag<QueryKey, TData, TError>;
     };
 };
 
-export type GetMediaFoldersQueryResult = NonNullable<Awaited<ReturnType<typeof getMediaFolders>>>;
-export type GetMediaFoldersQueryError = NotConnectedResponse;
+export type GetUserMediaFoldersQueryResult = NonNullable<Awaited<ReturnType<typeof getUserMediaFolders>>>;
+export type GetUserMediaFoldersQueryError = NotConnectedResponse;
 
-export function useGetMediaFolders<TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
-    params: undefined | GetMediaFoldersParams,
+export function useGetUserMediaFolders<TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
+    params: undefined | GetUserMediaFoldersParams,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>> &
-            Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, Awaited<ReturnType<typeof getMediaFolders>>>, "initialData">;
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, Awaited<ReturnType<typeof getUserMediaFolders>>>,
+                "initialData"
+            >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMediaFolders<TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
-    params?: GetMediaFoldersParams,
+export function useGetUserMediaFolders<TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
+    params?: GetUserMediaFoldersParams,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>> &
-            Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, Awaited<ReturnType<typeof getMediaFolders>>>, "initialData">;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, Awaited<ReturnType<typeof getUserMediaFolders>>>,
+                "initialData"
+            >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetMediaFolders<TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
-    params?: GetMediaFoldersParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+export function useGetUserMediaFolders<TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
+    params?: GetUserMediaFoldersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetMediaFolders<TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
-    params?: GetMediaFoldersParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> },
+export function useGetUserMediaFolders<TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
+    params?: GetUserMediaFoldersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetMediaFoldersQueryOptions(params, options);
+    const queryOptions = getGetUserMediaFoldersQueryOptions(params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
     return withQueryKey(query, queryOptions.queryKey);
 }
 
-export const prefetchGetMediaFoldersQuery = async <TData = Awaited<ReturnType<typeof getMediaFolders>>, TError = NotConnectedResponse>(
+export const prefetchGetUserMediaFoldersQuery = async <TData = Awaited<ReturnType<typeof getUserMediaFolders>>, TError = NotConnectedResponse>(
     queryClient: QueryClient,
-    params?: GetMediaFoldersParams,
-    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMediaFolders>>, TError, TData>>; request?: SecondParameter<typeof fetchWithAuth> }
+    params?: GetUserMediaFoldersParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserMediaFolders>>, TError, TData>>;
+        request?: SecondParameter<typeof fetchWithAuth>;
+    }
 ): Promise<QueryClient> => {
-    const queryOptions = getGetMediaFoldersQueryOptions(params, options);
+    const queryOptions = getGetUserMediaFoldersQueryOptions(params, options);
 
     await queryClient.prefetchQuery(queryOptions);
 
@@ -604,81 +627,81 @@ export const useDeleteMediaById = <TError = NotConnectedResponse | ForbiddenResp
 ): UseMutationResult<Awaited<ReturnType<typeof deleteMediaById>>, TError, { id: number | string }, TContext> => {
     return useMutation(getDeleteMediaByIdMutationOptions(options), queryClient);
 };
-export type putMediasByIdByAttributeResponse200 = {
-    data: PutMediasByIdByAttribute200;
+export type putMediaAttributeResponse200 = {
+    data: PutMediaAttribute200;
     status: 200;
 };
 
-export type putMediasByIdByAttributeResponse400 = {
+export type putMediaAttributeResponse400 = {
     data: BadRequestResponse;
     status: 400;
 };
 
-export type putMediasByIdByAttributeResponse401 = {
+export type putMediaAttributeResponse401 = {
     data: NotConnectedResponse;
     status: 401;
 };
 
-export type putMediasByIdByAttributeResponse403 = {
+export type putMediaAttributeResponse403 = {
     data: ForbiddenResponse;
     status: 403;
 };
 
-export type putMediasByIdByAttributeResponse404 = {
+export type putMediaAttributeResponse404 = {
     data: NotFoundResponse;
     status: 404;
 };
 
-export type putMediasByIdByAttributeResponseSuccess = putMediasByIdByAttributeResponse200 & {
+export type putMediaAttributeResponseSuccess = putMediaAttributeResponse200 & {
     headers: Headers;
 };
-export type putMediasByIdByAttributeResponseError = (
-    putMediasByIdByAttributeResponse400 | putMediasByIdByAttributeResponse401 | putMediasByIdByAttributeResponse403 | putMediasByIdByAttributeResponse404
+export type putMediaAttributeResponseError = (
+    putMediaAttributeResponse400 | putMediaAttributeResponse401 | putMediaAttributeResponse403 | putMediaAttributeResponse404
 ) & {
     headers: Headers;
 };
 
-export type putMediasByIdByAttributeResponse = putMediasByIdByAttributeResponseSuccess | putMediasByIdByAttributeResponseError;
+export type putMediaAttributeResponse = putMediaAttributeResponseSuccess | putMediaAttributeResponseError;
 
-export const getPutMediasByIdByAttributeUrl = (id: number | string, attribute: string) => {
+export const getPutMediaAttributeUrl = (id: number | string, attribute: string) => {
     return `${env.API_EDITOR_URL}/api/medias/${id}/${attribute}`;
 };
 
 /**
  * Affecte value à l'attribut du media d'identifiant id (attribute dans ['folder', 'name'])
  */
-export const putMediasByIdByAttribute = async (
+export const putMediaAttribute = async (
     id: number | string,
     attribute: string,
-    putMediasByIdByAttributeBody: PutMediasByIdByAttributeBody,
+    putMediaAttributeBody: PutMediaAttributeBody,
     options?: RequestInit
-): Promise<putMediasByIdByAttributeResponse> => {
-    return fetchWithAuth<putMediasByIdByAttributeResponse>(getPutMediasByIdByAttributeUrl(id, attribute), {
+): Promise<putMediaAttributeResponse> => {
+    return fetchWithAuth<putMediaAttributeResponse>(getPutMediaAttributeUrl(id, attribute), {
         ...options,
         method: "PUT",
         headers: { "Content-Type": "application/json", ...options?.headers },
-        body: JSON.stringify(putMediasByIdByAttributeBody),
+        body: JSON.stringify(putMediaAttributeBody),
     });
 };
 
-export const getPutMediasByIdByAttributeMutationOptions = <
+export const getPutMediaAttributeMutationOptions = <
     TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse,
     TContext = unknown,
 >(options?: {
     mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof putMediasByIdByAttribute>>,
+        Awaited<ReturnType<typeof putMediaAttribute>>,
         TError,
-        { id: number | string; attribute: string; data: PutMediasByIdByAttributeBody },
+        { id: number | string; attribute: string; data: PutMediaAttributeBody },
         TContext
     >;
     request?: SecondParameter<typeof fetchWithAuth>;
 }): UseMutationOptions<
-    Awaited<ReturnType<typeof putMediasByIdByAttribute>>,
+    Awaited<ReturnType<typeof putMediaAttribute>>,
     TError,
-    { id: number | string; attribute: string; data: PutMediasByIdByAttributeBody },
+    { id: number | string; attribute: string; data: PutMediaAttributeBody },
     TContext
 > => {
-    const mutationKey = ["putMediasByIdByAttribute"];
+    const mutationKey = ["putMediaAttribute"];
     const { mutation: mutationOptions, request: requestOptions } = options
         ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
             ? options
@@ -686,39 +709,39 @@ export const getPutMediasByIdByAttributeMutationOptions = <
         : { mutation: { mutationKey }, request: undefined };
 
     const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof putMediasByIdByAttribute>>,
-        { id: number | string; attribute: string; data: PutMediasByIdByAttributeBody }
+        Awaited<ReturnType<typeof putMediaAttribute>>,
+        { id: number | string; attribute: string; data: PutMediaAttributeBody }
     > = (props) => {
         const { id, attribute, data } = props ?? {};
 
-        return putMediasByIdByAttribute(id, attribute, data, requestOptions);
+        return putMediaAttribute(id, attribute, data, requestOptions);
     };
 
     return { mutationFn, ...mutationOptions };
 };
 
-export type PutMediasByIdByAttributeMutationResult = NonNullable<Awaited<ReturnType<typeof putMediasByIdByAttribute>>>;
-export type PutMediasByIdByAttributeMutationBody = PutMediasByIdByAttributeBody;
-export type PutMediasByIdByAttributeMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
+export type PutMediaAttributeMutationResult = NonNullable<Awaited<ReturnType<typeof putMediaAttribute>>>;
+export type PutMediaAttributeMutationBody = PutMediaAttributeBody;
+export type PutMediaAttributeMutationError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse;
 
-export const usePutMediasByIdByAttribute = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
+export const usePutMediaAttribute = <TError = BadRequestResponse | NotConnectedResponse | ForbiddenResponse | NotFoundResponse, TContext = unknown>(
     options?: {
         mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof putMediasByIdByAttribute>>,
+            Awaited<ReturnType<typeof putMediaAttribute>>,
             TError,
-            { id: number | string; attribute: string; data: PutMediasByIdByAttributeBody },
+            { id: number | string; attribute: string; data: PutMediaAttributeBody },
             TContext
         >;
         request?: SecondParameter<typeof fetchWithAuth>;
     },
     queryClient?: QueryClient
 ): UseMutationResult<
-    Awaited<ReturnType<typeof putMediasByIdByAttribute>>,
+    Awaited<ReturnType<typeof putMediaAttribute>>,
     TError,
-    { id: number | string; attribute: string; data: PutMediasByIdByAttributeBody },
+    { id: number | string; attribute: string; data: PutMediaAttributeBody },
     TContext
 > => {
-    return useMutation(getPutMediasByIdByAttributeMutationOptions(options), queryClient);
+    return useMutation(getPutMediaAttributeMutationOptions(options), queryClient);
 };
 export type postMediaFileByIdResponse200 = {
     data: PostMediaFileById200;

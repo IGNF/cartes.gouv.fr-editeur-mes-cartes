@@ -67,7 +67,7 @@ export const getPatchMeResponseMock = (): UserView => ({
     },
 });
 
-export const getGetUsersPublicByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({
+export const getGetUserByPublicidResponseMock = (overrideResponse: Partial<Extract<UserPublic, object>> = {}): UserPublic => ({
     public_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     public_name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     twitter_account: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),

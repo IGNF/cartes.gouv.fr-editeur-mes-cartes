@@ -10,36 +10,62 @@ import { faker } from "@faker-js/faker";
 import { HttpResponse, http } from "msw";
 import type { RequestHandlerOptions } from "msw";
 
-import type { DeletedResponse, Media, MediaList, PostMediaFileById200, PutMediasByIdByAttribute200 } from "../model";
+import type { DeletedResponse, Media, MediaList, PostMediaFileById200, PutMediaAttribute200 } from "../model";
 
-export const getGetMediasResponseMock = (): MediaList[] =>
-    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-        medias: faker.helpers.arrayElement([
-            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-                id: faker.helpers.arrayElement([faker.number.int(), undefined]),
-                name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                file: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
-                size: faker.helpers.arrayElement([faker.number.int(), undefined]),
-                folder: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-                valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-                view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
-                thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
-            })),
-            undefined,
-        ]),
-        count: faker.helpers.arrayElement([faker.number.int(), undefined]),
-        limit: faker.helpers.arrayElement([faker.number.int(), undefined]),
-        offset: faker.helpers.arrayElement([faker.number.int(), undefined]),
-    }));
+export const getGetUserMediasResponseMock = (overrideResponse: Partial<Extract<MediaList, object>> = {}): MediaList =>
+    faker.helpers.arrayElement([
+        {
+            medias: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+                    id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                    name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    fileName: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
+                    size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                    folder: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+                    view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+                    thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+                })),
+                undefined,
+            ]),
+            count: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            limit: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            offset: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            ...overrideResponse,
+        },
+        {
+            medias: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+                    id: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                    name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    fileName: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    uploaded_at: faker.helpers.arrayElement([faker.date.past().toISOString().slice(0, 19) + "Z", undefined]),
+                    size: faker.helpers.arrayElement([faker.number.int(), undefined]),
+                    folder: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+                    valid: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+                    view_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+                    thumb_url: faker.helpers.arrayElement([faker.internet.url(), undefined]),
+                })),
+                undefined,
+            ]),
+            count: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            limit: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            offset: faker.helpers.arrayElement([faker.number.int(), undefined]),
+            ...overrideResponse,
+        },
+    ]);
 
-export const getPostMediasResponseMock = (overrideResponse: Partial<Extract<Media, object>> = {}): Media => ({
+export const getPostMediaResponseMock = (overrideResponse: Partial<Extract<Media, object>> = {}): Media => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     name: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
-    file: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
+    fileName: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     owner: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     organization_id: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     organization: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -52,7 +78,7 @@ export const getPostMediasResponseMock = (overrideResponse: Partial<Extract<Medi
     ...overrideResponse,
 });
 
-export const getGetMediaFoldersResponseMock = (): string[] => Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => faker.word.sample());
+export const getGetUserMediaFoldersResponseMock = (): string[] => Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => faker.word.sample());
 
 export const getDeleteMediaByIdResponseMock = (overrideResponse: Partial<Extract<DeletedResponse, object>> = {}): DeletedResponse => ({
     code: faker.helpers.arrayElement([faker.number.int(), undefined]),
@@ -60,9 +86,7 @@ export const getDeleteMediaByIdResponseMock = (overrideResponse: Partial<Extract
     ...overrideResponse,
 });
 
-export const getPutMediasByIdByAttributeResponseMock = (
-    overrideResponse: Partial<Extract<PutMediasByIdByAttribute200, object>> = {}
-): PutMediasByIdByAttribute200 => ({
+export const getPutMediaAttributeResponseMock = (overrideResponse: Partial<Extract<PutMediaAttribute200, object>> = {}): PutMediaAttribute200 => ({
     id: faker.helpers.arrayElement([faker.number.int(), undefined]),
     attribute: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
     value: faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), undefined]),
@@ -77,8 +101,8 @@ export const getPostMediaFileByIdResponseMock = (overrideResponse: Partial<Extra
     ...overrideResponse,
 });
 
-export const getGetMediasMockHandler = (
-    overrideResponse?: MediaList[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MediaList[]> | MediaList[]),
+export const getGetUserMediasMockHandler = (
+    overrideResponse?: MediaList | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MediaList> | MediaList),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
@@ -89,7 +113,7 @@ export const getGetMediasMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getGetMediasResponseMock(),
+                    : getGetUserMediasResponseMock(),
                 { status: 200 }
             );
         },
@@ -97,7 +121,7 @@ export const getGetMediasMockHandler = (
     );
 };
 
-export const getPostMediasMockHandler = (
+export const getPostMediaMockHandler = (
     overrideResponse?: Media | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Media> | Media),
     options?: RequestHandlerOptions
 ) => {
@@ -109,7 +133,7 @@ export const getPostMediasMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPostMediasResponseMock(),
+                    : getPostMediaResponseMock(),
                 { status: 201 }
             );
         },
@@ -117,7 +141,7 @@ export const getPostMediasMockHandler = (
     );
 };
 
-export const getGetMediaFoldersMockHandler = (
+export const getGetUserMediaFoldersMockHandler = (
     overrideResponse?: string[] | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<string[]> | string[]),
     options?: RequestHandlerOptions
 ) => {
@@ -129,7 +153,7 @@ export const getGetMediaFoldersMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getGetMediaFoldersResponseMock(),
+                    : getGetUserMediaFoldersResponseMock(),
                 { status: 200 }
             );
         },
@@ -174,10 +198,8 @@ export const getDeleteMediaByIdMockHandler = (
     );
 };
 
-export const getPutMediasByIdByAttributeMockHandler = (
-    overrideResponse?:
-        | PutMediasByIdByAttribute200
-        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutMediasByIdByAttribute200> | PutMediasByIdByAttribute200),
+export const getPutMediaAttributeMockHandler = (
+    overrideResponse?: PutMediaAttribute200 | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<PutMediaAttribute200> | PutMediaAttribute200),
     options?: RequestHandlerOptions
 ) => {
     return http.put(
@@ -188,7 +210,7 @@ export const getPutMediasByIdByAttributeMockHandler = (
                     ? typeof overrideResponse === "function"
                         ? await overrideResponse(info)
                         : overrideResponse
-                    : getPutMediasByIdByAttributeResponseMock(),
+                    : getPutMediaAttributeResponseMock(),
                 { status: 200 }
             );
         },
@@ -216,11 +238,11 @@ export const getPostMediaFileByIdMockHandler = (
     );
 };
 export const getMediaMock = () => [
-    getGetMediasMockHandler(),
-    getPostMediasMockHandler(),
-    getGetMediaFoldersMockHandler(),
+    getGetUserMediasMockHandler(),
+    getPostMediaMockHandler(),
+    getGetUserMediaFoldersMockHandler(),
     getGetImageByFilenameMockHandler(),
     getDeleteMediaByIdMockHandler(),
-    getPutMediasByIdByAttributeMockHandler(),
+    getPutMediaAttributeMockHandler(),
     getPostMediaFileByIdMockHandler(),
 ];

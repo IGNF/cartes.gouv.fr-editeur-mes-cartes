@@ -9,7 +9,7 @@
 export interface Article {
     /** Identifiant de l'article */
     id?: number;
-    /** Categorie de l'article */
+    /** Catégorie de l'article */
     category?: string;
     /** Ordre d'affichage de l'article */
     position?: number;

@@ -15,7 +15,7 @@ export type GetOrganizationsMe200Item = {
     profile_picture?: string;
     /** Image de couverture */
     cover_picture?: string;
-    /** Role de l'utilisateur dans l'organisation */
+    /** Rôle de l'utilisateur dans l'organisation */
     user_role?: string;
     /** l'utilisateur est actif dans l'organisation */
     active?: boolean;

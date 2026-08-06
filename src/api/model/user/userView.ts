@@ -15,5 +15,6 @@ export type UserView = UserEdit & {
     medias_limit_size?: number;
     /** Taille globale des images uploadées (en octet) */
     medias_size?: number;
+    /** Rôle(s) de l'utilisateur */
     roles?: string[];
 };

@@ -15,7 +15,7 @@ export interface Media {
     /** nom de l'image originale */
     name?: string;
     /** nom du fichier enregistré */
-    file?: string;
+    fileName?: string;
     /** username de l'utilisateur qui a chargé le media */
     owner?: string;
     /** id de l'organisation à qui appartient le media */
