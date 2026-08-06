@@ -4,7 +4,7 @@ export const appRoot = "";
 
 // Routes non protégées
 const publicRoutes = {
-    // home: defineRoute(`${appRoot}/`),
+    home: defineRoute(`${appRoot}/`),
     // dashboard: defineRoute(`/`),
     discover_publish: defineRoute(
         {
@@ -38,9 +38,20 @@ const mapRoutes = {
             query: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => ["/mes-cartes", "/"]
+        () => ["/mes-cartes"]
     ),
     create_map: defineRoute(`${appRoot}/creer-une-carte`),
+}
+
+const mediaRoutes = {
+    media_list: defineRoute(
+        {
+            page: param.query.optional.number.default(1),
+            limit: param.query.optional.number.default(10),
+            query: param.query.optional.string,
+        },
+        () => ["/mes-images"]
+    ),
 }
 
 // Chemin vers les sources utiles
@@ -66,7 +77,8 @@ const routeDefs = {
     ...publicRoutes,
     ...privateRoutes,
     ...helpRoutes,
-    ...mapRoutes
+    ...mapRoutes,
+    ...mediaRoutes,
 };
 export const { RouteProvider, useRoute, routes, session } = createRouter(routeDefs);
 
@@ -74,11 +86,13 @@ export const knownRoutes = Object.values(routes).map((r) => r.name);
 export const publicGroup = createGroup((Object.keys(publicRoutes) as (keyof typeof publicRoutes)[]).map((key) => routes[key]));
 export const privateGroup = createGroup((Object.keys(privateRoutes) as (keyof typeof privateRoutes)[]).map((key) => routes[key]));
 export const mapGroup = createGroup((Object.keys(mapRoutes) as (keyof typeof mapRoutes)[]).map((key) => routes[key]));
+export const mediaGroup = createGroup((Object.keys(mediaRoutes) as (keyof typeof mediaRoutes)[]).map((key) => routes[key]));
 
 export const groups = {
     public: publicGroup,
     private: privateGroup,
-    map: mapGroup
+    map: mapGroup,
+    media: mediaGroup,
 };
 
 export const useRoutePaginationParams = () => {

@@ -5,12 +5,12 @@ import { symToStr } from "tsafe/symToStr";
 
 import { useImage } from "@/hooks/useImage";
 import { MapList } from "@/api/model";
-type MapListItemProps = {
+type MapItemProps = {
     map: MapList,
     footer: ReactNode
 };
 
-const MapListItem: FC<MapListItemProps> = ({ map, footer }) => {
+const MapItem: FC<MapItemProps> = ({ map, footer }) => {
     // En réalité, correspond à une image
     const imageUrl = useImage(map.img_url);
 
@@ -38,5 +38,5 @@ const MapListItem: FC<MapListItemProps> = ({ map, footer }) => {
     );
 };
 
-MapListItem.displayName = symToStr({ MapListItem });
-export default MapListItem;
+MapItem.displayName = symToStr({ MapItem });
+export default MapItem;

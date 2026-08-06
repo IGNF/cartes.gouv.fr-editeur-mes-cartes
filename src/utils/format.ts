@@ -25,11 +25,13 @@ export const removeDiacritics = (str: string) => {
 /**
  * Convertit des octets en KB, MB ...
  */
-export const niceBytes = (x: string) => {
-    const units = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+export const niceBytes = (x: string | number, octet: boolean = false) => {
+    const bytes = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    const octets = ["octets", "Ko", "Mo", "Go", "To", "Po", "Eo", "Zo", "Yo"];
+    const units = octet ? octets : bytes;
 
     let l = 0,
-        n = parseInt(x, 10) || 0;
+        n = typeof x === "string" ? parseInt(x, 10) || 0 : x;
     while (n >= 1000 && ++l) {
         n = n / 1000;
     }

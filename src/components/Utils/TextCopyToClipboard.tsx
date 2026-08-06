@@ -28,9 +28,9 @@ const TextCopyToClipboard: FC<TextCopyToClipboardProps> = (props) => {
         nativeTextAreaProps,
         text,
         textArea,
-        title = t("copy_to_clipboard"),
+        title = t("copy-to-clipboard"),
         copyLabel = t("copy"),
-        copiedLabel = t("alert_copied"),
+        copiedLabel = t("alert-copied"),
         ...inputProps
     } = props;
     const { classes } = useStyles({ disabled });

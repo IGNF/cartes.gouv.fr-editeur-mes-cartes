@@ -21,7 +21,7 @@ const HiddenElements: FC = () => {
                 links={[
                     {
                         anchor: "#main",
-                        label: t("go_to_content"),
+                        label: t("go-to-content"),
                     },
                 ]}
             />

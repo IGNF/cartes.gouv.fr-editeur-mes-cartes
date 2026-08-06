@@ -7,6 +7,7 @@ import GroupMap from "./GroupMap";
 import { groups, knownRoutes, useRoute } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import GroupApp from "./GroupApp";
+import GroupMedia from "./GroupMedia";
 
 const RouterRenderer: FC = () => {
     const route = useRoute();
@@ -25,7 +26,10 @@ const RouterRenderer: FC = () => {
             return <GroupMap route={route} />;
         }
 
-        console.log(route.name)
+        if (groups.media.has(route)) {
+            return <GroupMedia route={route} />;
+        }
+
 
         return <GroupApp route={route} />;
     }, [route]);

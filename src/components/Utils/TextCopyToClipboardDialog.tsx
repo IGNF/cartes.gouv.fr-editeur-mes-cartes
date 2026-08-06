@@ -15,7 +15,7 @@ export const TextCopyToClipboardModal = createModal({
 
 export function TextCopyToClipboardDialog(props: TextCopyToClipboardDialogProps) {
     const { t } = useTranslation("Common");
-    const { title = t("copy_to_clipboard"), ...componentProps } = props;
+    const { title = t("copy-to-clipboard"), ...componentProps } = props;
     return (
         <>
             {createPortal(

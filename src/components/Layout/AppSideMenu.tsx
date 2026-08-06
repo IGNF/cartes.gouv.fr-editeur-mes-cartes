@@ -8,8 +8,9 @@ import { routes, useRoute } from "@/router/router";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { externalLink } from "@/router/externalUrls";
 
-export default function MapSideMenu() {
-    const { t: tCommon } = useTranslation("Common");
+export default function AppSideMenu() {
+    const { t: tMapList } = useTranslation("MapList");
+    const { t: tMediaList } = useTranslation("MediaList");
     const route = useRoute();
     const { classes, css, cx } = useStyles();
 
@@ -128,11 +129,16 @@ export default function MapSideMenu() {
             burgerMenuButtonText="Entrepôts"
             items={[
                 {
-                    text: tCommon("maps_sidemenu"),
+                    text: tMapList("map-list"),
                     linkProps: routes.map_list().link,
                     expandedByDefault: true,
-                    // isActive: route.name === routes.map_list().name || route.name === routes.home().name,
                     isActive: route.name === routes.map_list().name,
+                },
+                {
+                    text: tMediaList("media-list"),
+                    linkProps: routes.media_list().link,
+                    expandedByDefault: true,
+                    isActive: route.name === routes.media_list().name,
                 },
             ]}
             classes={{
@@ -143,7 +149,7 @@ export default function MapSideMenu() {
     );
 }
 
-const useStyles = tss.withName({ MapSideMenu }).create({
+const useStyles = tss.withName({ AppSideMenu }).create({
     root: {
         padding: 0,
     },

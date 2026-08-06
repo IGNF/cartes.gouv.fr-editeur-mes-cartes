@@ -4,6 +4,7 @@ import { Route } from "type-route";
 import AppLayout, { AppLayoutProps } from "../components/Layout/AppLayout";
 import PageNotFoundWithLayout from "../pages/error/PageNotFoundWithLayout";
 import { routes } from "./router";
+import Dashboard from "@/pages/dashboard/Dashboard";
 
 
 interface IGroupAppProps {
@@ -18,6 +19,10 @@ function GroupApp(props: IGroupAppProps) {
             case "page_not_found":
                 return {
                     render: <PageNotFoundWithLayout />,
+                };
+            case "home":
+                return {
+                    render: <Dashboard />,
                 };
         }
     }, [route]);

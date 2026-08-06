@@ -5,18 +5,18 @@ import { useHead } from "@unhead/react";
 import { PropsWithChildren } from "react";
 import { tss } from "tss-react";
 
-import MapSideMenu from "@/components/Layout/MapSideMenu";
+import AppSideMenu from "@/components/Layout/AppSideMenu";
 import useBreadcrumb from "@/hooks/useBreadcrumb";
 import SessionExpiredAlert from "../Utils/SessionExpiredAlert";
 import { type MainProps } from "./Main";
 
-export type MapMainProps = PropsWithChildren<
+export type ListMainProps = PropsWithChildren<
     MainProps
 > & {
     classes?: Partial<MainProps["classes"] & Record<"content", string>>;
 };
 
-export default function MapMain(props: MapMainProps) {
+export default function ListMain(props: ListMainProps) {
     const {children, customBreadcrumbProps, title, classes: propsClasses } = props;
 
     useHead({
@@ -34,7 +34,7 @@ export default function MapMain(props: MapMainProps) {
                     <div
                         className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}
                     >
-                        <MapSideMenu />
+                        <AppSideMenu />
                     </div>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-md-9"), classes.content, propsClasses?.content)}>
                         {/* // "fr-px-5w" */}
@@ -48,7 +48,7 @@ export default function MapMain(props: MapMainProps) {
     );
 }
 
-const useStyles = tss.withName({ MapMain }).create({
+const useStyles = tss.withName({ ListMain }).create({
     sideMenuCol: {
         display: "flex",
         flexDirection: "column",

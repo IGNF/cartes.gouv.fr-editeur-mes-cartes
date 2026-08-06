@@ -9,7 +9,7 @@ const Forbidden: FC = () => {
 
     return (
         <Main>
-            <Alert className={fr.cx("fr-mb-2w")} title={t("information")} description={t("no_necessary_rights")} severity={"info"} />
+            <Alert className={fr.cx("fr-mb-2w")} title={t("information")} description={t("no-necessary-rights")} severity={"info"} />
         </Main>
     );
 };
