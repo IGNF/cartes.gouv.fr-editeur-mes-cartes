@@ -14,7 +14,7 @@ type MediaItemProps = {
 
 const MediaItem: FC<MediaItemProps> = ({ media, footer }) => {
     const { classes, cx } = useStyles();
-    const { t } = useTranslation("MediaList");
+    const { t } = useTranslation("Media");
 
 
     return (
@@ -45,9 +45,17 @@ const useStyles = tss.withName({ MediaItem }).create({
             justifyContent: "center",
             "& img": {
                 maxWidth: "fit-content",
-                maxHeight: "fit-content"
-            }
-        }
+                maxHeight: "fit-content",
+                objectFit: "contain",
+                // // En mobile, pas de grande image
+                [fr.breakpoints.down("md")]: {
+                    maxHeight: "300px",
+                },
+            },
+        },
+        // [fr.breakpoints.up("md")]: {
+        //     maxHeight: "200px",
+        // },
     }
 });
 

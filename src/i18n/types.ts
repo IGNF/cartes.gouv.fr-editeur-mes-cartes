@@ -18,8 +18,9 @@ export type Language = (typeof languages)[number];
 export type ComponentKey =
     | import("./locales/Common.locale").I18n
     | import("./locales/Breadcrumb.locale").I18n
-    | import("./locales/MapList.locale").I18n
+    | import("./locales/Map.locale").I18n
     | import("./locales/Layout.locale").I18n
-    | import("./locales/MediaList.locale").I18n
+    | import("./locales/Media.locale").I18n
+    // | import("./locales/Organization.locale").I18n
 
 export type Translations<L extends Language> = GenericTranslations<ComponentKey, Language, typeof fallbackLanguage, L>;

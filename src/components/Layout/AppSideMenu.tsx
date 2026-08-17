@@ -9,8 +9,8 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { externalLink } from "@/router/externalUrls";
 
 export default function AppSideMenu() {
-    const { t: tMapList } = useTranslation("MapList");
-    const { t: tMediaList } = useTranslation("MediaList");
+    const { t: tMapList } = useTranslation("Map");
+    const { t: tMediaList } = useTranslation("Media");
     const route = useRoute();
     const { classes, css, cx } = useStyles();
 

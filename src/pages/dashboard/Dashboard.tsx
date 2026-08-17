@@ -12,8 +12,8 @@ import { useOidc } from "@/oidc";
 export default function Dashboard() {
     const { t } = useTranslation("Common");
     const { t: tLayout } = useTranslation("Layout");
-    const { t: tMapList } = useTranslation("MapList");
-    const { t: tMediaList } = useTranslation("MediaList");
+    const { t: tMapList } = useTranslation("Map");
+    const { t: tMediaList } = useTranslation("Media");
     const { decodedIdToken } = useOidc();
 
     return (

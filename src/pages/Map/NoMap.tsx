@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { tss } from "tss-react";
 
 export default function NoMap() {
-    const { t } = useTranslation("MapList");
+    const { t } = useTranslation("Map");
     const { classes, cx } = useStyles();
 
     return (

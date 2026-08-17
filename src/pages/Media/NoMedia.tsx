@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { tss } from "tss-react";
 
 export default function NoMedia() {
-    const { t } = useTranslation("MediaList");
+    const { t } = useTranslation("Media");
     const { classes, cx } = useStyles();
 
     return (

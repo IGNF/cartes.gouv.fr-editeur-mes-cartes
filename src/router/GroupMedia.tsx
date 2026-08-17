@@ -5,7 +5,7 @@ import { groups } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import AppLayout from "@/components/Layout/AppLayout";
 
-const MediaList = lazy(() => import("@/pages/MediaList/MediaList"));
+const MediaList = lazy(() => import("@/pages/Media/MediaList"));
 
 interface GroupAppProps {
     route: Route<typeof groups.media | typeof groups.public>;

@@ -14,10 +14,10 @@ const { i18n } = declareComponentKeys<
     | { K: "uploaded-at"; P: { dataUploadedAt: string }; R: string }
     | "delete-media"
     | { K: "delete-media--message"; P: { fileName?: string }; R: ReactNode }
->()("MediaList");
+>()("Media");
 export type I18n = typeof i18n;
 
-export const MediaListFrTranslations: Translations<"fr">["MediaList"] = {
+export const MediaFrTranslations: Translations<"fr">["Media"] = {
     "medias": "Images",
     "media-list": "Mes images",
     "media-list__description": "Gérer mes images",
@@ -31,7 +31,7 @@ export const MediaListFrTranslations: Translations<"fr">["MediaList"] = {
         <b> Cette action est irréversible.</b></>,
 };
 
-export const MediaListEnTranslations: Translations<"en">["MediaList"] = {
+export const MediaEnTranslations: Translations<"en">["Media"] = {
     "medias": undefined,
     "media-list": undefined,
     "media-list__description": undefined,

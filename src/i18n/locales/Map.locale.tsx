@@ -19,10 +19,10 @@ const { i18n } = declareComponentKeys<
     | "share-map__iframe-hint"
     | "copy-map"
     | { K: "delete-map--message"; P: { fileName?: string }; R: ReactNode }
->()("MapList");
+>()("Map");
 export type I18n = typeof i18n;
 
-export const MapListFrTranslations: Translations<"fr">["MapList"] = {
+export const MapFrTranslations: Translations<"fr">["Map"] = {
     "maps": "Cartes",
     "map-list": "Mes cartes",
     "map-list__description": "Gérer mes cartes",
@@ -42,7 +42,7 @@ export const MapListFrTranslations: Translations<"fr">["MapList"] = {
         <b> Cette action est irréversible.</b></>,
 };
 
-export const MapListEnTranslations: Translations<"en">["MapList"] = {
+export const MapEnTranslations: Translations<"en">["Map"] = {
     "maps": undefined,
     "map-list": undefined,
     "map-list__description": undefined,

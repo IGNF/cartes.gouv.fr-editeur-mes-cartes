@@ -5,7 +5,7 @@ import { groups } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import AppLayout from "@/components/Layout/AppLayout";
 
-const MapList = lazy(() => import("@/pages/MapList/MapList"));
+const MapList = lazy(() => import("@/pages/Map/MapList"));
 
 interface GroupAppProps {
     route: Route<typeof groups.map | typeof groups.public>;

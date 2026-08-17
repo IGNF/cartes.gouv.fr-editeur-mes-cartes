@@ -14,61 +14,73 @@ import PageTitle from "@/components/Layout/PageTitle";
 import { routes, useRoute } from "@/router/router";
 import { useFakePagination } from "@/hooks/usePagination";
 import { tss } from "tss-react";
-import MediaItem from "./MediaItem";
+import MapItem from "./MapItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { Media, } from "@/api/model";
-import NoMedia from "./NoMedia";
+import { usePrefetchQuery } from "@tanstack/react-query";
+import RQKeys from "@/modules/maps/RQKeys";
+import { type MapList as MapListType, Theme } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
+import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
+import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
+import NoMap from "./NoMap";
 
 /**
  * Élément dans l'URL de recherche
  */
-type MediaRouteParams = {
+type MapRouteParams = {
     page: number,
     limit: number,
+    theme: string,
     query: string,
 }
 
-const confirmDeleteMediaModal = createModal({
-    id: "confirm-delete-media-modal",
+const confirmDeleteMapModal = createModal({
+    id: "confirm-delete-map-modal",
     isOpenedByDefault: false,
 });
 
-const shareMediaModal = createModal({
-    id: "share-media-modal",
+const shareMapModal = createModal({
+    id: "share-map-modal",
+    isOpenedByDefault: false,
+});
+
+const confirmCopyMapModal = createModal({
+    id: "confirm-copy-map-modal",
     isOpenedByDefault: false,
 });
 
 /** 
  * Permet de récupérer les paramètres dans l'URL
  */
-function useMediaRouteParams(): MediaRouteParams {
+function useMapRouteParams(): MapRouteParams {
     // Ajouter ici les différents paramètres dans l'URL
     const route = useRoute();
     const page = route.params?.["page"] ?? 1;
     const limit = parseInt(route.params?.["limit"]) ?? 10;
+    const theme = route.params?.["theme"] ?? "";
     const query = route.params?.["query"] ?? "";
 
-    return { page, limit, query };
+    return { page, limit, theme, query };
 };
 
-export default function MediaList() {
+export default function MapList() {
     // Traduction
-    const { t } = useTranslation("MediaList");
+    const { t } = useTranslation("Map");
     const { t: tCommon } = useTranslation("Common");
 
+    
     // React states
-    const [openedMedia, setOpenedMedia] = useState<Media>();
-    const [mediaCount, setMediaCount] = useState(0);
-
+    const [openedMap, setOpenedMap] = useState<MapListType>();
+    const [mapCount, setMapCount] = useState(0);
+    
     // Appelé plus tard dans la modale
-    const deleteMediaMutation = api.media.useDeleteMediaById({
+    const deleteMapMutation = api.map.useDeleteMapByEditId({
         mutation: {
             onSuccess: () => {
                 refetch();
-                confirmDeleteMediaModal.close();
+                confirmDeleteMapModal.close();
             },
             onError: error => {
                 console.error(error);
@@ -81,16 +93,17 @@ export default function MediaList() {
 
     // const confirmCopyMutation = useMutation();
     // Param dans l'URL
-    const routeParams = useMediaRouteParams();
+    const routeParams = useMapRouteParams();
     const offset = (routeParams.page - 1) * (routeParams.limit);
 
     // Appel à l'API
-    const { data: mediasResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.media.useGetUserMedias(
-        { limit: routeParams.limit, name: routeParams.query, offset: offset },
+    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useGetMaps(
+        { ...routeParams, offset: offset, context: "profile" },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
                 select: (response) => {
+                    console.log(response)
                     if (response.status === 200 || response.status === 206) {
                         return response.data
                     }
@@ -104,19 +117,37 @@ export default function MediaList() {
 
     // Va chercher les cartes de la page d'après
     // TODO : améliorer cela car pas l'air de fonctionner
-    // usePrefetchQuery({
-    //     queryKey: RQKeys.medias({ ...routeParams, offset: routeParams.page * routeParams.limit }),
-    //     queryFn: ({ signal }) => api.media.getMedias({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
-    // });
+    usePrefetchQuery({
+        queryKey: RQKeys.maps({ ...routeParams, offset: routeParams.page * routeParams.limit }),
+        queryFn: ({ signal }) => api.map.getMaps({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
+    });
+
+    // Thèmes disponible
+    const { data: themesResponse } = api.theme.useGetThemes(
+        {
+            query: {
+                // Évite les erreurs typescript en vérifiant le bon retour
+                select: (response) => {
+                    if (response.status === 200) {
+                        return response.data
+                    } else {
+                        return undefined
+                    }
+                },
+            },
+        },
+    );
+
+    const themes = (themesResponse || []) as Theme[]
 
     // Cartes et nombre total de cartes
-    const medias = (mediasResponse?.medias ?? []);
+    const maps = (mapsResponse?.maps ?? []);
 
     useEffect(() => {
-        if (mediasResponse?.count !== undefined) {
-            setMediaCount(mediasResponse.count);
+        if (mapsResponse?.count !== undefined) {
+            setMapCount(mapsResponse.count);
         }
-    }, [mediasResponse?.count]);
+    }, [mapsResponse?.count]);
 
     // Permet d'activer / désactiver l'affichage des filtres
     const [showFilters, toggleShowFilters] = useToggle();
@@ -124,14 +155,14 @@ export default function MediaList() {
     // Filtre et tri
 
     // Nombre de page total
-    const { totalPages } = useFakePagination(mediaCount, routeParams.limit);
+    const { totalPages } = useFakePagination(mapCount, routeParams.limit);
 
     // Pour classes css
     const { classes, cx } = useStyles();
 
     return (
-        <ListMain title={t("media-list")}>
-            <PageTitle title={t("media-list")}>
+        <ListMain title="Mes cartes">
+            <PageTitle title={t("map-list")}>
             </PageTitle>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
                 <div
@@ -141,16 +172,19 @@ export default function MediaList() {
                         alignItems: "center",
                     }}
                 >
-                    <strong className={fr.cx("fr-text--xl", "fr-m-0", "fr-mr-2v")}>{t("medias")}</strong>
+                    <strong className={fr.cx("fr-text--xl", "fr-m-0", "fr-mr-2v")}>{t("maps")}</strong>
                     <Badge severity="info" noIcon={true}>
-                        {mediaCount}
+                        {mapCount}
                     </Badge>
                     <Button
+                        linkProps={
+                            routes.create_map().link
+                        }
                         iconId="fr-icon-add-line"
                         iconPosition="right"
                         className={fr.cx("fr-ml-auto")}
                     >
-                        {t("add-media")}
+                        {t("create-map")}
                     </Button>
                 </div>
             </div>
@@ -168,7 +202,7 @@ export default function MediaList() {
                         label={tCommon("search")}
                         onButtonClick={(text) => {
                             if (!isLoading) {
-                                routes.media_list({ ...routeParams, query: text }).push();
+                                routes.map_list({ ...routeParams, query: text }).push();
                             }
                         }}
                         allowEmptySearch={true}
@@ -184,17 +218,17 @@ export default function MediaList() {
             {showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
-                        {<SelectNext
+                        {themes.length && <SelectNext
                             label={tCommon("filter-label")}
                             options={[
                                 { label: "Tous les thèmes", value: "" },
-                                // ...themes.map(theme => ({
-                                //     label: theme.name || "",
-                                //     value: theme.name || "",
-                                // }))
+                                ...themes.map(theme => ({
+                                    label: theme.name || "",
+                                    value: theme.name || "",
+                                }))
                             ]}
                             nativeSelectProps={{
-                                // value: routeParams.theme?.toString() ?? "",
+                                value: routeParams.theme?.toString() ?? "",
                                 onChange: (event) => {
                                     const value = event.target.value;
                                     if (value === "") {
@@ -227,17 +261,16 @@ export default function MediaList() {
                             </div> */}
                 </div>
             )}
-
             {isLoading ? (
                 <Skeleton count={3} rectangleHeight={200} />
             ) : (
                 <>
-                    {mediaCount > 0 ? (
+                    {mapCount > 0 ? (
                         <>
                             <ListHeader
                                 nbResults={{
-                                    displayed: medias.length,
-                                    total: mediaCount,
+                                    displayed: maps.length,
+                                    total: mapCount,
                                 }}
                                 dataUpdatedAt={dataUpdatedAt}
                                 isFetching={isFetching}
@@ -245,9 +278,9 @@ export default function MediaList() {
                             />
 
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                                {medias.map((media) => (
-                                    <div className={fr.cx("fr-col-12")} key={media.id} >
-                                        <MediaItem media={media}
+                                {maps.map((map) => (
+                                    <div className={fr.cx("fr-col-12")} key={map.view_id}>
+                                        <MapItem map={map}
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
 
@@ -257,19 +290,37 @@ export default function MediaList() {
                                                         size="small"
                                                         priority="tertiary"
                                                         onClick={() => {
-                                                            setOpenedMedia(media);
-                                                            confirmDeleteMediaModal.open()
+                                                            setOpenedMap(map);
+                                                            confirmDeleteMapModal.open()
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        title={tCommon("duplicate")}
+                                                        iconId='ri-file-copy-line'
+                                                        size="small"
+                                                        priority="tertiary"
+                                                        onClick={() => {
+                                                            setOpenedMap(map);
+                                                            confirmCopyMapModal.open()
+                                                        }}
+                                                    />
+                                                    <Button
+                                                        title={tCommon("share")}
+                                                        iconId='ri-share-2-line'
+                                                        size="small"
+                                                        priority="tertiary"
+                                                        onClick={() => {
+                                                            setOpenedMap(map);
+                                                            shareMapModal.open()
                                                         }}
                                                     />
                                                     <Button
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        onClick={() => {
-                                                            setOpenedMedia(media);
-                                                        }}
+                                                        linkProps={routes.view_map({ mapId: map.view_id || "", }).link}
                                                     >
-                                                        {tCommon("see")}
+                                                        {tCommon("open")}
                                                     </Button>
                                                 </div>
                                             }
@@ -283,7 +334,7 @@ export default function MediaList() {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...routes.media_list({ ...routeParams, page: pageNumber })
+                                            ...routes.map_list({ ...routeParams, page: pageNumber })
                                                 .link,
                                         })}
                                         defaultPage={routeParams.page}
@@ -295,13 +346,13 @@ export default function MediaList() {
                             )}
                         </>
                     ) : (
-                        <NoMedia />
+                        <NoMap />
                     )}
                 </>
             )}
             {createPortal(
-                <confirmDeleteMediaModal.Component
-                    title={t("delete-media")}
+                <confirmDeleteMapModal.Component
+                    title={t("delete-map")}
                     buttons={[
                         {
                             children: tCommon("cancel"),
@@ -310,42 +361,59 @@ export default function MediaList() {
                         {
                             children: tCommon("delete"),
                             onClick: () => {
-                                if (openedMedia?.id === undefined) {
+                                if (openedMap?.edit_id === undefined) {
                                     return;
                                 }
-                                deleteMediaMutation.mutate({ id: openedMedia.id });
+                                deleteMapMutation.mutate({ editId: openedMap.edit_id });
                             },
                             priority: "primary",
                             doClosesModal: true,
                         },
                     ]}
                 >
-                    {t('delete-media--message', { fileName: openedMedia?.fileName })}
-
-                    <div />
-                </confirmDeleteMediaModal.Component>,
+                    {t('delete-map--message', { fileName: openedMap?.title })}
+                </confirmDeleteMapModal.Component>,
                 document.body
             )}
 
             {createPortal(
-                <shareMediaModal.Component
-                    title="titre"
-                // title={t("share-media")}
+                <confirmCopyMapModal.Component
+                    title={t("copy-map")}
+                    buttons={[
+                        {
+                            children: tCommon("cancel"),
+                            priority: "secondary",
+                        },
+                        {
+                            children: tCommon("duplicate"),
+                            priority: "primary",
+                            doClosesModal: false,
+                        },
+                    ]}
+                >
+                    <div />
+                </confirmCopyMapModal.Component>,
+                document.body
+            )}
+
+            {createPortal(
+                <shareMapModal.Component
+                    title={t("share-map")}
                 >
 
-                    {/* <TextCopyToClipboard label={tCommon("link")} hintText={t("share-media__link-hint")} text={useMediaLink(openedMedia)} className="fr-mb-1w" />
+                    <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={useMapLink(openedMap)} className="fr-mb-1w" />
 
-                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-media__iframe-hint")} text={useMediaIframe(openedMedia)} textArea className="fr-mb-1w" /> */}
+                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-map__iframe-hint")} text={useMapIframe(openedMap)} textArea className="fr-mb-1w" />
 
                     <div />
-                </shareMediaModal.Component>,
+                </shareMapModal.Component>,
                 document.body
             )}
         </ListMain>
     );
 };
 
-const useStyles = tss.withName({ MediaList }).create({
+const useStyles = tss.withName({ MapList }).create({
     filterRoot: {
         display: "flex",
         flexDirection: "column",
@@ -366,4 +434,18 @@ const useStyles = tss.withName({ MediaList }).create({
         display: "flex",
         gap: fr.spacing("4v"),
     },
+
+    // filterApplyBtn: {
+    //     [fr.breakpoints.up("sm")]: {
+    //         flex: 0,
+    //         alignSelf: "flex-end",
+    //     },
+    // },
 });
+
+//  const useStyles = tss.withName({ MapItem }).create({
+//     footerBtnGroup: {
+//         display: "flex",
+//         gap: fr.spacing("4v"),
+//     },
+// });
