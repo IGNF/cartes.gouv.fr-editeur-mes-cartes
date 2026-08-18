@@ -9,8 +9,9 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { externalLink } from "@/router/externalUrls";
 
 export default function AppSideMenu() {
-    const { t: tMapList } = useTranslation("Map");
-    const { t: tMediaList } = useTranslation("Media");
+    const { t: tMap } = useTranslation("Map");
+    const { t: tMedia } = useTranslation("Media");
+    const { t: tOrganization } = useTranslation("Organization");
     const route = useRoute();
     const { classes, css, cx } = useStyles();
 
@@ -129,16 +130,22 @@ export default function AppSideMenu() {
             burgerMenuButtonText="Entrepôts"
             items={[
                 {
-                    text: tMapList("map-list"),
+                    text: tMap("map-list"),
                     linkProps: routes.map_list().link,
                     expandedByDefault: true,
                     isActive: route.name === routes.map_list().name,
                 },
                 {
-                    text: tMediaList("media-list"),
+                    text: tMedia("media-list"),
                     linkProps: routes.media_list().link,
                     expandedByDefault: true,
                     isActive: route.name === routes.media_list().name,
+                },
+                {
+                    text: tOrganization("organization-list"),
+                    linkProps: routes.organization_list().link,
+                    expandedByDefault: true,
+                    isActive: route.name === routes.organization_list().name,
                 },
             ]}
             classes={{

@@ -1,0 +1,62 @@
+import { declareComponentKeys } from "@/i18n/i18n";
+
+import { Translations } from "@/i18n/types";
+import { UserRole } from "@/types/UserRole";
+import { formatDateFromISO } from "@/utils";
+import { ReactNode } from "react";
+
+const { i18n } = declareComponentKeys<
+    | "organizations"
+    | "organization-list"
+    | "organization-list__description"
+    | { K: "user-role"; P: UserRole; R: string }
+    | "no-corresponding-organization__title"
+    | "no-corresponding-organization__description"
+    | "add-organization"
+    | { K: "uploaded-at"; P: { dataUploadedAt: string }; R: string }
+    | "delete-organization"
+    | { K: "delete-organization--message"; P: { name?: string }; R: ReactNode }
+    | "inactive"
+>()("Organization");
+export type I18n = typeof i18n;
+
+export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
+    "organizations": "Équipes",
+    "organization-list": "Mes équipes",
+    "organization-list__description": "Gérer mes équipes",
+    "user-role": (role) => {
+        switch (role) {
+            case UserRole.OWNER:
+                return "Propriétaire";
+            case UserRole.MEMBER:
+                return "Membre";
+            case UserRole.EDITOR:
+                return "Éditeur";
+            default:
+                return "";
+        }
+    },
+    "no-corresponding-organization__title": "Aucune équipe correspondante",
+    "no-corresponding-organization__description": "Aucune équipe ne correspond à vos filtres.",
+    "add-organization": "Ajouter une équipe",
+    "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
+    "delete-organization": "Supprimer l'équipe",
+    "delete-organization--message": ({ name }) => <>Êtes-vous sûr de vouloir supprimer cette équipe
+        {name ? <> (<em>{ name }</em>)</> : ""} ?
+        <b> Cette action est irréversible.</b></>,
+    "inactive": "Inactif",
+};
+
+export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
+    "organizations": undefined,
+    "organization-list": undefined,
+    "organization-list__description": undefined,
+    "user-role": undefined,
+    "no-corresponding-organization__title": undefined,
+    "no-corresponding-organization__description": undefined,
+    "add-organization": undefined,
+    "uploaded-at": undefined,
+    "delete-organization": undefined,
+    "delete-organization--message": undefined,
+    "inactive": undefined,
+};

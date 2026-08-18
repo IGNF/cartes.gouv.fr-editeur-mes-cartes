@@ -54,6 +54,17 @@ const mediaRoutes = {
     ),
 }
 
+const organizationRoutes = {
+    organization_list: defineRoute(
+        {
+            page: param.query.optional.number.default(1),
+            limit: param.query.optional.number.default(10),
+            query: param.query.optional.string,
+        },
+        () => ["/mes-equipes"]
+    ),
+}
+
 // Chemin vers les sources utiles
 const helpRoutes = {
     help_more_info: defineRoute(`${appRoot}/aide/creer-une-carte`),
@@ -79,6 +90,7 @@ const routeDefs = {
     ...helpRoutes,
     ...mapRoutes,
     ...mediaRoutes,
+    ...organizationRoutes,
 };
 export const { RouteProvider, useRoute, routes, session } = createRouter(routeDefs);
 
@@ -87,12 +99,14 @@ export const publicGroup = createGroup((Object.keys(publicRoutes) as (keyof type
 export const privateGroup = createGroup((Object.keys(privateRoutes) as (keyof typeof privateRoutes)[]).map((key) => routes[key]));
 export const mapGroup = createGroup((Object.keys(mapRoutes) as (keyof typeof mapRoutes)[]).map((key) => routes[key]));
 export const mediaGroup = createGroup((Object.keys(mediaRoutes) as (keyof typeof mediaRoutes)[]).map((key) => routes[key]));
+export const organizationGroup = createGroup((Object.keys(organizationRoutes) as (keyof typeof organizationRoutes)[]).map((key) => routes[key]));
 
 export const groups = {
     public: publicGroup,
     private: privateGroup,
     map: mapGroup,
     media: mediaGroup,
+    organization: organizationGroup,
 };
 
 export const useRoutePaginationParams = () => {
