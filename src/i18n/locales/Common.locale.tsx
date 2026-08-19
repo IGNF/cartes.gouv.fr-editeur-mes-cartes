@@ -61,6 +61,8 @@ const { i18n } = declareComponentKeys<
     | "link"
     | "iframe"
     | "tab-nav"
+    | "email"
+    | "username"
     | { K: "last-refresh-date"; P: { dataUpdatedAt: number }; R: string }
     | { K: "nb-results"; P: { displayed: number; total: number }; R: string }
     | { K: "welcome"; P: { username: string }; R: string }
@@ -126,6 +128,8 @@ export const commonFrTranslations: Translations<"fr">["Common"] = {
     "link": "Lien",
     "iframe": "iframe",
     "tab-nav": "Navigation tertiaire",
+    "email": "Email",
+    "username": "Nom d'utilisateur",
     "last-refresh-date": ({ dataUpdatedAt }) => `Mise à jour le ${formatDateFromISO(new Date(dataUpdatedAt).toISOString())}`,
     "nb-results": ({ displayed, total }) => {
         if (total === 0) return "Aucun résultat";
@@ -194,6 +198,8 @@ export const commonEnTranslations: Translations<"en">["Common"] = {
     "link": undefined,
     "iframe": undefined,
     "tab-nav": undefined,
+    "email": undefined,
+    "username": undefined,
     "last-refresh-date": undefined,
     "nb-results": undefined,
     "welcome": undefined,

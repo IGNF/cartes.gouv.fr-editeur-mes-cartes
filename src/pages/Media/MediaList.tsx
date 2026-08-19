@@ -7,10 +7,8 @@ import SelectNext from "@codegouvfr/react-dsfr/SelectNext";
 import { useEffect, useState } from "react";
 
 import { useToggle } from "@mantine/hooks";
-import ListMain from "@/components/Layout/ListMain";
 import { useTranslation } from "@/i18n";
 import { api } from "@/api";
-import PageTitle from "@/components/Layout/PageTitle";
 import { routes, useRoute } from "@/router/router";
 import { useFakePagination } from "@/hooks/usePagination";
 import { tss } from "tss-react";

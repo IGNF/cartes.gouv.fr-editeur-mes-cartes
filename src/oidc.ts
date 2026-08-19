@@ -12,7 +12,7 @@ export const { bootstrapOidc, useOidc, getOidc, OidcInitializationGate } = oidcS
         }),
         decodedIdToken_mock: {
             preferred_username: "claire.durand",
-            email: "mathis.rouillard@ign.fr",
+            email: "claire.durand@ign.fr",
         },
     }) 
     // Voir : https://docs.oidc-spa.dev/v/v10/features/auto-login#react-spa

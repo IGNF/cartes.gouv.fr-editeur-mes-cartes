@@ -26,7 +26,7 @@ const OrganizationMaps: FC<OrganizationLayoutChildrenProps> = ({ organizationId,
 
     return (
         organization && organization.public_id ? (
-            <MapList organizationId={organization.public_id} >
+            <MapList organizationId={organization.public_id} role={role} >
 
             </MapList>
 

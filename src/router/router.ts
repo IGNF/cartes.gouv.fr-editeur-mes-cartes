@@ -70,8 +70,20 @@ const organizationRoutes = {
         },
         () => ["/equipes"]
     ),
-    organization_maps: organizationRoute.extend("/cartes"),
-    organization_members: organizationRoute.extend("/membres"),
+    organization_maps: organizationRoute.extend(
+        {
+            page: param.query.optional.number.default(1),
+            limit: param.query.optional.number.default(10),
+            search: param.query.optional.string,
+        },
+        () => "/cartes"),
+    organization_members: organizationRoute.extend(
+        {
+            page: param.query.optional.number.default(1),
+            limit: param.query.optional.number.default(20),
+            search: param.query.optional.string,
+        },
+        () => "/membres"),
     organization_info: organizationRoute.extend("/infos"),
 }
 

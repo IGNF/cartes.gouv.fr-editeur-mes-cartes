@@ -9,7 +9,19 @@ const { i18n } = declareComponentKeys<
     | "organizations"
     | "organization-list"
     | "organization-list__description"
+    | "rights"
+    | "members"
+    | "select-member__label"
+    | "add-member"
+    | "remove-member"
+    | "owner"
+    | "owner__explain"
+    | "member"
+    | "member__explain"
+    | "editor"
+    | "editor__explain"
     | { K: "user-role"; P: UserRole; R: string }
+    | { K: "user-role__explain"; P: UserRole; R: string }
     | "no-corresponding-organization__title"
     | "no-corresponding-organization__description"
     | "add-organization"
@@ -24,14 +36,33 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
     "organizations": "Espaces de travail",
     "organization-list": "Mes espaces de travail",
     "organization-list__description": "Gérer mes espaces de travail",
+    "rights": "Droits",
+    "members": "Membres",
+    "select-member__label": "Sélectionnez un droit pour ce membre",
+    "add-member": "Ajouter un membre",
+    "remove-member": "Supprimer le membre de l'espace de travail",
+    "owner": "Admin",
+    "owner__explain": "Gérer les membres et cartes d'un espace de travail (suppression, modification de droits...)",
+    "member": "Consultation",
+    "member__explain": "Consulter les cartes de l'espace de travail",
+    "editor": "Édition",
+    "editor__explain": "Créer des cartes dans l'espace de travail",
     "user-role": (role) => {
         switch (role) {
             case UserRole.OWNER:
-                return "Admin";
             case UserRole.MEMBER:
-                return "Consultation";
             case UserRole.EDITOR:
-                return "Édition";
+                return OrganizationFrTranslations[role];
+            default:
+                return "";
+        }
+    },
+    "user-role__explain": (role) => {
+        switch (role) {
+            case UserRole.OWNER:
+            case UserRole.MEMBER:
+            case UserRole.EDITOR:
+                return OrganizationFrTranslations[`${role}__explain`];
             default:
                 return "";
         }
@@ -42,7 +73,7 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
     "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
     "delete-organization": "Supprimer l'espace de travail",
     "delete-organization--message": ({ name }) => <>Êtes-vous sûr de vouloir supprimer cet espace
-        {name ? <> (<em>{ name }</em>)</> : ""} ?
+        {name ? <> (<em>{name}</em>)</> : ""} ?
         <b> Cette action est irréversible.</b></>,
     "inactive": "Inactif",
 };
@@ -51,7 +82,19 @@ export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
     "organizations": undefined,
     "organization-list": undefined,
     "organization-list__description": undefined,
+    "rights": undefined,
+    "members": undefined,
+    "select-member__label": undefined,
+    "add-member": undefined,
+    "remove-member": undefined,
+    "owner": undefined,
+    "owner__explain": undefined,
+    "member": undefined,
+    "member__explain": undefined,
+    "editor": undefined,
+    "editor__explain": undefined,
     "user-role": undefined,
+    "user-role__explain": undefined,
     "no-corresponding-organization__title": undefined,
     "no-corresponding-organization__description": undefined,
     "add-organization": undefined,
