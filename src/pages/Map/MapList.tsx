@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import SearchBar from "@codegouvfr/react-dsfr/SearchBar";
 import SelectNext from "@codegouvfr/react-dsfr/SelectNext";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { useToggle } from "@mantine/hooks";
 import ListMain from "@/components/Layout/ListMain";
@@ -36,6 +36,10 @@ type MapRouteParams = {
     query: string,
 }
 
+type MapListProps = {
+    organizationId?: string,
+}
+
 const confirmDeleteMapModal = createModal({
     id: "confirm-delete-map-modal",
     isOpenedByDefault: false,
@@ -65,16 +69,16 @@ function useMapRouteParams(): MapRouteParams {
     return { page, limit, theme, query };
 };
 
-export default function MapList() {
+export default function MapList({ organizationId }: MapListProps) {
     // Traduction
     const { t } = useTranslation("Map");
     const { t: tCommon } = useTranslation("Common");
 
-    
+
     // React states
     const [openedMap, setOpenedMap] = useState<MapListType>();
     const [mapCount, setMapCount] = useState(0);
-    
+
     // Appelé plus tard dans la modale
     const deleteMapMutation = api.map.useDeleteMapByEditId({
         mutation: {
@@ -98,7 +102,7 @@ export default function MapList() {
 
     // Appel à l'API
     const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useGetMaps(
-        { ...routeParams, offset: offset, context: "profile" },
+        { ...routeParams, offset: offset, context: "profile", organization: organizationId },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour

@@ -82,7 +82,6 @@ export default function OrganizationList() {
     // const confirmCopyMutation = useMutation();
     // Param dans l'URL
     const routeParams = useOrganizationRouteParams();
-    const offset = (routeParams.page - 1) * (routeParams.limit);
 
     // Appel à l'API
     const { data: organizationsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.organization.useGetOrganizationsMe(
@@ -260,9 +259,7 @@ export default function OrganizationList() {
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        onClick={() => {
-                                                            setOpenedOrganization(organization);
-                                                        }}
+                                                        linkProps={routes.organization_info({ organizationId: organization.public_id || "", }).link}
                                                     >
                                                         {tCommon("see")}
                                                     </Button>

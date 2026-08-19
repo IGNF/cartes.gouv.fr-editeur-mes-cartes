@@ -6,6 +6,7 @@ const { i18n } = declareComponentKeys<
     | "dashboard"
     | "map_list"
     | "media_list"
+    | "organization_list"
 >()("Breadcrumb");
 export type I18n = typeof i18n;
 
@@ -14,6 +15,7 @@ export const BreadcrumbFrTranslations: Translations<"fr">["Breadcrumb"] = {
     "dashboard": "Tableau de bord",
     "map_list": "Mes cartes",
     "media_list": "Mes images",
+    "organization_list": "Mes espaces de travail",
 };
 
 export const BreadcrumbEnTranslations: Translations<"en">["Breadcrumb"] = {
@@ -21,4 +23,5 @@ export const BreadcrumbEnTranslations: Translations<"en">["Breadcrumb"] = {
     "dashboard": undefined,
     "map_list": undefined,
     "media_list": undefined,
+    "organization_list": undefined,
 };

@@ -7,8 +7,13 @@ import { useTranslation } from "@/i18n";
 import { routes, useRoute } from "@/router/router";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { externalLink } from "@/router/externalUrls";
+import { api } from "@/api";
 
-export default function AppSideMenu() {
+type AppSideMenuProps = {
+    organizationId?: string;
+};
+
+export default function AppSideMenu({ organizationId } : AppSideMenuProps) {
     const { t: tMap } = useTranslation("Map");
     const { t: tMedia } = useTranslation("Media");
     const { t: tOrganization } = useTranslation("Organization");
@@ -23,6 +28,25 @@ export default function AppSideMenu() {
         }),
         size: "lg",
     };
+
+    // Appel à l'API
+    const { data: organizationsResponse } = api.organization.useGetOrganizationsMe(
+        {
+            query: {
+                // Évite les erreurs typescript en vérifiant le bon retour
+                select: (response) => {
+                    if (response.status === 200) {
+                        return response.data
+                    }
+                    else {
+                        return undefined
+                    }
+                },
+            },
+        },
+    );
+
+    const organizations = (organizationsResponse ?? []);
 
     return (
         <SideMenu
@@ -147,6 +171,11 @@ export default function AppSideMenu() {
                     expandedByDefault: true,
                     isActive: route.name === routes.organization_list().name,
                 },
+                ...organizations.map((organization) => ({
+                    text: organization.name,
+                    linkProps: routes.organization_info({ organizationId: organization.public_id || ""}).link,
+                    isActive: organizationId === organization.public_id,
+                })),
             ]}
             classes={{
                 root: classes.root,

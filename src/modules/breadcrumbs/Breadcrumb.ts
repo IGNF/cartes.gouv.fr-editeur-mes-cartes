@@ -26,12 +26,21 @@ const getBreadcrumb = (route: Route<typeof routes>): BreadcrumbProps | undefined
         currentPageLabel: t("media_list"),
     };
 
+    const organizationProp: BreadcrumbProps = {
+        homeLinkProps: routes.home().link,
+        // segments: [{ label: t("dashboard"), linkProps: routes.dashboard().link }],
+        segments: [],
+        currentPageLabel: t("organization_list"),
+    };
+
     switch (route.name) {
         // case "home":
         case "map_list":
             return { ...mapProps, currentPageLabel: t(route.name) };
         case "media_list":
             return { ...mediaProp, currentPageLabel: t(route.name) };
+        case "organization_list":
+            return {...organizationProp, currentPageLabel: t(route.name)}
 
         default:
             return undefined;

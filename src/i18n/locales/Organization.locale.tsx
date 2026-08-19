@@ -21,27 +21,27 @@ const { i18n } = declareComponentKeys<
 export type I18n = typeof i18n;
 
 export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
-    "organizations": "Équipes",
-    "organization-list": "Mes équipes",
-    "organization-list__description": "Gérer mes équipes",
+    "organizations": "Espaces de travail",
+    "organization-list": "Mes espaces de travail",
+    "organization-list__description": "Gérer mes espaces de travail",
     "user-role": (role) => {
         switch (role) {
             case UserRole.OWNER:
-                return "Propriétaire";
+                return "Admin";
             case UserRole.MEMBER:
-                return "Membre";
+                return "Consultation";
             case UserRole.EDITOR:
-                return "Éditeur";
+                return "Édition";
             default:
                 return "";
         }
     },
-    "no-corresponding-organization__title": "Aucune équipe correspondante",
-    "no-corresponding-organization__description": "Aucune équipe ne correspond à vos filtres.",
-    "add-organization": "Ajouter une équipe",
+    "no-corresponding-organization__title": "Aucun espace de travail correspondant",
+    "no-corresponding-organization__description": "Aucun espace de travail ne correspond à vos filtres.",
+    "add-organization": "Ajouter un espace de travail",
     "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
-    "delete-organization": "Supprimer l'équipe",
-    "delete-organization--message": ({ name }) => <>Êtes-vous sûr de vouloir supprimer cette équipe
+    "delete-organization": "Supprimer l'espace de travail",
+    "delete-organization--message": ({ name }) => <>Êtes-vous sûr de vouloir supprimer cet espace
         {name ? <> (<em>{ name }</em>)</> : ""} ?
         <b> Cette action est irréversible.</b></>,
     "inactive": "Inactif",

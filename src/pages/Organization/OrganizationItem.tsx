@@ -10,12 +10,12 @@ import { UserRole } from "@/types/UserRole";
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
-type MapItemProps = {
+type OrganizationItemProps = {
     organization: GetOrganizationsMe200Item,
     footer: ReactNode
 };
 
-const MapItem: FC<MapItemProps> = ({ organization, footer }) => {
+const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) => {
     const { t } = useTranslation("Organization");
     // En réalité, correspond à une image
     const imageUrl = useImage(organization.profile_picture);
@@ -72,5 +72,5 @@ const MapItem: FC<MapItemProps> = ({ organization, footer }) => {
     );
 };
 
-MapItem.displayName = symToStr({ MapItem });
-export default MapItem;
+OrganizationItem.displayName = symToStr({ OrganizationItem });
+export default OrganizationItem;

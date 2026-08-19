@@ -13,7 +13,7 @@ export const externalUrls = {
     helpUserGuideCreateKeys: appRoot + "/aide/fr/guides-utilisateur/creation-des-cles-et-integration-sig/",
     helpUserGuideCreateMap: appRoot + "/aide/fr/guides-utilisateur/creer-une-carte/",
     maps: appRoot + "/explorer-les-cartes",
-    map_list: appRoot + "/mes-cartes",
+    map_list: appRoot + "/cartes",
     contact_us: appRoot + "/aide/fr/nous-ecrire",
     discover_cartesgouvfr: appRoot + "/decouvrir",
     catalogue: appRoot + "/rechercher-une-donnee/search",

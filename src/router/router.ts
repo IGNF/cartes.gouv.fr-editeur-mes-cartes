@@ -38,7 +38,7 @@ const mapRoutes = {
             query: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => ["/mes-cartes"]
+        () => ["/cartes"]
     ),
     create_map: defineRoute(`${appRoot}/creer-une-carte`),
 }
@@ -50,9 +50,16 @@ const mediaRoutes = {
             limit: param.query.optional.number.default(10),
             query: param.query.optional.string,
         },
-        () => ["/mes-images"]
+        () => ["/images"]
     ),
 }
+
+const organizationRoute = defineRoute(
+    {
+        organizationId: param.path.string,
+    },
+    (p) => [`/equipes/${p.organizationId}`]
+);
 
 const organizationRoutes = {
     organization_list: defineRoute(
@@ -61,8 +68,11 @@ const organizationRoutes = {
             limit: param.query.optional.number.default(10),
             query: param.query.optional.string,
         },
-        () => ["/mes-equipes"]
+        () => ["/equipes"]
     ),
+    organization_maps: organizationRoute.extend("/cartes"),
+    organization_members: organizationRoute.extend("/membres"),
+    organization_info: organizationRoute.extend("/infos"),
 }
 
 // Chemin vers les sources utiles
