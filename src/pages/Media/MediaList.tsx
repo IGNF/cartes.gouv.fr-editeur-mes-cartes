@@ -130,9 +130,7 @@ export default function MediaList() {
     const { classes, cx } = useStyles();
 
     return (
-        <ListMain title={t("media-list")}>
-            <PageTitle title={t("media-list")}>
-            </PageTitle>
+        <>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
                 <div
                     className={fr.cx("fr-col-12", "fr-py-0")}
@@ -339,7 +337,7 @@ export default function MediaList() {
                 </shareMediaModal.Component>,
                 document.body
             )}
-        </ListMain>
+        </>
     );
 };
 

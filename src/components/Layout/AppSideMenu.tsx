@@ -13,7 +13,7 @@ type AppSideMenuProps = {
     organizationId?: string;
 };
 
-export default function AppSideMenu({ organizationId } : AppSideMenuProps) {
+export default function AppSideMenu({ organizationId }: AppSideMenuProps) {
     const { t: tMap } = useTranslation("Map");
     const { t: tMedia } = useTranslation("Media");
     const { t: tOrganization } = useTranslation("Organization");
@@ -47,6 +47,18 @@ export default function AppSideMenu({ organizationId } : AppSideMenuProps) {
     );
 
     const organizations = (organizationsResponse ?? []);
+    // Tri par nom
+    organizations.sort((orgA, orgB) => {
+        if (orgA.name && orgB.name) {
+            return orgA.name.toUpperCase().localeCompare(
+                orgB.name.toUpperCase(),
+                "fr",
+                { ignorePunctuation: true }
+            );
+        }
+        // Sinon retourne 0 (pas de changement)
+        return 0;
+    });
 
     return (
         <SideMenu
@@ -173,7 +185,7 @@ export default function AppSideMenu({ organizationId } : AppSideMenuProps) {
                 },
                 ...organizations.map((organization) => ({
                     text: organization.name,
-                    linkProps: routes.organization_info({ organizationId: organization.public_id || ""}).link,
+                    linkProps: routes.organization_maps({ organizationId: organization.public_id || "" }).link,
                     isActive: organizationId === organization.public_id,
                 })),
             ]}

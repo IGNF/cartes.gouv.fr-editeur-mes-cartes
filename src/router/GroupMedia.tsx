@@ -4,6 +4,7 @@ import { Route } from "type-route";
 import { groups } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import AppLayout from "@/components/Layout/AppLayout";
+import MediaLayout from "@/pages/Media/MediaLayout";
 
 const MediaList = lazy(() => import("@/pages/Media/MediaList"));
 
@@ -18,7 +19,10 @@ function GroupMedia(props: GroupAppProps) {
         switch (route.name) {
             case "media_list":
                 return {
-                    render: <MediaList />,
+                    render:
+                        <MediaLayout>
+                            <MediaList />
+                        </MediaLayout>,
                 };
             default:
                 return undefined;

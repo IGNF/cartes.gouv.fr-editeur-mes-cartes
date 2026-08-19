@@ -100,9 +100,13 @@ export default function MapList({ organizationId }: MapListProps) {
     const routeParams = useMapRouteParams();
     const offset = (routeParams.page - 1) * (routeParams.limit);
 
+    // Contexte de recherche
+    const context = organizationId ? "organization" : "profile";
+
+    console.log(routeParams)
     // Appel à l'API
     const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useGetMaps(
-        { ...routeParams, offset: offset, context: "profile", organization: organizationId },
+        { ...routeParams, offset: offset, context: context, organization: organizationId },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
@@ -165,9 +169,7 @@ export default function MapList({ organizationId }: MapListProps) {
     const { classes, cx } = useStyles();
 
     return (
-        <ListMain title="Mes cartes">
-            <PageTitle title={t("map-list")}>
-            </PageTitle>
+        <>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
                 <div
                     className={fr.cx("fr-col-12", "fr-py-0")}
@@ -413,7 +415,7 @@ export default function MapList({ organizationId }: MapListProps) {
                 </shareMapModal.Component>,
                 document.body
             )}
-        </ListMain>
+        </>
     );
 };
 

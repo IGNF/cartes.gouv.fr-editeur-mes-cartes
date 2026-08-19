@@ -4,6 +4,7 @@ import { Route } from "type-route";
 import { groups } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import AppLayout from "@/components/Layout/AppLayout";
+import MapLayout from "@/pages/Map/MapLayout";
 
 const MapList = lazy(() => import("@/pages/Map/MapList"));
 
@@ -18,7 +19,10 @@ function GroupMap(props: GroupAppProps) {
         switch (route.name) {
             case "map_list":
                 return {
-                    render: <MapList />,
+                    render:
+                        <MapLayout>
+                            <MapList />
+                        </MapLayout>,
                 };
             default:
                 return undefined;

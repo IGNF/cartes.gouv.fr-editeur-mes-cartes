@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+// import Badge, { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import ButtonsGroup, { ButtonsGroupProps } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { ReactNode } from "react";
 import { useStyles } from "tss-react";
@@ -6,6 +7,7 @@ import { useStyles } from "tss-react";
 interface IPageTitleProps {
     buttons?: ButtonsGroupProps.Common["buttons"];
     children?: ReactNode;
+    // badgeProps?: BadgeProps;
     showButtons?: boolean;
     title: ReactNode;
 }
@@ -23,6 +25,9 @@ function PageTitle(props: IPageTitleProps) {
                     })}
                 >
                     {title}
+                    {/* {badgeProps && (
+                        <Badge {...badgeProps}></Badge>
+                    )} */}
                 </h1>
                 {children}
             </div>

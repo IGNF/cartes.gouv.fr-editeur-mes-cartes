@@ -3,6 +3,7 @@ import { symToStr } from "tsafe/symToStr";
 import { api } from "@/api";
 import PageNotFound from "../error/PageNotFound";
 import { OrganizationLayoutChildrenProps } from "./OrganizationLayout";
+import MapList from "@/pages/Map/MapList";
 
 const OrganizationMaps: FC<OrganizationLayoutChildrenProps> = ({ organizationId, role }) => {
     const { data: organization } = api.organization.useGetOrganizationsById(
@@ -25,9 +26,9 @@ const OrganizationMaps: FC<OrganizationLayoutChildrenProps> = ({ organizationId,
 
     return (
         organization && organization.public_id ? (
-            <div>
-                <p>Cartes</p>
-            </div>
+            <MapList organizationId={organization.public_id} >
+
+            </MapList>
 
         ) : (
             <PageNotFound />

@@ -26,16 +26,13 @@ function GroupOrganization(props: GroupAppProps) {
         switch (route.name) {
             case "organization_list":
                 return {
-                    render: <>
-                        <OrganizationList />,
-                    </>,
-
+                    render: <OrganizationList />,
                 };
             // Fallthrough intentionnel
             case "organization_maps":
                 return {
                     render: 
-                        <OrganizationLayout organizationId={route.params.organizationId} >
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
                             <OrganizationMaps organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,
@@ -43,8 +40,7 @@ function GroupOrganization(props: GroupAppProps) {
             case "organization_members":
                 return {
                     render:
-                        
-                        <OrganizationLayout organizationId={route.params.organizationId} >
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
                             <OrganizationMembers organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,
@@ -52,7 +48,7 @@ function GroupOrganization(props: GroupAppProps) {
             case "organization_info":
                 return {
                     render:
-                        <OrganizationLayout organizationId={route.params.organizationId} >
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
                             <OrganizationInfo organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,

@@ -7,6 +7,7 @@ import { FC, PropsWithChildren, ReactNode, memo } from "react";
 import OrganizationTertiaryNavigation from "./OrganizationTertiaryNavigation";
 import PageNotFound from "../error/PageNotFound";
 import { UserRole } from "@/types/UserRole";
+import { useTranslation } from "@/i18n";
 
 export interface OrganizationLayoutChildrenProps {
     organizationId: string,
@@ -17,7 +18,9 @@ export interface OrganizationLayoutProps extends OrganizationLayoutChildrenProps
     children: ReactNode
 };
 
-const OrganizationLayout: FC<PropsWithChildren<OrganizationLayoutProps>> = ({ organizationId, children }) => {
+const OrganizationLayout: FC<PropsWithChildren<OrganizationLayoutProps>> = ({ organizationId, role, children }) => {
+    const { t } = useTranslation("Organization");
+
     const { data: organization, isFetching, status } = api.organization.useGetOrganizationsById(
         organizationId,
         {
@@ -39,7 +42,8 @@ const OrganizationLayout: FC<PropsWithChildren<OrganizationLayoutProps>> = ({ or
         organization && organization.public_id ? (
             <OrganizationProvider organization={organization} isFetching={isFetching} status={status}>
                 <ListMain title={organization.name} organizationId={organization.public_id}>
-                    <PageTitle title={organization.name}>
+                    <PageTitle title={organization.name} >
+                        {role && <>Rôle : {t("user-role", role)} ({role})</>}
                     </PageTitle>
                     <OrganizationTertiaryNavigation organizationId={organization.public_id} />
                     {children}
