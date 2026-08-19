@@ -1,29 +1,10 @@
-import { Tag } from "@codegouvfr/react-dsfr/Tag";
-import Card from "@codegouvfr/react-dsfr/Card";
-import { FC, ReactNode } from "react";
-import { Table } from "@codegouvfr/react-dsfr/Table";
+import { FC } from "react";
 import { symToStr } from "tsafe/symToStr";
-
-import { useImage } from "@/hooks/useImage";
-import { GetOrganizationsMe200Item } from "@/api/model";
-import { useTranslation } from "@/i18n";
-import { UserRole } from "@/types/UserRole";
-import { fr } from "@codegouvfr/react-dsfr";
-import Badge from "@codegouvfr/react-dsfr/Badge";
 import { api } from "@/api";
-import ListMain from "@/components/Layout/ListMain";
-import PageTitle from "@/components/Layout/PageTitle";
 import PageNotFound from "../error/PageNotFound";
-import OrganizationTertiaryNavigation from "./OrganizationTertiaryNavigation";
+import { OrganizationLayoutChildrenProps } from "./OrganizationLayout";
 
-type OrganizationMapsProps = {
-    organizationId: string,
-    footer?: ReactNode
-};
-
-const OrganizationMaps: FC<OrganizationMapsProps> = ({ organizationId, footer }) => {
-    const { t } = useTranslation("Organization");
-
+const OrganizationMaps: FC<OrganizationLayoutChildrenProps> = ({ organizationId, role }) => {
     const { data: organization } = api.organization.useGetOrganizationsById(
         organizationId,
         {

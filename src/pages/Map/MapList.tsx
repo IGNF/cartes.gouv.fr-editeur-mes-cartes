@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import SearchBar from "@codegouvfr/react-dsfr/SearchBar";
 import SelectNext from "@codegouvfr/react-dsfr/SelectNext";
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useToggle } from "@mantine/hooks";
 import ListMain from "@/components/Layout/ListMain";

@@ -1,4 +1,3 @@
-import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import Card from "@codegouvfr/react-dsfr/Card";
 import { FC, ReactNode } from "react";
 import { symToStr } from "tsafe/symToStr";
@@ -27,14 +26,12 @@ const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) =
                 return fr.cx("fr-badge--green-bourgeon");
             case UserRole.MEMBER:
                 return fr.cx("fr-badge--green-emeraude");
-            case UserRole.OWNER:
+            case UserRole.EDITOR:
                 return fr.cx("fr-badge--blue-cumulus");
             default:
                 return "";
         }
     }
-
-    // const isOpen = useIsModalOpen(confirmDeleteMapModal);
 
     return (
         <>

@@ -259,7 +259,7 @@ export default function OrganizationList() {
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        linkProps={routes.organization_info({ organizationId: organization.public_id || "", }).link}
+                                                        linkProps={routes.organization_maps({ organizationId: organization.public_id || "", }).link}
                                                     >
                                                         {tCommon("see")}
                                                     </Button>

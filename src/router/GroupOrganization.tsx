@@ -8,31 +8,35 @@ import OrganizationInfo from "@/pages/Organization/OrganizationInfo";
 import OrganizationMaps from "@/pages/Organization/OrganizationMaps";
 import OrganizationMembers from "@/pages/Organization/OrganizationMembers";
 import OrganizationLayout from "@/pages/Organization/OrganizationLayout";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const OrganizationList = lazy(() => import("@/pages/Organization/OrganizationList"));
 
 interface GroupAppProps {
-    route: Route<typeof groups.organization | typeof groups.public>;
+    route: Route<typeof groups.organization>;
 }
 
 function GroupOrganization(props: GroupAppProps) {
     const { route } = props;
+    const organizationId = "organizationId" in route.params ? route.params.organizationId : undefined;
+    const role = useUserRole(organizationId);
 
     const content: { render: JSX.Element } | undefined = useMemo(() => {
+
         switch (route.name) {
             case "organization_list":
                 return {
-                    // render: <OrganizationList />,
                     render: <>
                         <OrganizationList />,
                     </>,
 
                 };
+            // Fallthrough intentionnel
             case "organization_maps":
                 return {
                     render: 
                         <OrganizationLayout organizationId={route.params.organizationId} >
-                            <OrganizationMaps organizationId={route.params.organizationId} />
+                            <OrganizationMaps organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,
                 };
@@ -41,7 +45,7 @@ function GroupOrganization(props: GroupAppProps) {
                     render:
                         
                         <OrganizationLayout organizationId={route.params.organizationId} >
-                            <OrganizationMembers organizationId={route.params.organizationId} />
+                            <OrganizationMembers organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,
                 };
@@ -49,14 +53,14 @@ function GroupOrganization(props: GroupAppProps) {
                 return {
                     render:
                         <OrganizationLayout organizationId={route.params.organizationId} >
-                            <OrganizationInfo organizationId={route.params.organizationId} />
+                            <OrganizationInfo organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
                     ,
                 };
             default:
                 return undefined;
         }
-    }, [route]);
+    }, [route, role]);
 
     if (!content) {
         return <PageNotFoundWithLayout />;
