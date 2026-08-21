@@ -164,7 +164,7 @@ export default function MediaList() {
                         label={tCommon("search")}
                         onButtonClick={(text) => {
                             if (!isLoading) {
-                                routes.media_list({ ...routeParams, query: text }).push();
+                                routes.media_list({ ...routeParams, search: text }).push();
                             }
                         }}
                         allowEmptySearch={true}

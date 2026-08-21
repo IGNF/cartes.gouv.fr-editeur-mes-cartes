@@ -1417,6 +1417,13 @@ components:
       minItems: 4
     Map_add:
       description: "Objet carte à envoyer lors d'ajout / modification d'une carte"
+      required:
+        - title
+        - theme_id
+        - type
+        - premium
+        - active
+        - bbox
       properties:
         title:
           description: 'Titre de la carte'
@@ -1434,25 +1441,21 @@ components:
         premium:
           description: "Premium de la carte ('default', 'edugeo')"
           type: string
-          default: default
         organization_id:
           description: "Identifiant public de l'organisation."
           type: string
-          nullable: true
-          default: 'null'
         active:
           description: 'Carte active (par ex : terminée ou non)'
           type: boolean
         share:
           description: "Publication de la carte ('atlas', 'public', 'private').\nSi 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner"
           type: string
-          default: private
+          default: public
         bbox:
           $ref: '#/components/schemas/Bbox'
         img_url:
-          description: "Url de l'image illustrant la carte"
+          description: "Url de l'image illustrant la carte. Peut être une chaîne vide."
           type: string
-          format: uri
           nullable: true
         creator_id:
           description: 'Identifiant public du créateur (si la carte est dans une organisation)'
@@ -1460,6 +1463,31 @@ components:
       type: object
     Map_list:
       description: "Description d'une carte avec ses métadonnées"
+      required:
+        - title
+        - title_url
+        - description
+        - theme
+        - theme_id
+        - organization
+        - organization_id
+        - organization_name
+        - type
+        - premium
+        - active
+        - valid
+        - created_at
+        - updated_at
+        - nb_view
+        - img_url
+        - share
+        - bbox
+        - user
+        - user_id
+        - author
+        - author_id
+        - view_id
+        - view_url
       properties:
         title:
           description: 'Titre de la carte'
@@ -1479,6 +1507,10 @@ components:
           description: 'Id du thème'
           type: integer
           nullable: true
+        organization:
+          description: "Nom de l'organisation"
+          type: string
+          nullable: true
         organization_id:
           description: "Identifiant de l'organisation"
           type: string
@@ -1491,6 +1523,12 @@ components:
         premium:
           description: "Premium de la carte ('default', 'edugeo')"
           type: string
+        active:
+          description: 'Carte active'
+          type: boolean
+        valid:
+          description: 'Carte valide'
+          type: boolean
         created_at:
           description: 'Date de création de la carte'
           type: string
@@ -1503,9 +1541,8 @@ components:
           description: 'Nombre total de vues'
           type: integer
         img_url:
-          description: "URI de l'image"
+          description: "URI de l'image. Peut être une chaîne vide."
           type: string
-          format: uri
           nullable: true
         share:
           description: "Publication de la carte ('atlas', 'public', 'private')"
@@ -1518,35 +1555,46 @@ components:
         view_url:
           description: 'Lien vers la visualisation de la carte'
           type: string
+          format: uri
         edit_id:
-          description: 'Si auteur de la carte'
+          description: "Id utilisé pour l'édition, renvoyé uniquement si l'utilisateur peut éditer la carte"
+          type: string
+          nullable: true
+        user:
+          description: 'Nom public du dernier éditeur de la carte'
+          type: string
+        user_id:
+          description: 'Identifiant public du dernier éditeur de la carte'
           type: string
         author:
-          description: "Public_id de l'auteur de la carte"
+          description: "Nom public de l'auteur de la carte"
+          type: string
+        author_id:
+          description: "Identifiant public de l'auteur de la carte"
           type: string
       type: object
     Map_view:
       description: "Description d'une carte avec ses métadonnées et les liens de modification / visualisation"
-      type: object
       allOf:
         -
           $ref: '#/components/schemas/Map_list'
         -
+          required:
+            - data_url
           properties:
             data_url:
               description: 'lien vers le contenu de la carte'
               type: string
               format: uri
             data_edit_url:
-              description: "lien vers l'édition du contenu de la carte, si auteur de la carte"
+              description: "lien vers l'édition du contenu de la carte, renvoyé uniquement si l'utilisateur peut éditer la carte"
               type: string
               format: uri
+              nullable: true
             editor:
-              description: 'utilisateur qui a modifié le contenu, renvoyé si auteur de la carte'
+              description: "utilisateur qui a modifié le contenu, renvoyé uniquement si l'utilisateur peut éditer la carte"
               type: string
-            creator_id:
-              description: "identifiant de l'utilisateur qui a créé le contenu, renvoyé si auteur de la carte"
-              type: string
+              nullable: true
           type: object
     Media:
       description: media
@@ -1711,20 +1759,173 @@ components:
                 format: uri
             type: object
       type: object
+    MapResearchItem:
+      description: "Carte renvoyée dans les résultats de recherche. Cet objet est construit depuis une requête SQL, et non directement depuis le normalizer d'entité Map."
+      required:
+        - type
+        - title
+        - description
+        - updated_at
+        - nb_view
+        - img_url
+        - organization_id
+        - organization_name
+        - user
+        - user_id
+        - theme
+        - theme_id
+        - share
+        - premium
+        - valid
+        - active
+        - title_url
+        - view_id
+        - view_url
+        - bbox
+      properties:
+        type:
+          description: "Type de la carte ('macarte', 'storymap')"
+          type: string
+        title:
+          description: 'Titre de la carte'
+          type: string
+        description:
+          description: 'Description de la carte'
+          type: string
+          nullable: true
+        updated_at:
+          description: 'Dernière date de mise à jour de la carte'
+          type: string
+          format: date-time
+        nb_view:
+          description: 'Nombre total de vues'
+          type: integer
+        img_url:
+          description: "URL de l'image illustrant la carte. Peut être une chaîne vide."
+          type: string
+          nullable: true
+        organization_id:
+          description: "Identifiant public de l'organisation"
+          type: string
+          nullable: true
+        organization_name:
+          description: "Nom de l'organisation"
+          type: string
+          nullable: true
+        user:
+          description: "Nom public de l'auteur de la carte"
+          type: string
+        user_id:
+          description: "Identifiant public de l'auteur de la carte"
+          type: string
+        theme:
+          description: 'Thème lié à la carte'
+          type: string
+          nullable: true
+        theme_id:
+          description: 'Id du thème'
+          type: integer
+          nullable: true
+        share:
+          description: "Publication de la carte ('atlas', 'public', 'private')"
+          type: string
+        premium:
+          description: "Premium de la carte ('default', 'edugeo')"
+          type: string
+          nullable: true
+        valid:
+          description: 'Carte valide'
+          type: boolean
+        active:
+          description: 'Carte active'
+          type: boolean
+        title_url:
+          description: 'Titre de la carte, adapté pour être utilisé dans les URLs'
+          type: string
+        view_id:
+          description: 'Id utilisé pour la visualisation'
+          type: string
+        view_url:
+          description: 'Lien vers la visualisation de la carte'
+          type: string
+          format: uri
+        bbox:
+          $ref: '#/components/schemas/Bbox'
+        edit_id:
+          description: "Id utilisé pour l'édition, renvoyé uniquement en contexte profile"
+          type: string
+          nullable: true
+        edit_url:
+          description: "Lien vers l'édition de la carte, renvoyé uniquement en contexte profile"
+          type: string
+          format: uri
+          nullable: true
+      type: object
+    MapResearchTheme:
+      description: 'Agrégat du nombre de cartes par thème dans les résultats de recherche'
+      required:
+        - theme
+        - count
+      properties:
+        theme:
+          description: "Nom du thème, ou 'undefined' pour les cartes sans thème"
+          type: string
+        count:
+          description: 'Nombre de cartes'
+          type: integer
+      type: object
+    MapResearchOrganization:
+      description: 'Agrégat du nombre de cartes par organisation dans les résultats de recherche'
+      required:
+        - organization
+        - public_id
+        - count
+      properties:
+        organization:
+          description: "Nom de l'organisation, ou chaîne vide pour les cartes hors organisation"
+          type: string
+        public_id:
+          description: "Identifiant public de l'organisation, ou chaîne vide pour les cartes hors organisation"
+          type: string
+        count:
+          description: 'Nombre de cartes'
+          type: integer
+      type: object
     Map_research:
       description: 'Recherche des cartes'
+      required:
+        - maps
+        - themes
+        - organizations
+        - users
+        - types
+        - premiums
+        - actives
+        - valides
+        - shares
+        - query
+        - count
+        - limit
+        - offset
       properties:
         maps:
           type: array
           items:
-            $ref: '#/components/schemas/Map_list'
+            $ref: '#/components/schemas/MapResearchItem'
         themes:
           type: array
           items:
-            $ref: '#/components/schemas/Theme'
+            $ref: '#/components/schemas/MapResearchTheme'
+        organizations:
+          type: array
+          items:
+            $ref: '#/components/schemas/MapResearchOrganization'
         users:
           type: array
           items:
+            required:
+              - user
+              - count
             properties:
               user:
                 description: "Nom public de l'utilisateur"
@@ -1736,6 +1937,9 @@ components:
         types:
           type: array
           items:
+            required:
+              - type
+              - count
             properties:
               type:
                 description: 'Nom du type'
@@ -1747,6 +1951,9 @@ components:
         premiums:
           type: array
           items:
+            required:
+              - premium
+              - count
             properties:
               premium:
                 description: 'Nom du premium'
@@ -1758,6 +1965,9 @@ components:
         actives:
           type: array
           items:
+            required:
+              - active
+              - count
             properties:
               active:
                 description: 'booléen indiquant active/inactive'
@@ -1769,6 +1979,9 @@ components:
         valides:
           type: array
           items:
+            required:
+              - valid
+              - count
             properties:
               valid:
                 description: 'booléen indiquant valide/invalide'
@@ -1780,6 +1993,9 @@ components:
         shares:
           type: array
           items:
+            required:
+              - share
+              - count
             properties:
               share:
                 description: 'Publication de la carte'
@@ -1795,8 +2011,9 @@ components:
           description: 'Nombre de cartes correspondant à la recherche'
           type: integer
         limit:
-          description: 'Nombre de cartes reçues dans la requete'
+          description: 'Nombre de cartes reçues dans la requête. Peut être null lorsque toutes les cartes sont demandées.'
           type: integer
+          nullable: true
         offset:
           description: 'Nombre de cartes à passer avant de les inclure dans la requete'
           type: integer

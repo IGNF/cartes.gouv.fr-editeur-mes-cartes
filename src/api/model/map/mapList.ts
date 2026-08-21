@@ -12,52 +12,70 @@ import type { Bbox } from "./bbox";
  */
 export interface MapList {
     /** Titre de la carte */
-    title?: string;
+    title: string;
     /** Titre de la carte, adapté pour etre utilisé dans les url */
-    title_url?: string;
+    title_url: string;
     /**
      * Description de la carte
      * @nullable
      */
-    description?: string | null;
+    description: string | null;
     /**
      * Thème lié à la carte
      * @nullable
      */
-    theme?: string | null;
+    theme: string | null;
     /**
      * Id du thème
      * @nullable
      */
-    theme_id?: number | null;
-    /** Identifiant de l'organisation */
-    organization_id?: string;
-    /** Nom de l'organisation */
-    organization_name?: string;
-    /** Type de la carte ('macarte', 'mesadresses', statistic', storymap') */
-    type?: string;
-    /** Premium de la carte ('default', 'edugeo') */
-    premium?: string;
-    /** Date de création de la carte */
-    created_at?: string;
-    /** Dernière date de mise à jour de la carte */
-    updated_at?: string;
-    /** Nombre total de vues */
-    nb_view?: number;
+    theme_id: number | null;
     /**
-     * URI de l'image
+     * Nom de l'organisation
      * @nullable
      */
-    img_url?: string | null;
+    organization: string | null;
+    /** Identifiant de l'organisation */
+    organization_id: string;
+    /** Nom de l'organisation */
+    organization_name: string;
+    /** Type de la carte ('macarte', 'mesadresses', statistic', storymap') */
+    type: string;
+    /** Premium de la carte ('default', 'edugeo') */
+    premium: string;
+    /** Carte active */
+    active: boolean;
+    /** Carte valide */
+    valid: boolean;
+    /** Date de création de la carte */
+    created_at: string;
+    /** Dernière date de mise à jour de la carte */
+    updated_at: string;
+    /** Nombre total de vues */
+    nb_view: number;
+    /**
+     * URI de l'image. Peut être une chaîne vide.
+     * @nullable
+     */
+    img_url: string | null;
     /** Publication de la carte ('atlas', 'public', 'private') */
-    share?: string;
-    bbox?: Bbox;
+    share: string;
+    bbox: Bbox;
     /** Id utilisé pour la visualisation */
-    view_id?: string;
+    view_id: string;
     /** Lien vers la visualisation de la carte */
-    view_url?: string;
-    /** Si auteur de la carte */
-    edit_id?: string;
-    /** Public_id de l'auteur de la carte */
-    author?: string;
+    view_url: string;
+    /**
+     * Id utilisé pour l'édition, renvoyé uniquement si l'utilisateur peut éditer la carte
+     * @nullable
+     */
+    edit_id?: string | null;
+    /** Nom public du dernier éditeur de la carte */
+    user: string;
+    /** Identifiant public du dernier éditeur de la carte */
+    user_id: string;
+    /** Nom public de l'auteur de la carte */
+    author: string;
+    /** Identifiant public de l'auteur de la carte */
+    author_id: string;
 }

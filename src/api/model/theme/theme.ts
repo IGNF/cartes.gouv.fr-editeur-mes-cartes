@@ -6,9 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type MapResearchValidesItem = {
-    /** booléen indiquant valide/invalide */
-    valid: boolean;
-    /** Nombre de cartes */
-    count: number;
-};
+/**
+ * Theme
+ */
+export interface Theme {
+    /** Id du thème */
+    id?: number;
+    /** Nom complet du thème */
+    name?: string;
+}

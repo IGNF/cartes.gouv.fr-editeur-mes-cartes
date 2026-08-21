@@ -8,7 +8,7 @@
 
 export type MapResearchActivesItem = {
     /** booléen indiquant active/inactive */
-    active?: boolean;
+    active: boolean;
     /** Nombre de cartes */
-    count?: number;
+    count: number;
 };

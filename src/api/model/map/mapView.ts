@@ -12,11 +12,15 @@ import type { MapList } from "./mapList";
  */
 export type MapView = MapList & {
     /** lien vers le contenu de la carte */
-    data_url?: string;
-    /** lien vers l'édition du contenu de la carte, si auteur de la carte */
-    data_edit_url?: string;
-    /** utilisateur qui a modifié le contenu, renvoyé si auteur de la carte */
-    editor?: string;
-    /** identifiant de l'utilisateur qui a créé le contenu, renvoyé si auteur de la carte */
-    creator_id?: string;
+    data_url: string;
+    /**
+     * lien vers l'édition du contenu de la carte, renvoyé uniquement si l'utilisateur peut éditer la carte
+     * @nullable
+     */
+    data_edit_url?: string | null;
+    /**
+     * utilisateur qui a modifié le contenu, renvoyé uniquement si l'utilisateur peut éditer la carte
+     * @nullable
+     */
+    editor?: string | null;
 };

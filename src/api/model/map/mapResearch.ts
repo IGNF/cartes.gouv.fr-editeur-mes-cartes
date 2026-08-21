@@ -5,11 +5,12 @@
  * Documentation OpenAPI de l'API MaCarte
  * OpenAPI spec version: 1.0.0
  */
-import type { Theme } from "../theme";
-import type { MapList } from "./mapList";
 import type { MapResearchActivesItem } from "./mapResearchActivesItem";
+import type { MapResearchItem } from "./mapResearchItem";
+import type { MapResearchOrganization } from "./mapResearchOrganization";
 import type { MapResearchPremiumsItem } from "./mapResearchPremiumsItem";
 import type { MapResearchSharesItem } from "./mapResearchSharesItem";
+import type { MapResearchTheme } from "./mapResearchTheme";
 import type { MapResearchTypesItem } from "./mapResearchTypesItem";
 import type { MapResearchUsersItem } from "./mapResearchUsersItem";
 import type { MapResearchValidesItem } from "./mapResearchValidesItem";
@@ -18,20 +19,24 @@ import type { MapResearchValidesItem } from "./mapResearchValidesItem";
  * Recherche des cartes
  */
 export interface MapResearch {
-    maps?: MapList[];
-    themes?: Theme[];
-    users?: MapResearchUsersItem[];
-    types?: MapResearchTypesItem[];
-    premiums?: MapResearchPremiumsItem[];
-    actives?: MapResearchActivesItem[];
-    valides?: MapResearchValidesItem[];
-    shares?: MapResearchSharesItem[];
+    maps: MapResearchItem[];
+    themes: MapResearchTheme[];
+    organizations: MapResearchOrganization[];
+    users: MapResearchUsersItem[];
+    types: MapResearchTypesItem[];
+    premiums: MapResearchPremiumsItem[];
+    actives: MapResearchActivesItem[];
+    valides: MapResearchValidesItem[];
+    shares: MapResearchSharesItem[];
     /** Mot(s) contenu(s) dans le titre, la description ou le theme des cartes */
-    query?: string;
+    query: string;
     /** Nombre de cartes correspondant à la recherche */
-    count?: number;
-    /** Nombre de cartes reçues dans la requete */
-    limit?: number;
+    count: number;
+    /**
+     * Nombre de cartes reçues dans la requête. Peut être null lorsque toutes les cartes sont demandées.
+     * @nullable
+     */
+    limit: number | null;
     /** Nombre de cartes à passer avant de les inclure dans la requete */
-    offset?: number;
+    offset: number;
 }

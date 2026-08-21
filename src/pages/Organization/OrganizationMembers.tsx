@@ -68,24 +68,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
     const tableId = useId();
     const { classes, cx } = useStyles();
 
-    //  <Table
-    //             caption={`Membres de l'espace ${organization.name}`}
-    //             headers={[
-    //                 "Nom",
-    //                 "Rôle"
-    //             ]}
-    //             data={[...(organization.members ?? [])]
-    //                 .sort((memberA, memberB) => {
-    //                     return (roleOrder[memberA.role || 2] ?? 999) - (roleOrder[memberB.role || 2] ?? 999);
-    //                 })
-    //                 .map((member) => [
-    //                     member.public_name,
-    //                     t('user-role', member.role as UserRole)
-    //                 ])}>
-
-    //         </Table>
-
-    // const isOpen = useIsModalOpen(confirmDeleteMapModal);
+    console.log("current member : ", currentMember);
 
     return (
         <>
@@ -179,22 +162,22 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                                             )}
                                                         </td>
                                                         <td>
-                                                        {role === UserRole.OWNER ?
-                                                            <Select
-                                                                label={undefined}
-                                                                nativeSelectProps={{
-                                                                    "aria-label": t("select-member__label")
-                                                                }}
-                                                                options={roleTypes.map(value => ({
-                                                                    value,
-                                                                    "label": t("user-role", value),
-                                                                    "selected": value === role
-                                                                }))}
-                                                            />
+                                                            {role === UserRole.OWNER ?
+                                                                <Select
+                                                                    label={undefined}
+                                                                    nativeSelectProps={{
+                                                                        "aria-label": t("select-member__label")
+                                                                    }}
+                                                                    options={roleTypes.map(value => ({
+                                                                        value,
+                                                                        "label": t("user-role", value),
+                                                                        "selected": value === role
+                                                                    }))}
+                                                                />
 
                                                                 : <>{t("user-role", member.role as UserRole)}</>
-                                                            
-                                                        }
+
+                                                            }
                                                         </td>
 
                                                         {role === UserRole.OWNER &&

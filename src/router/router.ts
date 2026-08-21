@@ -26,7 +26,8 @@ const mapRoutes = {
     ),
     edit_map: defineRoute(
         {
-            mapId: param.path.string
+            mapId: param.path.string,
+            organizationId: param.query.optional.string,
         },
         (p) => `${appRoot}/creer-une-carte/${p.mapId}`
     ),
@@ -35,7 +36,8 @@ const mapRoutes = {
         {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(10),
-            query: param.query.optional.string,
+            search: param.query.optional.string,
+            organizationId: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
         () => ["/cartes"]
@@ -48,7 +50,7 @@ const mediaRoutes = {
         {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(10),
-            query: param.query.optional.string,
+            search: param.query.optional.string,
         },
         () => ["/images"]
     ),
@@ -66,7 +68,7 @@ const organizationRoutes = {
         {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(10),
-            query: param.query.optional.string,
+            search: param.query.optional.string,
         },
         () => ["/equipes"]
     ),
@@ -75,6 +77,7 @@ const organizationRoutes = {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(10),
             search: param.query.optional.string,
+            theme: param.query.optional.string.default(""),
         },
         () => "/cartes"),
     organization_members: organizationRoute.extend(

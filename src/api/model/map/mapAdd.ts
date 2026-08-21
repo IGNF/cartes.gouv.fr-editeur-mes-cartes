@@ -12,33 +12,30 @@ import type { Bbox } from "./bbox";
  */
 export interface MapAdd {
     /** Titre de la carte */
-    title?: string;
+    title: string;
     /**
      * Description de la carte
      * @nullable
      */
     description?: string | null;
     /** identifiant du theme */
-    theme_id?: number;
+    theme_id: number;
     /** Type de la carte ('macarte', 'mesadresses', statistic', storymap') */
-    type?: string;
+    type: string;
     /** Premium de la carte ('default', 'edugeo') */
-    premium?: string;
-    /**
-     * Identifiant public de l'organisation.
-     * @nullable
-     */
-    organization_id?: string | null;
+    premium: string;
+    /** Identifiant public de l'organisation. */
+    organization_id?: string;
     /** Carte active (par ex : terminée ou non) */
-    active?: boolean;
+    active: boolean;
     /**
      * Publication de la carte ('atlas', 'public', 'private').
      * Si 'organization' est rempli, la valeur sera 'private' sauf si l'utilisateur connecté est owner
      */
     share?: string;
-    bbox?: Bbox;
+    bbox: Bbox;
     /**
-     * Url de l'image illustrant la carte
+     * Url de l'image illustrant la carte. Peut être une chaîne vide.
      * @nullable
      */
     img_url?: string | null;

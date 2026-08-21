@@ -17,12 +17,17 @@ import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
 import { usePrefetchQuery } from "@tanstack/react-query";
 import RQKeys from "@/modules/maps/RQKeys";
-import { type MapList as MapListType, Theme } from "@/api/model";
+import { MapResearchItem, Theme, UserView } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
 import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
 import NoMap from "./NoMap";
+import { UserRole } from "@/types/UserRole";
+import type { Route } from "type-route";
+import { useEditorUser } from "@/hooks/useEditorUser";
+import { useOrganizationMaps } from "@/hooks/useOrganizationMaps";
+import { ShareDefinition } from "../Media/ShareDefinition";
 
 /**
  * Élément dans l'URL de recherche
@@ -31,14 +36,23 @@ type MapRouteParams = {
     page: number,
     limit: number,
     theme: string,
-    query: string,
+    search: string,
+    organizationId?: string // Seulement dans le cas de l'équipe
 }
 
 type MapListProps = {
     organizationId?: string,
-    role?: string,
+    role?: UserRole,
 }
 
+type canDeleteProps = {
+    map: MapResearchItem,
+    user?: UserView,
+    role?: UserRole,
+    organizationId?: string
+}
+
+// Modales
 const confirmDeleteMapModal = createModal({
     id: "confirm-delete-map-modal",
     isOpenedByDefault: false,
@@ -54,6 +68,28 @@ const confirmCopyMapModal = createModal({
     isOpenedByDefault: false,
 });
 
+/**
+ * Permet de choisir la bonne route selon l'endroit où se situe le composant
+ * (Soit cartes d'un espace de travail, soit cartes personnels)
+ */
+function getMapListRoute(route: Route<typeof routes>, params: MapRouteParams) {
+    const queryParams = {
+        page: params.page,
+        limit: params.limit,
+        search: params.search || undefined,
+        theme: params.theme || undefined,
+    };
+
+    if (route.name === "organization_maps") {
+        return routes.organization_maps({
+            ...queryParams,
+            organizationId: route.params.organizationId,
+        });
+    }
+
+    return routes.map_list(queryParams);
+}
+
 /** 
  * Permet de récupérer les paramètres dans l'URL
  */
@@ -63,32 +99,51 @@ function useMapRouteParams(): MapRouteParams {
     const page = route.params?.["page"] ?? 1;
     const limit = parseInt(route.params?.["limit"]) ?? 10;
     const theme = route.params?.["theme"] ?? "";
-    const query = route.params?.["query"] ?? "";
+    const search = route.params?.["search"] ?? "";
+    const organizationId = route.params?.["organizationId"] ?? undefined;
 
-    return { page, limit, theme, query };
+    return { page, limit, theme, search, organizationId };
 };
 
-export default function MapList({ organizationId }: MapListProps) {
+/**
+ * Définit si un utilisateur peut supprimer une carte.
+ * Cela est le cas si l'une des conditions suivantes est respectée :
+ * - La carte appartient seulement à l'utilisateur, pas à une équipe;
+ * - La carte est dans une équipe et a les droits admin sur l'équipe;
+ * - La carte est dans une équipe, l'utilisateur a les droits
+ * d'édition sur l'équipe ET la carte lui appartient;
+ */
+function canDelete(props: canDeleteProps): boolean {
+    const { role, map, organizationId, user } = props;
+    const isNotOrganisation = !organizationId;
+    const isOwner = organizationId && role === UserRole.OWNER;
+    const isEditorAndAuthor = organizationId && role === UserRole.EDITOR && map.user_id === user?.public_id;
+    return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
+}
+
+export default function MapList({ role }: MapListProps) {
     // Traduction
     const { t } = useTranslation("Map");
     const { t: tCommon } = useTranslation("Common");
 
-
     // React states
-    const [openedMap, setOpenedMap] = useState<MapListType>();
+    const [openedMap, setOpenedMap] = useState<MapResearchItem>();
     const [mapCount, setMapCount] = useState(0);
 
     // Appelé plus tard dans la modale
     const deleteMapMutation = api.map.useDeleteMapByEditId({
         mutation: {
             onSuccess: () => {
+                // TODO : AFFICHER MESSAGE VALIDATION ?
                 refetch();
-                confirmDeleteMapModal.close();
             },
             onError: error => {
+                // TODO : AFFICHER MESSAGE ERREUR ?
                 console.error(error);
             },
             onMutate: (args) => {
+                // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
+                confirmDeleteMapModal.close();
                 console.log(args);
             }
         },
@@ -98,38 +153,24 @@ export default function MapList({ organizationId }: MapListProps) {
     // Param dans l'URL
     const routeParams = useMapRouteParams();
     const offset = (routeParams.page - 1) * (routeParams.limit);
+    const organizationId = routeParams.organizationId;
 
-    // Contexte de recherche
-    const context = organizationId ? "organization" : "profile";
+    const user = useEditorUser();
+    const route = useRoute();
 
-    console.log(routeParams)
-    // Appel à l'API
-    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.map.useGetMaps(
-        { ...routeParams, offset: offset, context: context, organization: organizationId },
-        {
-            query: {
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    console.log(response)
-                    if (response.status === 200 || response.status === 206) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
-                    }
-                },
-            },
-        },
-    );
+    // Envoi deux requêtes dans le cas d'une équipe
+    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = useOrganizationMaps(role, organizationId, { ...routeParams, query: routeParams.search, offset: offset })
+
+    const context = role === UserRole.MEMBER ? "organization" : "profile";
 
     // Va chercher les cartes de la page d'après
     // TODO : améliorer cela car pas l'air de fonctionner
+    const nextPageOffset = routeParams.page * routeParams.limit;
     usePrefetchQuery({
-        queryKey: RQKeys.maps({ ...routeParams, offset: routeParams.page * routeParams.limit }),
-        queryFn: ({ signal }) => api.map.getMaps({ ...routeParams, offset: routeParams.page * routeParams.limit }, { signal }),
+        queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
+        queryFn: ({ signal }) => api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
     });
 
-    // Thèmes disponible
     const { data: themesResponse } = api.theme.useGetThemes(
         {
             query: {
@@ -145,7 +186,7 @@ export default function MapList({ organizationId }: MapListProps) {
         },
     );
 
-    const themes = (themesResponse || []) as Theme[]
+    const themes = (themesResponse || []) as Theme[];
 
     // Cartes et nombre total de cartes
     const maps = (mapsResponse?.maps ?? []);
@@ -167,9 +208,12 @@ export default function MapList({ organizationId }: MapListProps) {
     // Pour classes css
     const { classes, cx } = useStyles();
 
+    // Pour voir si on affiche les filtres ou pas
+    const hasFilters = (themes.length > 1);
+
     return (
         <>
-            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
+            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", organizationId ? "fr-mb-4v" : "fr-mb-8v")}>
                 <div
                     className={fr.cx("fr-col-12", "fr-py-0")}
                     style={{
@@ -181,18 +225,23 @@ export default function MapList({ organizationId }: MapListProps) {
                     <Badge severity="info" noIcon={true}>
                         {mapCount}
                     </Badge>
-                    <Button
-                        linkProps={
-                            routes.create_map().link
-                        }
-                        iconId="fr-icon-add-line"
-                        iconPosition="right"
-                        className={fr.cx("fr-ml-auto")}
-                    >
-                        {t("create-map")}
-                    </Button>
+                    {role !== UserRole.MEMBER &&
+                        <Button
+                            linkProps={
+                                routes.create_map().link
+                            }
+                            iconId="fr-icon-add-line"
+                            iconPosition="right"
+                            className={fr.cx("fr-ml-auto")}
+                        >
+                            {t("create-map")}
+                        </Button>
+                    }
                 </div>
             </div>
+
+            {organizationId && <ShareDefinition />}
+
 
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-2v")}>
                 <div
@@ -207,23 +256,25 @@ export default function MapList({ organizationId }: MapListProps) {
                         label={tCommon("search")}
                         onButtonClick={(text) => {
                             if (!isLoading) {
-                                routes.map_list({ ...routeParams, query: text }).push();
+                                getMapListRoute(route, { ...routeParams, search: text, page: 1 }).push();
                             }
                         }}
                         allowEmptySearch={true}
                         renderInput={(props) => <input {...props} disabled={isLoading} />}
-                        defaultValue={routeParams.query}
+                        defaultValue={routeParams.search}
                     />
-                    <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
-                        Filtres
-                    </Button>
+                    {hasFilters &&
+                        <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
+                            Filtres
+                        </Button>
+                    }
                 </div>
             </div>
 
-            {showFilters && (
+            {(hasFilters && showFilters) && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
-                        {themes.length && <SelectNext
+                        {themes.length > 1 && <SelectNext
                             label={tCommon("filter-label")}
                             options={[
                                 { label: "Tous les thèmes", value: "" },
@@ -237,20 +288,18 @@ export default function MapList({ organizationId }: MapListProps) {
                                 onChange: (event) => {
                                     const value = event.target.value;
                                     if (value === "") {
-                                        routes
-                                            .map_list({
-                                                ...routeParams,
-                                                theme: undefined,
-                                                page: 1,
-                                            })
+                                        getMapListRoute(route, {
+                                            ...routeParams,
+                                            theme: "",
+                                            page: 1,
+                                        })
                                             .push();
                                     } else {
-                                        routes
-                                            .map_list({
-                                                ...routeParams,
-                                                theme: value,
-                                                page: 1,
-                                            })
+                                        getMapListRoute(route, {
+                                            ...routeParams,
+                                            theme: value,
+                                            page: 1,
+                                        })
                                             .push();
                                     }
                                 },
@@ -289,15 +338,19 @@ export default function MapList({ organizationId }: MapListProps) {
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
 
-                                                    <Button
+                                                    < Button
                                                         title={tCommon("delete")}
                                                         iconId='fr-icon-delete-bin-line'
                                                         size="small"
                                                         priority="tertiary"
                                                         onClick={() => {
                                                             setOpenedMap(map);
+                                                            console.log(map);
+                                                            console.log(user);
+                                                            console.log(map.user_id === user?.public_id)
                                                             confirmDeleteMapModal.open()
                                                         }}
+                                                        disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                     />
                                                     <Button
                                                         title={tCommon("duplicate")}
@@ -308,7 +361,9 @@ export default function MapList({ organizationId }: MapListProps) {
                                                             setOpenedMap(map);
                                                             confirmCopyMapModal.open()
                                                         }}
+                                                        disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                     />
+
                                                     <Button
                                                         title={tCommon("share")}
                                                         iconId='ri-share-2-line'
@@ -323,9 +378,13 @@ export default function MapList({ organizationId }: MapListProps) {
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        linkProps={routes.view_map({ mapId: map.view_id || "", }).link}
+                                                        linkProps={role !== UserRole.MEMBER ?
+                                                            routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
+                                                            :
+                                                            routes.view_map({ mapId: map.view_id || "" }).link
+                                                        }
                                                     >
-                                                        {tCommon("open")}
+                                                        {role !== UserRole.MEMBER ? tCommon("open") : tCommon("see")}
                                                     </Button>
                                                 </div>
                                             }
@@ -339,7 +398,7 @@ export default function MapList({ organizationId }: MapListProps) {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...routes.map_list({ ...routeParams, page: pageNumber })
+                                            ...getMapListRoute(route, { ...routeParams, page: pageNumber })
                                                 .link,
                                         })}
                                         defaultPage={routeParams.page}
@@ -366,7 +425,7 @@ export default function MapList({ organizationId }: MapListProps) {
                         {
                             children: tCommon("delete"),
                             onClick: () => {
-                                if (openedMap?.edit_id === undefined) {
+                                if (openedMap?.edit_id === undefined || openedMap?.edit_id === null) {
                                     return;
                                 }
                                 deleteMapMutation.mutate({ editId: openedMap.edit_id });
@@ -439,18 +498,4 @@ const useStyles = tss.withName({ MapList }).create({
         display: "flex",
         gap: fr.spacing("4v"),
     },
-
-    // filterApplyBtn: {
-    //     [fr.breakpoints.up("sm")]: {
-    //         flex: 0,
-    //         alignSelf: "flex-end",
-    //     },
-    // },
 });
-
-//  const useStyles = tss.withName({ MapItem }).create({
-//     footerBtnGroup: {
-//         display: "flex",
-//         gap: fr.spacing("4v"),
-//     },
-// });

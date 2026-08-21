@@ -136,7 +136,7 @@ export const commonFrTranslations: Translations<"fr">["Common"] = {
         if (total === 1) return "1 résultat affiché sur 1";
         return `${displayed} résultats affichés sur ${total}`;
     },
-    "welcome": ({username}) => `Bienvenue ${username}`,
+    "welcome": ({ username }) => `Bienvenue ${username}`,
 };
 
 export const commonEnTranslations: Translations<"en">["Common"] = {

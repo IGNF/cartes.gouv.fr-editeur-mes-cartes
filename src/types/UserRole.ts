@@ -5,4 +5,4 @@ export enum UserRole {
 }
 
 // UserRoles.constants.ts
-export const roleTypes = [UserRole.OWNER, UserRole.MEMBER, UserRole.EDITOR] as const;
+export const roleTypes = [UserRole.OWNER, UserRole.EDITOR, UserRole.MEMBER] as const;

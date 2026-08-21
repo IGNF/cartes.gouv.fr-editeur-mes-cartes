@@ -11,8 +11,6 @@ export default function OrganizationTertiaryNavigation(props: OrganizationTertia
     const { organizationId } = props;
     const { name: routeName } = useRoute();
 
-    console.log(organizationId)
-
     return (
         <TertiaryNavigation
             items={[

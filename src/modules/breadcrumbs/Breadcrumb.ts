@@ -13,8 +13,9 @@ const getBreadcrumb = (route: Route<typeof routes>, organization?: Organization)
         messages: { home: t("dashboard") },
     });
 
-    // 
-    const organizationSegment = "organizationId" in route.params ? {
+    // Nom de l'espace de travail
+    const isOrganizationDetailRoute = route.name === "organization_maps" || route.name === "organization_members" || route.name === "organization_info";
+    const organizationSegment = isOrganizationDetailRoute ? {
         label: organization?.name ?? route.params.organizationId,
         linkProps: routes.organization_maps({ organizationId: route.params.organizationId }).link,
     } : undefined;

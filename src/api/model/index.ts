@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./theme";
 export * from "./alreadyReportedResponse";
 export * from "./deletedResponse";
 export * from "./badRequestResponse";
@@ -22,4 +21,5 @@ export * from "./map";
 export * from "./media";
 export * from "./notifications";
 export * from "./organization";
+export * from "./theme";
 export * from "./user";

@@ -8,7 +8,7 @@
 
 export type MapResearchPremiumsItem = {
     /** Nom du premium */
-    premium?: string;
+    premium: string;
     /** Nombre de cartes */
-    count?: number;
+    count: number;
 };

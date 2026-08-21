@@ -8,7 +8,7 @@
 
 export type MapResearchSharesItem = {
     /** Publication de la carte */
-    share?: string;
+    share: string;
     /** Nombre de cartes */
-    count?: number;
+    count: number;
 };

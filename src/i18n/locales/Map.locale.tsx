@@ -1,6 +1,7 @@
 import { declareComponentKeys } from "@/i18n/i18n";
 
 import { Translations } from "@/i18n/types";
+import { formatDateWithoutTimeFromISO } from "@/utils";
 import { ReactNode } from "react";
 
 const { i18n } = declareComponentKeys<
@@ -19,6 +20,8 @@ const { i18n } = declareComponentKeys<
     | "share-map__iframe-hint"
     | "copy-map"
     | { K: "delete-map--message"; P: { fileName?: string }; R: ReactNode }
+    | { K: "updated-at"; P: { date: string }; R: ReactNode }
+    | { K: "updated-at-by"; P: { date: string, user: string }; R: ReactNode }
 >()("Map");
 export type I18n = typeof i18n;
 
@@ -40,6 +43,8 @@ export const MapFrTranslations: Translations<"fr">["Map"] = {
     "delete-map--message": ({ fileName }) => <>Êtes-vous sûr de vouloir supprimer
         {fileName ? <> la carte <em>{fileName}</em></> : "cette carte"} ?
         <b> Cette action est irréversible.</b></>,
+    "updated-at": ({ date }) => `Mise à jour le ${formatDateWithoutTimeFromISO(new Date(date).toISOString())}`,
+    "updated-at-by": ({ date, user }) => `Mise à jour le ${formatDateWithoutTimeFromISO(new Date(date).toISOString())}, par ${user}`,
 };
 
 export const MapEnTranslations: Translations<"en">["Map"] = {
@@ -58,4 +63,6 @@ export const MapEnTranslations: Translations<"en">["Map"] = {
     "share-map__iframe-hint": undefined,
     "copy-map": undefined,
     "delete-map--message": undefined,
+    "updated-at": undefined,
+    "updated-at-by": undefined,
 };
