@@ -9,6 +9,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { useImage } from "@/hooks/useImage";
 import { Share } from "@/types/Share";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type MapItemProps = {
     map: MapResearchItem,
@@ -60,6 +61,9 @@ const MapItem: FC<MapItemProps> = ({ map, footer }) => {
                     </ul>
                 }
                 footer={footer}
+                // Avec icônes + nb de vues
+                // detail={<><span className={fr.cx("fr-icon-eye-line", "fr-icon--sm", "fr-mr-0-5v")} aria-hidden="true"></span>{ map.nb_view}<span className={fr.cx("fr-icon-time-line", "fr-icon--sm", "fr-mx-1v")} aria-hidden="true"> </span>{map.organization_id ?
+                //     t("updated-at-by", { date: map.updated_at, user: map.user }) : t("updated-at", { date: map.updated_at })}
                 detail={map.organization_id ? t("updated-at-by", { date: map.updated_at, user: map.user }) : t("updated-at", { date: map.updated_at })}
                 size="small"
             />

@@ -39,7 +39,7 @@ import type {
     PostMapFileByEditIdBody,
 } from "../model";
 
-import { fetchWithAuth } from ".././fetchWithAuth";
+import { fetchWithAuth } from "../fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 

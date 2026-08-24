@@ -61,9 +61,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
 
     const members = organization?.members ?? [];
     const { search, searchedItems } = useSearch(members, "public_name");
-    console.log(search, searchedItems)
     const { paginatedItems, totalPages } = usePagination(searchedItems, page, limit);
-    console.log(paginatedItems, totalPages)
 
     const tableId = useId();
     const { classes, cx } = useStyles();

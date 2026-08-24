@@ -26,7 +26,7 @@ import { createPortal } from "react-dom";
 type MediaRouteParams = {
     page: number,
     limit: number,
-    query: string,
+    search: string,
 }
 
 const confirmDeleteMediaModal = createModal({
@@ -47,9 +47,9 @@ function useMediaRouteParams(): MediaRouteParams {
     const route = useRoute();
     const page = route.params?.["page"] ?? 1;
     const limit = parseInt(route.params?.["limit"]) ?? 10;
-    const query = route.params?.["query"] ?? "";
+    const search = route.params?.["search"] ?? "";
 
-    return { page, limit, query };
+    return { page, limit, search };
 };
 
 export default function MediaList() {
@@ -84,7 +84,7 @@ export default function MediaList() {
 
     // Appel à l'API
     const { data: mediasResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.media.useGetUserMedias(
-        { limit: routeParams.limit, name: routeParams.query, offset: offset },
+        { limit: routeParams.limit, name: routeParams.search, offset: offset },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
@@ -169,7 +169,7 @@ export default function MediaList() {
                         }}
                         allowEmptySearch={true}
                         renderInput={(props) => <input {...props} disabled={isLoading} />}
-                        defaultValue={routeParams.query}
+                        defaultValue={routeParams.search}
                     />
                     <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
                         Filtres

@@ -14,7 +14,6 @@ export function usePagination<T>(data: T[], page = 1, limit = 20): IUsePaginatio
     } else if (page < 1) {
         page = 1;
     }
-    console.log(page)
     return {
         paginatedItems: data?.slice((page - 1) * limit, page * limit),
         totalPages,

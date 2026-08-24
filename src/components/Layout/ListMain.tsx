@@ -18,7 +18,7 @@ export type ListMainProps = PropsWithChildren<
 };
 
 export default function ListMain(props: ListMainProps) {
-    const {children, customBreadcrumbProps, title, classes: propsClasses, organizationId } = props;
+    const { children, customBreadcrumbProps, title, classes: propsClasses, organizationId } = props;
 
     useHead({
         titleTemplate: "%s | cartes.gouv.fr",
@@ -31,7 +31,7 @@ export default function ListMain(props: ListMainProps) {
     return (
         <main id="main" role="main">
             <div className={propsClasses?.container ?? fr.cx("fr-container")}>
-                <div className={fr.cx("fr-grid-row")}>
+                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-grid-row--center")}>
                     <div
                         className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}
                     >
@@ -54,7 +54,9 @@ const useStyles = tss.withName({ ListMain }).create({
         display: "flex",
         flexDirection: "column",
         gap: fr.spacing("10v"),
-        borderRight: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
+        [fr.breakpoints.up("md")]: {
+            borderRight: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
+        }
     },
     content: {
         padding: "0 1rem",

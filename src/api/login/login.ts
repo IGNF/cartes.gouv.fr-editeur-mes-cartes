@@ -12,7 +12,7 @@ import { env } from "../../env";
 
 import type { Login, NotConnectedResponse, PostLogin401, PostLogin429, PostLoginParams, RefreshToken401, RefreshTokenParams } from "../model";
 
-import { fetchWithAuth } from ".././fetchWithAuth";
+import { fetchWithAuth } from "../fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 

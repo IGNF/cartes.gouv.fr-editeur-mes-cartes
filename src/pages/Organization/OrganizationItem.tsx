@@ -18,7 +18,6 @@ const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) =
     const { t } = useTranslation("Organization");
     // En réalité, correspond à une image
     const imageUrl = useImage(organization.profile_picture);
-    console.log(organization)
 
     const getBadgeColor = (role: UserRole): string => {
         switch (role) {

@@ -338,31 +338,32 @@ export default function MapList({ role }: MapListProps) {
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
 
-                                                    < Button
-                                                        title={tCommon("delete")}
-                                                        iconId='fr-icon-delete-bin-line'
-                                                        size="small"
-                                                        priority="tertiary"
-                                                        onClick={() => {
-                                                            setOpenedMap(map);
-                                                            console.log(map);
-                                                            console.log(user);
-                                                            console.log(map.user_id === user?.public_id)
-                                                            confirmDeleteMapModal.open()
-                                                        }}
-                                                        disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
-                                                    />
-                                                    <Button
-                                                        title={tCommon("duplicate")}
-                                                        iconId='ri-file-copy-line'
-                                                        size="small"
-                                                        priority="tertiary"
-                                                        onClick={() => {
-                                                            setOpenedMap(map);
-                                                            confirmCopyMapModal.open()
-                                                        }}
-                                                        disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
-                                                    />
+                                                    {role !== UserRole.MEMBER &&
+                                                        <>
+                                                            < Button
+                                                                title={tCommon("delete")}
+                                                                iconId='fr-icon-delete-bin-line'
+                                                                size="small"
+                                                                priority="tertiary"
+                                                                onClick={() => {
+                                                                    setOpenedMap(map);
+                                                                    confirmDeleteMapModal.open()
+                                                                }}
+                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                            />
+                                                            <Button
+                                                                title={tCommon("duplicate")}
+                                                                iconId='ri-file-copy-line'
+                                                                size="small"
+                                                                priority="tertiary"
+                                                                onClick={() => {
+                                                                    setOpenedMap(map);
+                                                                    confirmCopyMapModal.open()
+                                                                }}
+                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                            />
+                                                        </>
+                                                    }
 
                                                     <Button
                                                         title={tCommon("share")}

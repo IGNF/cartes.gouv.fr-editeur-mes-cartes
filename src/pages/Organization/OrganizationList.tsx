@@ -28,7 +28,7 @@ import { createPortal } from "react-dom";
 type OrganizationRouteParams = {
     page: number,
     limit: number,
-    query: string,
+    search: string,
 }
 
 const confirmDeleteOrganizationModal = createModal({
@@ -49,9 +49,9 @@ function useOrganizationRouteParams(): OrganizationRouteParams {
     const route = useRoute();
     const page = route.params?.["page"] ?? 1;
     const limit = parseInt(route.params?.["limit"]) ?? 10;
-    const query = route.params?.["query"] ?? "";
+    const search = route.params?.["search"] ?? "";
 
-    return { page, limit, query };
+    return { page, limit, search };
 };
 
 export default function OrganizationList() {
@@ -164,12 +164,12 @@ export default function OrganizationList() {
                         label={tCommon("search")}
                         onButtonClick={(text) => {
                             if (!isLoading) {
-                                routes.organization_list({ ...routeParams, query: text }).push();
+                                routes.organization_list({ ...routeParams, search: text }).push();
                             }
                         }}
                         allowEmptySearch={true}
                         renderInput={(props) => <input {...props} disabled={isLoading} />}
-                        defaultValue={routeParams.query}
+                        defaultValue={routeParams.search}
                     />
                     <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
                         Filtres

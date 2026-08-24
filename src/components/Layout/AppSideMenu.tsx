@@ -63,13 +63,7 @@ export default function AppSideMenu({ organizationId }: AppSideMenuProps) {
     return (
         <SideMenu
             title={
-                <div
-                    className={css({
-                        margin: `${fr.spacing("6v")} ${fr.spacing("8v")} ${fr.spacing("4v")} 0`,
-                        borderBottom: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
-                        paddingBottom: fr.spacing("4v")
-                    })}
-                >
+                <div className={cx(classes.info)} >
                     <div
                         className={css({
                             display: "flex",
@@ -203,6 +197,15 @@ const useStyles = tss.withName({ AppSideMenu }).create({
     },
     inner: {
         padding: 0,
-        boxShadow: "none",
+        [fr.breakpoints.up("md")]: {
+            boxShadow: "none",
+        }
     },
+    info: {
+        [fr.breakpoints.up("md")]: {
+            margin: `${fr.spacing("6v")} ${fr.spacing("8v")} ${fr.spacing("4v")} 0`,
+            paddingBottom: fr.spacing("4v"),
+            borderBottom: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
+        }
+    }
 });
