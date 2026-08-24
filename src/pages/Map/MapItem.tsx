@@ -9,7 +9,6 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { useImage } from "@/hooks/useImage";
 import { Share } from "@/types/Share";
-import { fr } from "@codegouvfr/react-dsfr";
 
 type MapItemProps = {
     map: MapResearchItem,

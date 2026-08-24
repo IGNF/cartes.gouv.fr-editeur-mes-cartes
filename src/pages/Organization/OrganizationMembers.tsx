@@ -19,14 +19,15 @@ import LoadingText from "@/components/Utils/LoadingText";
 import { createPortal } from "react-dom";
 import { roleTypes, UserRole } from "@/types/UserRole";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
+import { OrganizationMembersItem } from "@/api/model";
 
 const addMemberModal = createModal({
-    id: "confirm-remove-user-modal",
+    id: "confirm-remove-member-modal",
     isOpenedByDefault: false,
 });
 
 const confirmRemoveUserModal = createModal({
-    id: "confirm-remove-user-modal",
+    id: "confirm-remove-member-modal",
     isOpenedByDefault: false,
 });
 
@@ -34,7 +35,8 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
     const { t } = useTranslation("Organization");
     const { t: tCommon } = useTranslation("Common");
 
-    const { data: organization, isLoading } = api.organization.useGetOrganizationsById(
+
+    const { data: organization, isLoading, refetch } = api.organization.useGetOrganizationsById(
         organizationId,
         {
             query: {
@@ -51,13 +53,33 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
         },
     );
 
+    // Appelé plus tard dans la modale
+    const deleteOrgMemberMutation = api.organization.useDeleteOrganizationMember({
+        mutation: {
+            onSuccess: () => {
+                // TODO : AFFICHER MESSAGE VALIDATION ?
+                refetch();
+            },
+            onError: error => {
+                // TODO : AFFICHER MESSAGE ERREUR ?
+                console.error(error);
+            },
+            onMutate: (args) => {
+                // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
+                confirmRemoveUserModal.close();
+                console.log(args);
+            }
+        },
+    });
+
     const user = useEditorUser();
-    const [currentMember, setCurrentMember] = useState<string | undefined>(undefined);
+    const [memberToDelete, setMemberToDelete] = useState<OrganizationMembersItem>();
+
+    const [currentMembers, setCurrentMembers] = useState<OrganizationMembersItem[]>([]);
 
     const { params } = useRoute();
     const page = params["page"] ? parseInt(params["page"]) : 1;
     const limit = params["limit"] ? parseInt(params["limit"]) : 20;
-
 
     const members = organization?.members ?? [];
     const { search, searchedItems } = useSearch(members, "public_name");
@@ -66,7 +88,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
     const tableId = useId();
     const { classes, cx } = useStyles();
 
-    console.log("current member : ", currentMember);
+    console.log("current member : ", memberToDelete);
 
     return (
         <>
@@ -169,7 +191,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                                                     options={roleTypes.map(value => ({
                                                                         value,
                                                                         "label": t("user-role", value),
-                                                                        "selected": value === role
+                                                                        "selected": value === member.role
                                                                     }))}
                                                                 />
 
@@ -185,7 +207,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                                                     priority={"tertiary no outline"}
                                                                     iconId={"fr-icon-delete-line"}
                                                                     onClick={() => {
-                                                                        setCurrentMember(member.public_id);
+                                                                        setMemberToDelete(member);
                                                                         confirmRemoveUserModal.open();
                                                                     }}
                                                                     disabled={member.public_id === user?.public_id}
@@ -234,20 +256,18 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             },
                             {
                                 children: tCommon("delete"),
-                                // onClick: () => {
-                                //     if (openedOrganization?.public_id === undefined) {
-                                //         return;
-                                //     }
-                                //     deleteOrganizationMutation.mutate({ id: openedOrganization.public_id });
-                                // },
+                                onClick: () => {
+                                    if (memberToDelete?.public_id === undefined) {
+                                        return;
+                                    }
+                                    deleteOrgMemberMutation.mutate({ id: organizationId, userId: memberToDelete.public_id });
+                                },
                                 priority: "primary",
                                 doClosesModal: true,
                             },
                         ]}
                     >
-                        {t('delete-organization--message', { name: organization?.name })}
-
-                        <div />
+                        {t('remove-member--message', { name: memberToDelete?.public_name, organization: organization?.name })}
                     </confirmRemoveUserModal.Component>,
                     document.body
                 )
@@ -264,18 +284,17 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             },
                             {
                                 children: tCommon("delete"),
-                                // onClick: () => {
-                                //     if (openedOrganization?.public_id === undefined) {
-                                //         return;
-                                //     }
-                                //     deleteOrganizationMutation.mutate({ id: openedOrganization.public_id });
-                                // },
+                                onClick: () => {
+                                    if (memberToDelete?.public_id === undefined) {
+                                        return;
+                                    }
+                                    deleteOrgMemberMutation.mutate({ id: organizationId, userId: memberToDelete.public_id });
+                                },
                                 priority: "primary",
                                 doClosesModal: true,
                             },
                         ]}
                     >
-                        {t('delete-organization--message', { name: organization?.name })}
 
                         <div />
                     </addMemberModal.Component>,

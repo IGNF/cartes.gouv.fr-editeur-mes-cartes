@@ -200,8 +200,6 @@ export default function MapList({ role }: MapListProps) {
     // Permet d'activer / désactiver l'affichage des filtres
     const [showFilters, toggleShowFilters] = useToggle();
 
-    // Filtre et tri
-
     // Nombre de page total
     const { totalPages } = useFakePagination(mapCount, routeParams.limit);
 

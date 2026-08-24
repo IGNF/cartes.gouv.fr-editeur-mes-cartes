@@ -15,6 +15,7 @@ const { i18n } = declareComponentKeys<
     | "select-member__label"
     | "add-member"
     | "remove-member"
+    | { K: "remove-member--message"; P: { name?: string, organization?: string }; R: ReactNode }
     | "user-role__label"
     | "owner"
     | "owner__explain"
@@ -52,6 +53,8 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
     "select-member__label": "Sélectionnez un droit pour ce membre",
     "add-member": "Ajouter un membre",
     "remove-member": "Supprimer le membre de l'espace de travail",
+    "remove-member--message": ({ name, organization }) => <>Êtes-vous sûr de vouloir supprimer {name ? <b>{name}</b> : "ce membre"} de cet espace de travail {organization ? <> (<em>{organization}</em>)</> : ""} ?
+        <b> Cette action est irréversible.</b></>,
     "user-role__label": "Droits",
     "owner": "Admin",
     "owner__explain": "Gérer les membres et cartes d'un espace de travail (suppression, modification de droits...)",
@@ -126,6 +129,7 @@ export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
     "select-member__label": undefined,
     "add-member": undefined,
     "remove-member": undefined,
+    "remove-member--message": undefined,
     "user-role__label": undefined,
     "owner": undefined,
     "owner__explain": undefined,
