@@ -68,7 +68,9 @@ export default defineConfig([
     tseslint.configs.recommendedTypeChecked,
     pluginReact.configs.flat.recommended,
     pluginReact.configs.flat["jsx-runtime"],
-    reactHooks.configs.flat.recommended,
+    /* eslint-disable */
+    reactHooks.configs.flat.recommended as any,
+    /* eslint-enable */
     reactRefresh.configs.recommended,
     ...pluginQuery.configs["flat/recommended"],
     jsxA11y.flatConfigs.strict,
