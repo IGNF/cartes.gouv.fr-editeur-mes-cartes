@@ -10,11 +10,9 @@ import useBreadcrumb from "@/hooks/useBreadcrumb";
 import SessionExpiredAlert from "../Utils/SessionExpiredAlert";
 import { type MainProps } from "./Main";
 
-export type ListMainProps = PropsWithChildren<
-    MainProps
-> & {
-    classes?: Partial<MainProps["classes"] & Record<"content", string>>,
-    organizationId?: string
+export type ListMainProps = PropsWithChildren<MainProps> & {
+    classes?: Partial<MainProps["classes"] & Record<"content", string>>;
+    organizationId?: string;
 };
 
 export default function ListMain(props: ListMainProps) {
@@ -32,9 +30,7 @@ export default function ListMain(props: ListMainProps) {
         <main id="main" role="main">
             <div className={propsClasses?.container ?? fr.cx("fr-container")}>
                 <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-grid-row--center")}>
-                    <div
-                        className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}
-                    >
+                    <div className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}>
                         <AppSideMenu organizationId={organizationId} />
                     </div>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-md-9"), classes.content, propsClasses?.content)}>
@@ -56,7 +52,7 @@ const useStyles = tss.withName({ ListMain }).create({
         gap: fr.spacing("10v"),
         [fr.breakpoints.up("md")]: {
             borderRight: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
-        }
+        },
     },
     content: {
         padding: "0 1rem",

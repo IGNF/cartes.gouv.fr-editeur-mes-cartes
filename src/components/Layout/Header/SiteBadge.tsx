@@ -7,16 +7,16 @@ export default function SiteBadge() {
     const route = useRoute();
 
     if (
-        (route.name &&
-            [
-                "dashboard",
-                "datastore_selection",
-                "datastore_create_request",
-                "datastore_create_request_confirm",
-                "join_community",
-                "accesses_request",
-                "discover_publish",
-            ].includes(route.name))
+        route.name &&
+        [
+            "dashboard",
+            "datastore_selection",
+            "datastore_create_request",
+            "datastore_create_request_confirm",
+            "join_community",
+            "accesses_request",
+            "discover_publish",
+        ].includes(route.name)
     ) {
         return (
             <Badge className={fr.cx("fr-badge--green-archipel")} noIcon={true} as="span" small={true}>

@@ -7,9 +7,9 @@ interface IUseSearchResult<T> {
 
 export function useSearch<T>(data: T[], searchProperty = "name"): IUseSearchResult<T> {
     const { params } = useRoute();
-    const search = params["search"] ?? "";
+    const search: string = params["search"] ?? "";
     return {
         search,
-        searchedItems: search ? data.filter((d) => d[searchProperty].toLowerCase().includes(search.toLowerCase())) : data,
+        searchedItems: search ? data.filter((d) => (d[searchProperty] as string)?.toLowerCase().includes(search.toLowerCase())) : data,
     };
 }

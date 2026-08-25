@@ -9,7 +9,6 @@ export default function NoMedia() {
     return (
         <div className={cx(classes.root, fr.cx("fr-mt-10v"))}>
             <div className={classes.rightSection}>
-
                 <h6 className={fr.cx("fr-mb-4v")}>{t("no-corresponding-media__title")}</h6>
 
                 <p className={fr.cx("fr-mb-8v")}>{t("no-corresponding-media__description")}</p>

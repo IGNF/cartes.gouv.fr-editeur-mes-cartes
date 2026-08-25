@@ -22,7 +22,6 @@ function GroupOrganization(props: GroupAppProps) {
     const role = useUserRole(organizationId);
 
     const content: { render: JSX.Element } | undefined = useMemo(() => {
-
         switch (route.name) {
             case "organization_list":
                 return {
@@ -31,27 +30,27 @@ function GroupOrganization(props: GroupAppProps) {
             // Fallthrough intentionnel
             case "organization_maps":
                 return {
-                    render: 
-                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
+                    render: (
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role}>
                             <OrganizationMaps organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
-                    ,
+                    ),
                 };
             case "organization_members":
                 return {
-                    render:
-                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
+                    render: (
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role}>
                             <OrganizationMembers organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
-                    ,
+                    ),
                 };
             case "organization_info":
                 return {
-                    render:
-                        <OrganizationLayout organizationId={route.params.organizationId} role={role} >
+                    render: (
+                        <OrganizationLayout organizationId={route.params.organizationId} role={role}>
                             <OrganizationInfo organizationId={route.params.organizationId} role={role} />
                         </OrganizationLayout>
-                    ,
+                    ),
                 };
             default:
                 return undefined;
@@ -61,11 +60,7 @@ function GroupOrganization(props: GroupAppProps) {
     if (!content) {
         return <PageNotFoundWithLayout />;
     }
-    return (
-        <AppLayout >
-            {content.render}
-        </AppLayout>
-    );
+    return <AppLayout>{content.render}</AppLayout>;
 }
 
 export default GroupOrganization;

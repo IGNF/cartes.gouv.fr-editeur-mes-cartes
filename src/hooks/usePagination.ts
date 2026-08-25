@@ -21,12 +21,12 @@ export function usePagination<T>(data: T[], page = 1, limit = 20): IUsePaginatio
 }
 
 /**
- * Permet de retourner un nombre de page à utiliser selon un nombre de cartes et de 
+ * Permet de retourner un nombre de page à utiliser selon un nombre de cartes et de
  * @param count Nombre total d'objet
  * @param page Page courante
  * @param limit Nombre d'objet par page
  */
-export function useFakePagination(count: number,  limit = 10): IUseFakePaginationResult {
+export function useFakePagination(count: number, limit = 10): IUseFakePaginationResult {
     return {
         totalPages: Math.ceil(count / limit),
     };

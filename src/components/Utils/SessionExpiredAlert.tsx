@@ -21,11 +21,7 @@ const SessionExpiredAlert: FC = () => {
                     description={
                         <>
                             Veuillez{" "}
-                            <a
-                                href="./login"
-                                rel="noreferrer"
-                                target="_blank"
-                            >
+                            <a href="./login" rel="noreferrer" target="_blank">
                                 vous-reconnecter
                             </a>{" "}
                             dans un nouvel onglet

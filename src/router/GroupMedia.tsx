@@ -19,10 +19,11 @@ function GroupMedia(props: GroupAppProps) {
         switch (route.name) {
             case "media_list":
                 return {
-                    render:
+                    render: (
                         <MediaLayout>
                             <MediaList />
-                        </MediaLayout>,
+                        </MediaLayout>
+                    ),
                 };
             default:
                 return undefined;
@@ -32,11 +33,7 @@ function GroupMedia(props: GroupAppProps) {
     if (!content) {
         return <PageNotFoundWithLayout />;
     }
-    return (
-        <AppLayout >
-            {content.render}
-        </AppLayout>
-    );
+    return <AppLayout>{content.render}</AppLayout>;
 }
 
 export default GroupMedia;

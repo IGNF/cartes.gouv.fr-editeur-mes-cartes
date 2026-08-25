@@ -26,10 +26,10 @@ import { createPortal } from "react-dom";
  * Élément dans l'URL de recherche
  */
 type OrganizationRouteParams = {
-    page: number,
-    limit: number,
-    search: string,
-}
+    page: number;
+    limit: number;
+    search: string;
+};
 
 const confirmDeleteOrganizationModal = createModal({
     id: "confirm-delete-organization-modal",
@@ -41,7 +41,7 @@ const shareOrganizationModal = createModal({
     isOpenedByDefault: false,
 });
 
-/** 
+/**
  * Permet de récupérer les paramètres dans l'URL
  */
 function useOrganizationRouteParams(): OrganizationRouteParams {
@@ -52,7 +52,7 @@ function useOrganizationRouteParams(): OrganizationRouteParams {
     const search = route.params?.["search"] ?? "";
 
     return { page, limit, search };
-};
+}
 
 export default function OrganizationList() {
     // Traduction
@@ -67,15 +67,15 @@ export default function OrganizationList() {
     const deleteOrganizationMutation = api.organization.useDeleteOrganization({
         mutation: {
             onSuccess: () => {
-                refetch();
+                void refetch();
                 confirmDeleteOrganizationModal.close();
             },
-            onError: error => {
+            onError: (error) => {
                 console.error(error);
             },
             onMutate: (args) => {
                 console.log(args);
-            }
+            },
         },
     });
 
@@ -84,21 +84,24 @@ export default function OrganizationList() {
     const routeParams = useOrganizationRouteParams();
 
     // Appel à l'API
-    const { data: organizationsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.organization.useGetOrganizationsMe(
-        {
-            query: {
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    if (response.status === 200) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
-                    }
-                },
+    const {
+        data: organizationsResponse,
+        dataUpdatedAt,
+        isFetching,
+        isLoading,
+        refetch,
+    } = api.organization.useGetOrganizationsMe({
+        query: {
+            // Évite les erreurs typescript en vérifiant le bon retour
+            select: (response) => {
+                if (response.status === 200) {
+                    return response.data;
+                } else {
+                    return undefined;
+                }
             },
         },
-    );
+    });
 
     // Va chercher les cartes de la page d'après
     // TODO : améliorer cela car pas l'air de fonctionner
@@ -108,7 +111,7 @@ export default function OrganizationList() {
     // });
 
     // Cartes et nombre total de cartes
-    const organizations = (organizationsResponse ?? []);
+    const organizations = organizationsResponse ?? [];
 
     useEffect(() => {
         setOrganizationCount(organizations.length);
@@ -127,8 +130,7 @@ export default function OrganizationList() {
 
     return (
         <ListMain title={t("organization-list")}>
-            <PageTitle title={t("organization-list")}>
-            </PageTitle>
+            <PageTitle title={t("organization-list")}></PageTitle>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-6v", "fr-mb-16v")}>
                 <div
                     className={fr.cx("fr-col-12", "fr-py-0")}
@@ -141,11 +143,7 @@ export default function OrganizationList() {
                     <Badge severity="info" noIcon={true}>
                         {organizationCount}
                     </Badge>
-                    <Button
-                        iconId="fr-icon-add-line"
-                        iconPosition="right"
-                        className={fr.cx("fr-ml-auto")}
-                    >
+                    <Button iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
                         {t("add-organization")}
                     </Button>
                 </div>
@@ -180,42 +178,43 @@ export default function OrganizationList() {
             {showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
-                        {<SelectNext
-                            label={tCommon("filter-label")}
-                            options={[
-                                { label: "Tous les thèmes", value: "" },
-                                // ...themes.map(theme => ({
-                                //     label: theme.name || "",
-                                //     value: theme.name || "",
-                                // }))
-                            ]}
-                            nativeSelectProps={{
-                                // value: routeParams.theme?.toString() ?? "",
-                                onChange: (event) => {
-                                    const value = event.target.value;
-                                    if (value === "") {
-                                        routes
-                                            .organization_list({
-                                                ...routeParams,
-                                                page: 1,
-                                            })
-                                            .push();
-                                    } else {
-                                        routes
-                                            .organization_list({
-                                                ...routeParams,
-                                                page: 1,
-                                            })
-                                            .push();
-                                    }
-                                },
-                            }}
-                            placeholder={tCommon("filter-placeholder")}
-                            disabled={isLoading}
-                        />}
+                        {
+                            <SelectNext
+                                label={tCommon("filter-label")}
+                                options={[
+                                    { label: "Tous les thèmes", value: "" },
+                                    // ...themes.map(theme => ({
+                                    //     label: theme.name || "",
+                                    //     value: theme.name || "",
+                                    // }))
+                                ]}
+                                nativeSelectProps={{
+                                    // value: routeParams.theme?.toString() ?? "",
+                                    onChange: (event) => {
+                                        const value = event.target.value;
+                                        if (value === "") {
+                                            routes
+                                                .organization_list({
+                                                    ...routeParams,
+                                                    page: 1,
+                                                })
+                                                .push();
+                                        } else {
+                                            routes
+                                                .organization_list({
+                                                    ...routeParams,
+                                                    page: 1,
+                                                })
+                                                .push();
+                                        }
+                                    },
+                                }}
+                                placeholder={tCommon("filter-placeholder")}
+                                disabled={isLoading}
+                            />
+                        }
                     </div>
-                    <div className={classes.filterSelect}>
-                    </div>
+                    <div className={classes.filterSelect}></div>
                     {/* <div className={classes.filterApplyBtn}>
                                 <Button>Valider</Button>
                             </div> */}
@@ -240,26 +239,26 @@ export default function OrganizationList() {
 
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                                 {organizations.map((organization) => (
-                                    <div className={fr.cx("fr-col-12")} key={organization.public_id} >
-                                        <OrganizationItem organization={organization}
+                                    <div className={fr.cx("fr-col-12")} key={organization.public_id}>
+                                        <OrganizationItem
+                                            organization={organization}
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
-
                                                     <Button
                                                         title={tCommon("delete")}
-                                                        iconId='fr-icon-delete-bin-line'
+                                                        iconId="fr-icon-delete-bin-line"
                                                         size="small"
                                                         priority="tertiary"
                                                         onClick={() => {
                                                             setOpenedOrganization(organization);
-                                                            confirmDeleteOrganizationModal.open()
+                                                            confirmDeleteOrganizationModal.open();
                                                         }}
                                                     />
                                                     <Button
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        linkProps={routes.organization_maps({ organizationId: organization.public_id || "", }).link}
+                                                        linkProps={routes.organization_maps({ organizationId: organization.public_id || "" }).link}
                                                     >
                                                         {tCommon("see")}
                                                     </Button>
@@ -275,15 +274,13 @@ export default function OrganizationList() {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...routes.organization_list({ ...routeParams, page: pageNumber })
-                                                .link,
+                                            ...routes.organization_list({ ...routeParams, page: pageNumber }).link,
                                         })}
                                         defaultPage={routeParams.page}
                                     />
                                 </div>
                             ) : (
-                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
-                                </div>
+                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}></div>
                             )}
                         </>
                     ) : (
@@ -312,7 +309,7 @@ export default function OrganizationList() {
                         },
                     ]}
                 >
-                    {t('delete-organization--message', { name: openedOrganization?.name })}
+                    {t("delete-organization--message", { name: openedOrganization?.name })}
 
                     <div />
                 </confirmDeleteOrganizationModal.Component>,
@@ -322,9 +319,8 @@ export default function OrganizationList() {
             {createPortal(
                 <shareOrganizationModal.Component
                     title="titre"
-                // title={t("share-organization")}
+                    // title={t("share-organization")}
                 >
-
                     {/* <TextCopyToClipboard label={tCommon("link")} hintText={t("share-organization__link-hint")} text={useOrganizationLink(openedOrganization)} className="fr-mb-1w" />
 
                     <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-organization__iframe-hint")} text={useOrganizationIframe(openedOrganization)} textArea className="fr-mb-1w" /> */}
@@ -335,7 +331,7 @@ export default function OrganizationList() {
             )}
         </ListMain>
     );
-};
+}
 
 const useStyles = tss.withName({ OrganizationList }).create({
     filterRoot: {

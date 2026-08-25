@@ -21,17 +21,17 @@ const { i18n } = declareComponentKeys<
     | "copy-map"
     | { K: "delete-map--message"; P: { fileName?: string }; R: ReactNode }
     | { K: "updated-at"; P: { date: string }; R: ReactNode }
-    | { K: "updated-at-by"; P: { date: string, user: string }; R: ReactNode }
+    | { K: "updated-at-by"; P: { date: string; user: string }; R: ReactNode }
 >()("Map");
 export type I18n = typeof i18n;
 
 export const MapFrTranslations: Translations<"fr">["Map"] = {
-    "maps": "Cartes",
+    maps: "Cartes",
     "map-list": "Mes cartes",
     "map-list__description": "Gérer mes cartes",
     "create-map": "Créer une carte",
     "create-map-service": "Créer",
-    "view": "Ouvrir",
+    view: "Ouvrir",
     "no-corresponding-map__title": "Aucune carte correspondante",
     "no-corresponding-map__description": "Aucune carte ne correspond à vos filtres.",
     "delete-map": "Supprimer la carte",
@@ -40,20 +40,31 @@ export const MapFrTranslations: Translations<"fr">["Map"] = {
     "share-map__link-hint": "Toute personne ayant ce lien peut visualiser votre carte sans avoir à se créer de compte.",
     "share-map__iframe-hint": "Intégrez votre carte dans un site web",
     "copy-map": "Dupliquer la carte",
-    "delete-map--message": ({ fileName }) => <>Êtes-vous sûr de vouloir supprimer
-        {fileName ? <> la carte <em>{fileName}</em></> : "cette carte"} ?
-        <b> Cette action est irréversible.</b></>,
+    "delete-map--message": ({ fileName }) => (
+        <>
+            Êtes-vous sûr de vouloir supprimer
+            {fileName ? (
+                <>
+                    {" "}
+                    la carte <em>{fileName}</em>
+                </>
+            ) : (
+                "cette carte"
+            )}{" "}
+            ?<b> Cette action est irréversible.</b>
+        </>
+    ),
     "updated-at": ({ date }) => `Mise à jour le ${formatDateWithoutTimeFromISO(new Date(date).toISOString())}`,
     "updated-at-by": ({ date, user }) => `Mise à jour le ${formatDateWithoutTimeFromISO(new Date(date).toISOString())}, par ${user}`,
 };
 
 export const MapEnTranslations: Translations<"en">["Map"] = {
-    "maps": undefined,
+    maps: undefined,
     "map-list": undefined,
     "map-list__description": undefined,
     "create-map": undefined,
     "create-map-service": undefined,
-    "view": undefined,
+    view: undefined,
     "no-corresponding-map__title": undefined,
     "no-corresponding-map__description": undefined,
     "delete-map": undefined,

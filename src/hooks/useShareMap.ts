@@ -5,7 +5,7 @@ import { routes } from "@/router/router";
  * Retourne le lien permettant de visualiser la carte
  * @param map Carte contenant les informations
  */
-export function useMapLink(map?: MapView|MapResearchItem): string {
+export function useMapLink(map?: MapView | MapResearchItem): string {
     if (!map?.view_id) {
         return "";
     }
@@ -16,7 +16,7 @@ export function useMapLink(map?: MapView|MapResearchItem): string {
  * Retourne l'uframe permettant de visualiser la carte
  * @param map Carte contenant les informations
  */
-export function useMapIframe(map?: MapView|MapResearchItem): string {
+export function useMapIframe(map?: MapView | MapResearchItem): string {
     const link = useMapLink(map);
     return `<iframe
 width="600" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"

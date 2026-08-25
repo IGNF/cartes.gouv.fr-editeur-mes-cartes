@@ -6,7 +6,6 @@ import PageNotFoundWithLayout from "../pages/error/PageNotFoundWithLayout";
 import { routes } from "./router";
 import Dashboard from "@/pages/dashboard/Dashboard";
 
-
 interface IGroupAppProps {
     route: Route<typeof routes>;
 }
@@ -31,11 +30,7 @@ function GroupApp(props: IGroupAppProps) {
         return <PageNotFoundWithLayout />;
     }
 
-    return (
-        <AppLayout {...content?.layoutProps}>
-            {content.render}
-        </AppLayout>
-    );
+    return <AppLayout {...content?.layoutProps}>{content.render}</AppLayout>;
 }
 
 export default GroupApp;

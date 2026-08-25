@@ -17,13 +17,14 @@ export default defineConfig([
         "assets/data",
         "vendor",
         "var",
+        "src/api/*", // Car généré automatiquement par orval
     ]),
     // Config de base pour tous les fichiers (plugins, globals, règles génériques)
     {
         files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         ...jsxA11y.flatConfigs.recommended,
         settings: { react: { version: "detect" } },
-        plugins: { js, pluginReact, reactHooks: reactHooks, tseslint},
+        plugins: { js, pluginReact, reactHooks: reactHooks, tseslint },
         extends: ["js/recommended"],
         languageOptions: {
             ...jsxA11y.flatConfigs.recommended.languageOptions,
@@ -56,22 +57,18 @@ export default defineConfig([
         },
     },
     // TODO Activer l'analyse typée pour TypeScript: nécessaire pour recommendedTypeChecked
-    // {
-    //     files: ["**/*.ts", "**/*.tsx"],
-    //     languageOptions: {
-    //         parser: tseslint.parser,
-    //         parserOptions: {
-    //             // Utilise automatiquement les tsconfig.* (monorepo-friendly)
-    //             projectService: true,
-    //             tsconfigRootDir: import.meta.dirname,
-    //         },
-    //     },
-    // },
-    // tseslint.configs.recommendedTypeChecked,
-    tseslint.configs.recommended,
+    {
+        files: ["**/*.ts", "**/*.tsx"],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+            },
+        },
+    },
+    tseslint.configs.recommendedTypeChecked,
     pluginReact.configs.flat.recommended,
     pluginReact.configs.flat["jsx-runtime"],
-    reactHooks.configs.flat.recommended as any,
+    reactHooks.configs.flat.recommended,
     reactRefresh.configs.recommended,
     ...pluginQuery.configs["flat/recommended"],
     jsxA11y.flatConfigs.strict,
@@ -87,6 +84,11 @@ export default defineConfig([
             "react-hooks/preserve-manual-memoization": "off",
             "react-hooks/incompatible-library": "off",
             "react/no-unescaped-entities": "off",
+            "@typescript-eslint/no-misused-promises": "off",
+            "@typescript-eslint/no-unsafe-call": "off",
+            "@typescript-eslint/no-unsafe-assignment": "off",
+            "@typescript-eslint/no-unsafe-argument": "off",
+            "@typescript-eslint/unbound-method": "off",
         },
     },
 ]);

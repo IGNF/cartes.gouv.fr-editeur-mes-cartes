@@ -4,7 +4,6 @@ import { UserRole } from "@/types/UserRole";
 
 type OrganizationMapsData = Pick<MapResearch, "count" | "maps">;
 
-
 // Permet de renvoyer les éléments nécessaires pour MapList
 type UseOrganizationMapsResult = {
     data: OrganizationMapsData;
@@ -19,7 +18,6 @@ type UseOrganizationMapsResult = {
  * Une avec context=profile et l'autre context=organization;
  */
 export function useOrganizationMaps(role: UserRole | undefined, organizationId: string | undefined, params: GetMapsParams): UseOrganizationMapsResult {
-
     const context = role === UserRole.MEMBER ? "organization" : "profile";
     const isEditor = role === UserRole.EDITOR;
     const isOrganizationMapsEnabled = isEditor && organizationId !== undefined;
@@ -33,39 +31,34 @@ export function useOrganizationMaps(role: UserRole | undefined, organizationId: 
                 // Évite les erreurs typescript en vérifiant le bon retour
                 select: (response) => {
                     if (response.status === 200 || response.status === 206) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
+                        return response.data;
+                    } else {
+                        return undefined;
                     }
                 },
             },
-        },
+        }
     );
 
     // Relance automatiquement une requête si c'est un éditeur pour avoir toutes les cartes
     // de l'organisation
-    const organizationQuery = api.map.useGetMaps(
-        organizationMapsParams,
-        {
-            query: {
-                enabled: isOrganizationMapsEnabled,
-                queryKey: ["organization-maps", organizationMapsParams ?? null],
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    if (response.status === 200 || response.status === 206) {
-                        return {
-                            ...response.data,
-                            maps: response.data.maps.filter(map => map.share !== "public"),
-                        }
-                    }
-                    else {
-                        return undefined
-                    }
-                },
+    const organizationQuery = api.map.useGetMaps(organizationMapsParams, {
+        query: {
+            enabled: isOrganizationMapsEnabled,
+            queryKey: ["organization-maps", organizationMapsParams ?? null],
+            // Évite les erreurs typescript en vérifiant le bon retour
+            select: (response) => {
+                if (response.status === 200 || response.status === 206) {
+                    return {
+                        ...response.data,
+                        maps: response.data.maps.filter((map) => map.share !== "public"),
+                    };
+                } else {
+                    return undefined;
+                }
             },
         },
-    );
+    });
 
     // Fusionne les résultats
     const userMaps = userQuery.data?.maps || [];
@@ -81,10 +74,7 @@ export function useOrganizationMaps(role: UserRole | undefined, organizationId: 
         isFetching: userQuery.isFetching || organizationQuery.isFetching,
         isLoading: userQuery.isLoading || (isOrganizationMapsEnabled && organizationQuery.isLoading),
         refetch: async () => {
-            await Promise.all([
-                userQuery.refetch(),
-                ...(isOrganizationMapsEnabled ? [organizationQuery.refetch()] : []),
-            ]);
+            await Promise.all([userQuery.refetch(), ...(isOrganizationMapsEnabled ? [organizationQuery.refetch()] : [])]);
         },
     };
 }

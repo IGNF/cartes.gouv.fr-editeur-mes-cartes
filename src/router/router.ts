@@ -20,7 +20,7 @@ const publicRoutes = {
 const mapRoutes = {
     view_map: defineRoute(
         {
-            mapId: param.path.string
+            mapId: param.path.string,
         },
         (p) => `${appRoot}/voir-une-carte/${p.mapId}`
     ),
@@ -43,7 +43,7 @@ const mapRoutes = {
         () => ["/cartes"]
     ),
     create_map: defineRoute(`${appRoot}/creer-une-carte`),
-}
+};
 
 const mediaRoutes = {
     media_list: defineRoute(
@@ -54,7 +54,7 @@ const mediaRoutes = {
         },
         () => ["/images"]
     ),
-}
+};
 
 const organizationRoute = defineRoute(
     {
@@ -79,21 +79,23 @@ const organizationRoutes = {
             search: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => "/cartes"),
+        () => "/cartes"
+    ),
     organization_members: organizationRoute.extend(
         {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(20),
             search: param.query.optional.string,
         },
-        () => "/membres"),
+        () => "/membres"
+    ),
     organization_info: organizationRoute.extend("/infos"),
-}
+};
 
 // Chemin vers les sources utiles
 const helpRoutes = {
     help_more_info: defineRoute(`${appRoot}/aide/creer-une-carte`),
-}
+};
 
 // Routes protégées qui ne sont pas dans des groupes spécifiques plus bas (community, datastore...etc.)
 const privateRoutes = {

@@ -11,8 +11,8 @@ import { useImage } from "@/hooks/useImage";
 import { Share } from "@/types/Share";
 
 type MapItemProps = {
-    map: MapResearchItem,
-    footer: ReactNode
+    map: MapResearchItem;
+    footer: ReactNode;
 };
 
 const MapItem: FC<MapItemProps> = ({ map, footer }) => {
@@ -37,11 +37,17 @@ const MapItem: FC<MapItemProps> = ({ map, footer }) => {
             break;
     }
 
-    const imageProps = map.organization_id ? {
-        imageUrl: imageUrl,
-        imageAlt: "Illustration de la carte",
-        badge: map.share ? <Badge as="span" severity={severity} noIcon={true}>{tOrganization("share", map.share as Share)}</Badge> : undefined,
-    } : {};
+    const imageProps = map.organization_id
+        ? {
+              imageUrl: imageUrl,
+              imageAlt: "Illustration de la carte",
+              badge: map.share ? (
+                  <Badge as="span" severity={severity} noIcon={true}>
+                      {tOrganization("share", map.share as Share)}
+                  </Badge>
+              ) : undefined,
+          }
+        : {};
 
     return (
         <>
@@ -54,9 +60,11 @@ const MapItem: FC<MapItemProps> = ({ map, footer }) => {
                 desc={map.description}
                 start={
                     <ul className="fr-tags-group fr-badges-group">
-                        {map.theme !== null &&
-                            <li><Tag as="span" >{map.theme}</Tag ></li>
-                        }
+                        {map.theme !== null && (
+                            <li>
+                                <Tag as="span">{map.theme}</Tag>
+                            </li>
+                        )}
                     </ul>
                 }
                 footer={footer}

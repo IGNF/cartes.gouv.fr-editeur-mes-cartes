@@ -8,7 +8,7 @@ export enum SortOrderEnum {
 const availableSortOrder = Object.values(SortOrderEnum);
 
 function getSortedList<T>(list: T[], sortBy: string, sortOrder: SortOrderEnum): T[] {
-    return [...list].sort((a, b) => {
+    return list.toSorted((a, b) => {
         if (typeof a[sortBy] === "string") {
             return a[sortBy].localeCompare(b[sortBy]) * sortOrder;
         } else if (typeof a[sortBy] === "number") {

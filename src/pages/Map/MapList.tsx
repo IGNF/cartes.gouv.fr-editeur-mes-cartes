@@ -17,7 +17,7 @@ import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
 import { usePrefetchQuery } from "@tanstack/react-query";
 import RQKeys from "@/modules/maps/RQKeys";
-import { MapResearchItem, Theme, UserView } from "@/api/model";
+import { MapResearchItem, UserView } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
@@ -33,24 +33,24 @@ import { ShareDefinition } from "../Media/ShareDefinition";
  * Élément dans l'URL de recherche
  */
 type MapRouteParams = {
-    page: number,
-    limit: number,
-    theme: string,
-    search: string,
-    organizationId?: string // Seulement dans le cas de l'équipe
-}
+    page: number;
+    limit: number;
+    theme: string;
+    search: string;
+    organizationId?: string; // Seulement dans le cas de l'équipe
+};
 
 type MapListProps = {
-    organizationId?: string,
-    role?: UserRole,
-}
+    organizationId?: string;
+    role?: UserRole;
+};
 
 type canDeleteProps = {
-    map: MapResearchItem,
-    user?: UserView,
-    role?: UserRole,
-    organizationId?: string
-}
+    map: MapResearchItem;
+    user?: UserView;
+    role?: UserRole;
+    organizationId?: string;
+};
 
 // Modales
 const confirmDeleteMapModal = createModal({
@@ -90,7 +90,7 @@ function getMapListRoute(route: Route<typeof routes>, params: MapRouteParams) {
     return routes.map_list(queryParams);
 }
 
-/** 
+/**
  * Permet de récupérer les paramètres dans l'URL
  */
 function useMapRouteParams(): MapRouteParams {
@@ -103,7 +103,7 @@ function useMapRouteParams(): MapRouteParams {
     const organizationId = route.params?.["organizationId"] ?? undefined;
 
     return { page, limit, theme, search, organizationId };
-};
+}
 
 /**
  * Définit si un utilisateur peut supprimer une carte.
@@ -135,9 +135,9 @@ export default function MapList({ role }: MapListProps) {
         mutation: {
             onSuccess: () => {
                 // TODO : AFFICHER MESSAGE VALIDATION ?
-                refetch();
+                void refetch();
             },
-            onError: error => {
+            onError: (error) => {
                 // TODO : AFFICHER MESSAGE ERREUR ?
                 console.error(error);
             },
@@ -145,21 +145,27 @@ export default function MapList({ role }: MapListProps) {
                 // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
                 confirmDeleteMapModal.close();
                 console.log(args);
-            }
+            },
         },
     });
 
     // const confirmCopyMutation = useMutation();
     // Param dans l'URL
     const routeParams = useMapRouteParams();
-    const offset = (routeParams.page - 1) * (routeParams.limit);
+    const offset = (routeParams.page - 1) * routeParams.limit;
     const organizationId = routeParams.organizationId;
 
     const user = useEditorUser();
     const route = useRoute();
 
     // Envoi deux requêtes dans le cas d'une équipe
-    const { data: mapsResponse, dataUpdatedAt, isFetching, isLoading, refetch } = useOrganizationMaps(role, organizationId, { ...routeParams, query: routeParams.search, offset: offset })
+    const {
+        data: mapsResponse,
+        dataUpdatedAt,
+        isFetching,
+        isLoading,
+        refetch,
+    } = useOrganizationMaps(role, organizationId, { ...routeParams, query: routeParams.search, offset: offset });
 
     const context = role === UserRole.MEMBER ? "organization" : "profile";
 
@@ -168,28 +174,27 @@ export default function MapList({ role }: MapListProps) {
     const nextPageOffset = routeParams.page * routeParams.limit;
     usePrefetchQuery({
         queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
-        queryFn: ({ signal }) => api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
+        queryFn: ({ signal }) =>
+            api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
     });
 
-    const { data: themesResponse } = api.theme.useGetThemes(
-        {
-            query: {
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    if (response.status === 200) {
-                        return response.data
-                    } else {
-                        return undefined
-                    }
-                },
+    const { data: themesResponse } = api.theme.useGetThemes({
+        query: {
+            // Évite les erreurs typescript en vérifiant le bon retour
+            select: (response) => {
+                if (response.status === 200) {
+                    return response.data;
+                } else {
+                    return undefined;
+                }
             },
         },
-    );
+    });
 
-    const themes = (themesResponse || []) as Theme[];
+    const themes = themesResponse || [];
 
     // Cartes et nombre total de cartes
-    const maps = (mapsResponse?.maps ?? []);
+    const maps = mapsResponse?.maps ?? [];
 
     useEffect(() => {
         if (mapsResponse?.count !== undefined) {
@@ -207,7 +212,7 @@ export default function MapList({ role }: MapListProps) {
     const { classes, cx } = useStyles();
 
     // Pour voir si on affiche les filtres ou pas
-    const hasFilters = (themes.length > 1);
+    const hasFilters = themes.length > 1;
 
     return (
         <>
@@ -223,23 +228,15 @@ export default function MapList({ role }: MapListProps) {
                     <Badge severity="info" noIcon={true}>
                         {mapCount}
                     </Badge>
-                    {role !== UserRole.MEMBER &&
-                        <Button
-                            linkProps={
-                                routes.create_map().link
-                            }
-                            iconId="fr-icon-add-line"
-                            iconPosition="right"
-                            className={fr.cx("fr-ml-auto")}
-                        >
+                    {role !== UserRole.MEMBER && (
+                        <Button linkProps={routes.create_map().link} iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
                             {t("create-map")}
                         </Button>
-                    }
+                    )}
                 </div>
             </div>
 
             {organizationId && <ShareDefinition />}
-
 
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mt-2v")}>
                 <div
@@ -261,53 +258,52 @@ export default function MapList({ role }: MapListProps) {
                         renderInput={(props) => <input {...props} disabled={isLoading} />}
                         defaultValue={routeParams.search}
                     />
-                    {hasFilters &&
+                    {hasFilters && (
                         <Button priority="secondary" iconId="fr-icon-equalizer-line" onClick={() => toggleShowFilters()}>
                             Filtres
                         </Button>
-                    }
+                    )}
                 </div>
             </div>
 
-            {(hasFilters && showFilters) && (
+            {hasFilters && showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
-                        {themes.length > 1 && <SelectNext
-                            label={tCommon("filter-label")}
-                            options={[
-                                { label: "Tous les thèmes", value: "" },
-                                ...themes.map(theme => ({
-                                    label: theme.name || "",
-                                    value: theme.name || "",
-                                }))
-                            ]}
-                            nativeSelectProps={{
-                                value: routeParams.theme?.toString() ?? "",
-                                onChange: (event) => {
-                                    const value = event.target.value;
-                                    if (value === "") {
-                                        getMapListRoute(route, {
-                                            ...routeParams,
-                                            theme: "",
-                                            page: 1,
-                                        })
-                                            .push();
-                                    } else {
-                                        getMapListRoute(route, {
-                                            ...routeParams,
-                                            theme: value,
-                                            page: 1,
-                                        })
-                                            .push();
-                                    }
-                                },
-                            }}
-                            placeholder={tCommon("filter-placeholder")}
-                            disabled={isLoading}
-                        />}
+                        {themes.length > 1 && (
+                            <SelectNext
+                                label={tCommon("filter-label")}
+                                options={[
+                                    { label: "Tous les thèmes", value: "" },
+                                    ...themes.map((theme) => ({
+                                        label: theme.name || "",
+                                        value: theme.name || "",
+                                    })),
+                                ]}
+                                nativeSelectProps={{
+                                    value: routeParams.theme?.toString() ?? "",
+                                    onChange: (event) => {
+                                        const value = event.target.value;
+                                        if (value === "") {
+                                            getMapListRoute(route, {
+                                                ...routeParams,
+                                                theme: "",
+                                                page: 1,
+                                            }).push();
+                                        } else {
+                                            getMapListRoute(route, {
+                                                ...routeParams,
+                                                theme: value,
+                                                page: 1,
+                                            }).push();
+                                        }
+                                    },
+                                }}
+                                placeholder={tCommon("filter-placeholder")}
+                                disabled={isLoading}
+                            />
+                        )}
                     </div>
-                    <div className={classes.filterSelect}>
-                    </div>
+                    <div className={classes.filterSelect}></div>
                     {/* <div className={classes.filterApplyBtn}>
                                 <Button>Valider</Button>
                             </div> */}
@@ -332,55 +328,55 @@ export default function MapList({ role }: MapListProps) {
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                                 {maps.map((map) => (
                                     <div className={fr.cx("fr-col-12")} key={map.view_id}>
-                                        <MapItem map={map}
+                                        <MapItem
+                                            map={map}
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
-
-                                                    {role !== UserRole.MEMBER &&
+                                                    {role !== UserRole.MEMBER && (
                                                         <>
-                                                            < Button
+                                                            <Button
                                                                 title={tCommon("delete")}
-                                                                iconId='fr-icon-delete-bin-line'
+                                                                iconId="fr-icon-delete-bin-line"
                                                                 size="small"
                                                                 priority="tertiary"
                                                                 onClick={() => {
                                                                     setOpenedMap(map);
-                                                                    confirmDeleteMapModal.open()
+                                                                    confirmDeleteMapModal.open();
                                                                 }}
                                                                 disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                             <Button
                                                                 title={tCommon("duplicate")}
-                                                                iconId='ri-file-copy-line'
+                                                                iconId="ri-file-copy-line"
                                                                 size="small"
                                                                 priority="tertiary"
                                                                 onClick={() => {
                                                                     setOpenedMap(map);
-                                                                    confirmCopyMapModal.open()
+                                                                    confirmCopyMapModal.open();
                                                                 }}
                                                                 disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                         </>
-                                                    }
+                                                    )}
 
                                                     <Button
                                                         title={tCommon("share")}
-                                                        iconId='ri-share-2-line'
+                                                        iconId="ri-share-2-line"
                                                         size="small"
                                                         priority="tertiary"
                                                         onClick={() => {
                                                             setOpenedMap(map);
-                                                            shareMapModal.open()
+                                                            shareMapModal.open();
                                                         }}
                                                     />
                                                     <Button
                                                         iconId="fr-icon-arrow-right-s-line"
                                                         size="small"
                                                         iconPosition="right"
-                                                        linkProps={role !== UserRole.MEMBER ?
-                                                            routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
-                                                            :
-                                                            routes.view_map({ mapId: map.view_id || "" }).link
+                                                        linkProps={
+                                                            role !== UserRole.MEMBER
+                                                                ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
+                                                                : routes.view_map({ mapId: map.view_id || "" }).link
                                                         }
                                                     >
                                                         {role !== UserRole.MEMBER ? tCommon("open") : tCommon("see")}
@@ -397,15 +393,13 @@ export default function MapList({ role }: MapListProps) {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...getMapListRoute(route, { ...routeParams, page: pageNumber })
-                                                .link,
+                                            ...getMapListRoute(route, { ...routeParams, page: pageNumber }).link,
                                         })}
                                         defaultPage={routeParams.page}
                                     />
                                 </div>
                             ) : (
-                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
-                                </div>
+                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}></div>
                             )}
                         </>
                     ) : (
@@ -434,7 +428,7 @@ export default function MapList({ role }: MapListProps) {
                         },
                     ]}
                 >
-                    {t('delete-map--message', { fileName: openedMap?.title })}
+                    {t("delete-map--message", { fileName: openedMap?.title })}
                 </confirmDeleteMapModal.Component>,
                 document.body
             )}
@@ -460,13 +454,16 @@ export default function MapList({ role }: MapListProps) {
             )}
 
             {createPortal(
-                <shareMapModal.Component
-                    title={t("share-map")}
-                >
-
+                <shareMapModal.Component title={t("share-map")}>
                     <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={useMapLink(openedMap)} className="fr-mb-1w" />
 
-                    <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-map__iframe-hint")} text={useMapIframe(openedMap)} textArea className="fr-mb-1w" />
+                    <TextCopyToClipboard
+                        label={tCommon("iframe")}
+                        hintText={t("share-map__iframe-hint")}
+                        text={useMapIframe(openedMap)}
+                        textArea
+                        className="fr-mb-1w"
+                    />
 
                     <div />
                 </shareMapModal.Component>,
@@ -474,7 +471,7 @@ export default function MapList({ role }: MapListProps) {
             )}
         </>
     );
-};
+}
 
 const useStyles = tss.withName({ MapList }).create({
     filterRoot: {

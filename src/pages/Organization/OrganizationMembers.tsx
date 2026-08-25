@@ -35,32 +35,31 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
     const { t } = useTranslation("Organization");
     const { t: tCommon } = useTranslation("Common");
 
-
-    const { data: organization, isLoading, refetch } = api.organization.useGetOrganizationsById(
-        organizationId,
-        {
-            query: {
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    if (response.status === 200) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
-                    }
-                },
+    const {
+        data: organization,
+        isLoading,
+        refetch,
+    } = api.organization.useGetOrganizationsById(organizationId, {
+        query: {
+            // Évite les erreurs typescript en vérifiant le bon retour
+            select: (response) => {
+                if (response.status === 200) {
+                    return response.data;
+                } else {
+                    return undefined;
+                }
             },
         },
-    );
+    });
 
     // Appelé plus tard dans la modale
     const deleteOrgMemberMutation = api.organization.useDeleteOrganizationMember({
         mutation: {
             onSuccess: () => {
                 // TODO : AFFICHER MESSAGE VALIDATION ?
-                refetch();
+                void refetch();
             },
-            onError: error => {
+            onError: (error) => {
                 // TODO : AFFICHER MESSAGE ERREUR ?
                 console.error(error);
             },
@@ -68,14 +67,14 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                 // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
                 confirmRemoveUserModal.close();
                 console.log(args);
-            }
+            },
         },
     });
 
     const user = useEditorUser();
     const [memberToDelete, setMemberToDelete] = useState<OrganizationMembersItem>();
 
-    const [currentMembers, setCurrentMembers] = useState<OrganizationMembersItem[]>([]);
+    // const [currentMembers, setCurrentMembers] = useState<OrganizationMembersItem[]>([]);
 
     const { params } = useRoute();
     const page = params["page"] ? parseInt(params["page"]) : 1;
@@ -107,11 +106,11 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             <Badge severity="info" noIcon={true}>
                                 {members.length ?? 0}
                             </Badge>
-                            {role === UserRole.OWNER &&
+                            {role === UserRole.OWNER && (
                                 <Button onClick={() => addMemberModal.open()} iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
                                     {t("add-member")}
                                 </Button>
-                            }
+                            )}
                         </div>
                     </div>
 
@@ -130,10 +129,12 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                 label={tCommon("search")}
                                 onButtonClick={(text) => {
                                     if (!isLoading) {
-                                        routes.organization_members({
-                                            organizationId: organizationId,
-                                            search: text,
-                                        }).replace();
+                                        routes
+                                            .organization_members({
+                                                organizationId: organizationId,
+                                                search: text,
+                                            })
+                                            .replace();
                                     }
                                 }}
                                 allowEmptySearch={true}
@@ -142,30 +143,22 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             />
                         </div>
                     </div>
-                    <div
-                        className={fr.cx(
-                            "fr-table--lg",
-                            "fr-table--layout-fixed",
-                            "fr-table--no-caption",
-                            "fr-mt-2w"
-                        )}
-                        id={`${tableId}-component`}
-                    >
+                    <div className={fr.cx("fr-table--lg", "fr-table--layout-fixed", "fr-table--no-caption", "fr-mt-2w")} id={`${tableId}-component`}>
                         <div className={fr.cx("fr-table__wrapper")}>
                             <div className={fr.cx("fr-table__container")}>
                                 <div className={cx(fr.cx("fr-table__content"), classes.tableContent)}>
                                     <table id={tableId}>
                                         <thead>
                                             <tr>
-                                                <th className={fr.cx("fr-col--lg")} scope="col">{tCommon("username")}</th>
-                                                <th scope="col">
-                                                    {t("rights")}
+                                                <th className={fr.cx("fr-col--lg")} scope="col">
+                                                    {tCommon("username")}
                                                 </th>
-                                                {role === UserRole.OWNER &&
+                                                <th scope="col">{t("rights")}</th>
+                                                {role === UserRole.OWNER && (
                                                     <th className={fr.cx("fr-col--xs")} scope="col">
                                                         <span className={fr.cx("fr-icon-delete-line")} />
                                                     </th>
-                                                }
+                                                )}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -182,25 +175,24 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                                             )}
                                                         </td>
                                                         <td>
-                                                            {role === UserRole.OWNER ?
+                                                            {role === UserRole.OWNER ? (
                                                                 <Select
                                                                     label={undefined}
                                                                     nativeSelectProps={{
-                                                                        "aria-label": t("select-member__label")
+                                                                        "aria-label": t("select-member__label"),
                                                                     }}
-                                                                    options={roleTypes.map(value => ({
+                                                                    options={roleTypes.map((value) => ({
                                                                         value,
-                                                                        "label": t("user-role", value),
-                                                                        "selected": value === member.role
+                                                                        label: t("user-role", value),
+                                                                        selected: value === member.role,
                                                                     }))}
                                                                 />
-
-                                                                : <>{t("user-role", member.role as UserRole)}</>
-
-                                                            }
+                                                            ) : (
+                                                                <>{t("user-role", member.role as UserRole)}</>
+                                                            )}
                                                         </td>
 
-                                                        {role === UserRole.OWNER &&
+                                                        {role === UserRole.OWNER && (
                                                             <td>
                                                                 <Button
                                                                     title={t("remove-member")}
@@ -213,7 +205,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                                                     disabled={member.public_id === user?.public_id}
                                                                 />
                                                             </td>
-                                                        }
+                                                        )}
                                                     </tr>
                                                 );
                                             })}
@@ -231,22 +223,22 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                                 getPageLinkProps={(pageNumber) => ({
                                     ...routes.organization_members({
                                         organizationId: organizationId,
-                                        page: pageNumber, limit: limit, search
+                                        page: pageNumber,
+                                        limit: limit,
+                                        search,
                                     }).link,
                                 })}
                                 defaultPage={page}
                             />
                         </div>
                     ) : (
-                        <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
-                        </div>
+                        <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}></div>
                     )}
                 </>
-            )
-            }
+            )}
 
-            {
-                role === UserRole.OWNER && createPortal(
+            {role === UserRole.OWNER &&
+                createPortal(
                     <confirmRemoveUserModal.Component
                         title={t("remove-member")}
                         buttons={[
@@ -267,14 +259,13 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             },
                         ]}
                     >
-                        {t('remove-member--message', { name: memberToDelete?.public_name, organization: organization?.name })}
+                        {t("remove-member--message", { name: memberToDelete?.public_name, organization: organization?.name })}
                     </confirmRemoveUserModal.Component>,
                     document.body
-                )
-            }
+                )}
 
-            {
-                role === UserRole.OWNER && createPortal(
+            {role === UserRole.OWNER &&
+                createPortal(
                     <addMemberModal.Component
                         title={t("remove-member")}
                         buttons={[
@@ -295,18 +286,15 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             },
                         ]}
                     >
-
                         <div />
                     </addMemberModal.Component>,
                     document.body
-                )
-            }
+                )}
         </>
     );
 };
 
 export default OrganizationMembers;
-
 
 const useStyles = tss.withName({ OrganizationMembers }).create({
     tableContent: {

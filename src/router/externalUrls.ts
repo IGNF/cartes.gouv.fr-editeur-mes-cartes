@@ -32,7 +32,6 @@ export const externalUrls = {
     newsletterSubscription: appRoot + "/lettre-d-information",
     community_geopf_cartesgouvfr_expertises_territoires: "https://www.expertises-territoires.fr/jcms/pl1_557493/fr/communaute-geoplateforme-et-cartes-gouv",
     roadmap: appRoot + "/evolutions",
-    
 } as const;
 
 export function externalLink(route: keyof typeof externalUrls, title?: string): RegisteredLinkProps {

@@ -9,7 +9,6 @@ export default function NoMap() {
     return (
         <div className={cx(classes.root, fr.cx("fr-mt-10v"))}>
             <div className={classes.rightSection}>
-
                 <h6 className={fr.cx("fr-mb-4v")}>{t("no-corresponding-map__title")}</h6>
 
                 <p className={fr.cx("fr-mb-8v")}>{t("no-corresponding-map__description")}</p>

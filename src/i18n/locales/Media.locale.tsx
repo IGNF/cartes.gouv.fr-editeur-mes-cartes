@@ -18,7 +18,7 @@ const { i18n } = declareComponentKeys<
 export type I18n = typeof i18n;
 
 export const MediaFrTranslations: Translations<"fr">["Media"] = {
-    "medias": "Images",
+    medias: "Images",
     "media-list": "Mes images",
     "media-list__description": "Gérer mes images",
     "no-corresponding-media__title": "Aucune image correspondante",
@@ -26,13 +26,24 @@ export const MediaFrTranslations: Translations<"fr">["Media"] = {
     "add-media": "Ajouter une image",
     "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
     "delete-media": "Supprimer l'image",
-    "delete-media--message": ({ fileName }) => <>Êtes-vous sûr de vouloir supprimer cette image
-        {fileName ? <> (<em>{ fileName }</em>)</> : ""} ?
-        <b> Cette action est irréversible.</b></>,
+    "delete-media--message": ({ fileName }) => (
+        <>
+            Êtes-vous sûr de vouloir supprimer cette image
+            {fileName ? (
+                <>
+                    {" "}
+                    (<em>{fileName}</em>)
+                </>
+            ) : (
+                ""
+            )}{" "}
+            ?<b> Cette action est irréversible.</b>
+        </>
+    ),
 };
 
 export const MediaEnTranslations: Translations<"en">["Media"] = {
-    "medias": undefined,
+    medias: undefined,
     "media-list": undefined,
     "media-list__description": undefined,
     "no-corresponding-media__title": undefined,

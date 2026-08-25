@@ -1,7 +1,7 @@
 export enum UserRole {
-  OWNER = "owner",
-  MEMBER = "member",
-  EDITOR = "editor",
+    OWNER = "owner",
+    MEMBER = "member",
+    EDITOR = "editor",
 }
 
 // UserRoles.constants.ts

@@ -10,12 +10,12 @@ import * as user from "./user/user.ts";
 // TODO : AMÉLIORER ÇA ?
 
 export const api = {
-	editorial,
-	login,
-	map,
-	media,
-	notifications,
-	organization,
-	theme,
-	user
+    editorial,
+    login,
+    map,
+    media,
+    notifications,
+    organization,
+    theme,
+    user,
 };

@@ -1,7 +1,7 @@
 export enum Share {
-  RESTRICTED = "private",
-  TEAM = "public",
-  PUBLIC = "atlas",
+    RESTRICTED = "private",
+    TEAM = "public",
+    PUBLIC = "atlas",
 }
 
 // UserRoles.constants.ts

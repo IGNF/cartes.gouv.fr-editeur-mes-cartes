@@ -7,10 +7,9 @@ export function useEditorUser(): UserView | undefined {
             // Évite les erreurs typescript en vérifiant le bon retour
             select: (response) => {
                 if (response.status === 200) {
-                    return response.data
-                }
-                else {
-                    return undefined
+                    return response.data;
+                } else {
+                    return undefined;
                 }
             },
         },

@@ -14,7 +14,7 @@ Le projet s'appuie notamment sur [React](https://react.dev/) et [Vite](https://v
 
 - [TypeScript](https://www.typescriptlang.org/) : typage statique du projet.
 - [react-dsfr](https://github.com/codegouvfr/react-dsfr) : implémentation en React du DSFR (Système de Design de l’État).
-- [MSW](https://mswjs.io/) et [faker](https://fakerjs.dev/) : génération et interception de données simulées pour le développement et les tests de flux front (*N.B. : pas encore mis en place, mais disponible via Orval*).
+- [MSW](https://mswjs.io/) et [faker](https://fakerjs.dev/) : génération et interception de données simulées pour le développement et les tests de flux front (_N.B. : pas encore mis en place, mais disponible via Orval_).
 - [type-route](https://type-route.zilch.dev/) : routage typé de l'application.
 
 ## Organisation technique

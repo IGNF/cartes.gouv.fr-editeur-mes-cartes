@@ -19,10 +19,11 @@ function GroupMap(props: GroupAppProps) {
         switch (route.name) {
             case "map_list":
                 return {
-                    render:
+                    render: (
                         <MapLayout>
                             <MapList />
-                        </MapLayout>,
+                        </MapLayout>
+                    ),
                 };
             default:
                 return undefined;
@@ -32,11 +33,7 @@ function GroupMap(props: GroupAppProps) {
     if (!content) {
         return <PageNotFoundWithLayout />;
     }
-    return (
-        <AppLayout >
-            {content.render}
-        </AppLayout>
-    );
+    return <AppLayout>{content.render}</AppLayout>;
 }
 
 export default GroupMap;

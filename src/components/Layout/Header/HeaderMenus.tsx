@@ -1,4 +1,3 @@
-
 import { fr } from "@codegouvfr/react-dsfr";
 import { externalLink, externalUrls } from "@/router/externalUrls";
 import { routes } from "@/router/router";
@@ -99,7 +98,7 @@ export function HeaderMenuUser() {
                 <HeaderMenu
                     openButtonProps={{
                         children: "Mon compte",
-                        iconId: "fr-icon-account-circle-fill"
+                        iconId: "fr-icon-account-circle-fill",
                     }}
                     items={[
                         {
@@ -132,9 +131,7 @@ export function HeaderMenuUser() {
                     }}
                 />
             ) : (
-                <>
-
-                </>
+                <></>
             )}
         </>
     );

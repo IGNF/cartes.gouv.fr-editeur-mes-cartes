@@ -10,8 +10,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
 type OrganizationItemProps = {
-    organization: GetOrganizationsMe200Item,
-    footer: ReactNode
+    organization: GetOrganizationsMe200Item;
+    footer: ReactNode;
 };
 
 const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) => {
@@ -30,7 +30,7 @@ const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) =
             default:
                 return "";
         }
-    }
+    };
 
     return (
         <>
@@ -43,7 +43,6 @@ const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) =
                 start={
                     <>
                         {organization !== undefined && (
-
                             <ul className={fr.cx("fr-badge-group")}>
                                 {organization.active === false && (
                                     <Badge as="span" severity="warning">
@@ -54,9 +53,8 @@ const OrganizationItem: FC<OrganizationItemProps> = ({ organization, footer }) =
                                 {organization.user_role !== undefined && (
                                     <Badge as="span" className={getBadgeColor(organization.user_role as UserRole)}>
                                         {t("user-role", organization.user_role as UserRole)}
-                                    </Badge >
+                                    </Badge>
                                 )}
-
                             </ul>
                         )}
                     </>

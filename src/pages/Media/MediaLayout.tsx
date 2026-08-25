@@ -8,9 +8,8 @@ const MediaLayout: FC<PropsWithChildren<AppLayoutProps>> = ({ children }) => {
     const { t } = useTranslation("Media");
 
     return (
-        <ListMain title={t("media-list")} >
-            <PageTitle title={t("media-list")}>
-            </PageTitle>
+        <ListMain title={t("media-list")}>
+            <PageTitle title={t("media-list")}></PageTitle>
             {children}
         </ListMain>
     );

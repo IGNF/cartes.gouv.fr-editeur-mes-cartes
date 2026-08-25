@@ -1,4 +1,3 @@
-
 // TODO : créer les requêtes pour l'API editeur
 
 /**

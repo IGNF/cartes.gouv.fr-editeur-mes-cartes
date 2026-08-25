@@ -20,41 +20,33 @@ export default function AppSideMenu({ organizationId }: AppSideMenuProps) {
     const route = useRoute();
     const { classes, css, cx } = useStyles();
 
-    const highlightOptions: Partial<HighlightProps> =
-    {
+    const highlightOptions: Partial<HighlightProps> = {
         className: css({
             marginLeft: 0,
-            fontWeight: "normal"
+            fontWeight: "normal",
         }),
         size: "lg",
     };
 
     // Appel à l'API
-    const { data: organizationsResponse } = api.organization.useGetOrganizationsMe(
-        {
-            query: {
-                // Évite les erreurs typescript en vérifiant le bon retour
-                select: (response) => {
-                    if (response.status === 200) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
-                    }
-                },
+    const { data: organizationsResponse } = api.organization.useGetOrganizationsMe({
+        query: {
+            // Évite les erreurs typescript en vérifiant le bon retour
+            select: (response) => {
+                if (response.status === 200) {
+                    return response.data;
+                } else {
+                    return undefined;
+                }
             },
         },
-    );
+    });
 
-    const organizations = (organizationsResponse ?? []);
+    const organizations = organizationsResponse ?? [];
     // Tri par nom
     organizations.sort((orgA, orgB) => {
         if (orgA.name && orgB.name) {
-            return orgA.name.toUpperCase().localeCompare(
-                orgB.name.toUpperCase(),
-                "fr",
-                { ignorePunctuation: true }
-            );
+            return orgA.name.toUpperCase().localeCompare(orgB.name.toUpperCase(), "fr", { ignorePunctuation: true });
         }
         // Sinon retourne 0 (pas de changement)
         return 0;
@@ -63,7 +55,7 @@ export default function AppSideMenu({ organizationId }: AppSideMenuProps) {
     return (
         <SideMenu
             title={
-                <div className={cx(classes.info)} >
+                <div className={cx(classes.info)}>
                     <div
                         className={css({
                             display: "flex",
@@ -92,67 +84,42 @@ export default function AppSideMenu({ organizationId }: AppSideMenuProps) {
                             fr.cx("fr-mb-4v"),
                             css({
                                 marginTop: "",
-                                borderTop: "1px solid var(--border-default-grey)"
+                                borderTop: "1px solid var(--border-default-grey)",
                             })
                         )}
-                    >
-                    </p>
-                    <Badge
-                        as="span"
-                        noIcon
-                        severity="success"
-                        className={cx(
-                            fr.cx("fr-mb-4v"),
-                        )}
-                    >
+                    ></p>
+                    <Badge as="span" noIcon severity="success" className={cx(fr.cx("fr-mb-4v"))}>
                         SERVICE BETA
                     </Badge>
-                    <Highlight
-                        {...highlightOptions}
-                    >
+                    <Highlight {...highlightOptions}>
                         La création de cartes interactives est un service gratuit et libre dans lequel vous pouvez créer et partagez facilement votre carte.
                     </Highlight>
-                    <Highlight
-                        {...highlightOptions}
-                        className={cx(highlightOptions.className,
-                            css({ paddingTop: fr.spacing("8v") }))
-                        }
-                    >
+                    <Highlight {...highlightOptions} className={cx(highlightOptions.className, css({ paddingTop: fr.spacing("8v") }))}>
                         1. Utilisez les données de cartes.gouv.fr, ou importez vos propres données.
                     </Highlight>
-                    <Highlight
-                        {...highlightOptions}
-                        className={cx(highlightOptions.className,
-                            css({ paddingTop: fr.spacing("4v") }))
-                        }
-                    >
+                    <Highlight {...highlightOptions} className={cx(highlightOptions.className, css({ paddingTop: fr.spacing("4v") }))}>
                         2. Personnalisez le style et la mise en page de vos données.
-
                     </Highlight>
-                    <Highlight
-                        {...highlightOptions}
-                        className={cx(highlightOptions.className,
-                            css({ paddingTop: fr.spacing("4v") }))
-                        }
-                    >
+                    <Highlight {...highlightOptions} className={cx(highlightOptions.className, css({ paddingTop: fr.spacing("4v") }))}>
                         3. Partagez-là autour de vous.
                     </Highlight>
                     <Highlight
                         {...highlightOptions}
-                        className={cx(highlightOptions.className,
-                            css({ paddingTop: fr.spacing("4v"), marginBottom: fr.spacing("4v") }))
-                        }
+                        className={cx(highlightOptions.className, css({ paddingTop: fr.spacing("4v"), marginBottom: fr.spacing("4v") }))}
                     >
                         4. Retrouvez vos cartes depuis votre tableau de bord.
                     </Highlight>
-                    <a {...externalLink("helpUserGuideCreateMap", "En savoir plus")}
+                    <a
+                        {...externalLink("helpUserGuideCreateMap", "En savoir plus")}
                         className={cx(
-                            fr.cx("fr-link"), fr.cx("fr-mb-4v"),
+                            fr.cx("fr-link"),
+                            fr.cx("fr-mb-4v"),
                             css({
                                 "--underline-img": "linear-gradient(0deg,currentColor,currentColor)",
                                 fontWeight: "initial",
                             })
-                        )} >
+                        )}
+                    >
                         En savoir plus
                     </a>
                 </div>
@@ -199,13 +166,13 @@ const useStyles = tss.withName({ AppSideMenu }).create({
         padding: 0,
         [fr.breakpoints.up("md")]: {
             boxShadow: "none",
-        }
+        },
     },
     info: {
         [fr.breakpoints.up("md")]: {
             margin: `${fr.spacing("6v")} ${fr.spacing("8v")} ${fr.spacing("4v")} 0`,
             paddingBottom: fr.spacing("4v"),
             borderBottom: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
-        }
-    }
+        },
+    },
 });

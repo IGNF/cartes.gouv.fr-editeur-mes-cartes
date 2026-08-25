@@ -19,8 +19,8 @@ export default function Dashboard() {
     const { decodedIdToken } = useOidc();
 
     return (
-        <Main title={tLayout('board')}>
-            <h1 className={fr.cx("fr-mt-4v")}>{tLayout('board')}</h1>
+        <Main title={tLayout("board")}>
+            <h1 className={fr.cx("fr-mt-4v")}>{tLayout("board")}</h1>
             <p className={fr.cx("fr-text--xl")}>{t("welcome", { username: decodedIdToken.preferred_username })}</p>
 
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mb-3w")}>

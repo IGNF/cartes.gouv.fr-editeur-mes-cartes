@@ -49,7 +49,7 @@ Afin d'utiliser plus facilement les commitlint, il est possible d'installer glob
 npm install -g @commitlint/prompt-cli @commitlint/config-angular
 ```
 
-Cela permet ensuite d'utiliser directement la commande 
+Cela permet ensuite d'utiliser directement la commande
 
 ```bash
 commit

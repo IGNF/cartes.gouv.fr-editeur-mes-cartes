@@ -1,4 +1,3 @@
-
 import { commonEnTranslations } from "../locales/Common.locale";
 import { BreadcrumbEnTranslations } from "@/i18n/locales/Breadcrumb.locale";
 import { MapEnTranslations } from "@/i18n/locales/Map.locale";

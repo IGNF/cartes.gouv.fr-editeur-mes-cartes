@@ -15,7 +15,7 @@ import { tss } from "tss-react";
 import MediaItem from "./MediaItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { Media, } from "@/api/model";
+import { Media } from "@/api/model";
 import NoMedia from "./NoMedia";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
@@ -24,10 +24,10 @@ import { createPortal } from "react-dom";
  * Élément dans l'URL de recherche
  */
 type MediaRouteParams = {
-    page: number,
-    limit: number,
-    search: string,
-}
+    page: number;
+    limit: number;
+    search: string;
+};
 
 const confirmDeleteMediaModal = createModal({
     id: "confirm-delete-media-modal",
@@ -39,7 +39,7 @@ const shareMediaModal = createModal({
     isOpenedByDefault: false,
 });
 
-/** 
+/**
  * Permet de récupérer les paramètres dans l'URL
  */
 function useMediaRouteParams(): MediaRouteParams {
@@ -50,7 +50,7 @@ function useMediaRouteParams(): MediaRouteParams {
     const search = route.params?.["search"] ?? "";
 
     return { page, limit, search };
-};
+}
 
 export default function MediaList() {
     // Traduction
@@ -65,39 +65,44 @@ export default function MediaList() {
     const deleteMediaMutation = api.media.useDeleteMediaById({
         mutation: {
             onSuccess: () => {
-                refetch();
+                void refetch();
                 confirmDeleteMediaModal.close();
             },
-            onError: error => {
+            onError: (error) => {
                 console.error(error);
             },
             onMutate: (args) => {
                 console.log(args);
-            }
+            },
         },
     });
 
     // const confirmCopyMutation = useMutation();
     // Param dans l'URL
     const routeParams = useMediaRouteParams();
-    const offset = (routeParams.page - 1) * (routeParams.limit);
+    const offset = (routeParams.page - 1) * routeParams.limit;
 
     // Appel à l'API
-    const { data: mediasResponse, dataUpdatedAt, isFetching, isLoading, refetch } = api.media.useGetUserMedias(
+    const {
+        data: mediasResponse,
+        dataUpdatedAt,
+        isFetching,
+        isLoading,
+        refetch,
+    } = api.media.useGetUserMedias(
         { limit: routeParams.limit, name: routeParams.search, offset: offset },
         {
             query: {
                 // Évite les erreurs typescript en vérifiant le bon retour
                 select: (response) => {
                     if (response.status === 200 || response.status === 206) {
-                        return response.data
-                    }
-                    else {
-                        return undefined
+                        return response.data;
+                    } else {
+                        return undefined;
                     }
                 },
             },
-        },
+        }
     );
 
     // Va chercher les cartes de la page d'après
@@ -108,7 +113,7 @@ export default function MediaList() {
     // });
 
     // Cartes et nombre total de cartes
-    const medias = (mediasResponse?.medias ?? []);
+    const medias = mediasResponse?.medias ?? [];
 
     useEffect(() => {
         if (mediasResponse?.count !== undefined) {
@@ -141,11 +146,7 @@ export default function MediaList() {
                     <Badge severity="info" noIcon={true}>
                         {mediaCount}
                     </Badge>
-                    <Button
-                        iconId="fr-icon-add-line"
-                        iconPosition="right"
-                        className={fr.cx("fr-ml-auto")}
-                    >
+                    <Button iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
                         {t("add-media")}
                     </Button>
                 </div>
@@ -180,42 +181,43 @@ export default function MediaList() {
             {showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
-                        {<SelectNext
-                            label={tCommon("filter-label")}
-                            options={[
-                                { label: "Tous les thèmes", value: "" },
-                                // ...themes.map(theme => ({
-                                //     label: theme.name || "",
-                                //     value: theme.name || "",
-                                // }))
-                            ]}
-                            nativeSelectProps={{
-                                // value: routeParams.theme?.toString() ?? "",
-                                onChange: (event) => {
-                                    const value = event.target.value;
-                                    if (value === "") {
-                                        routes
-                                            .media_list({
-                                                ...routeParams,
-                                                page: 1,
-                                            })
-                                            .push();
-                                    } else {
-                                        routes
-                                            .media_list({
-                                                ...routeParams,
-                                                page: 1,
-                                            })
-                                            .push();
-                                    }
-                                },
-                            }}
-                            placeholder={tCommon("filter-placeholder")}
-                            disabled={isLoading}
-                        />}
+                        {
+                            <SelectNext
+                                label={tCommon("filter-label")}
+                                options={[
+                                    { label: "Tous les thèmes", value: "" },
+                                    // ...themes.map(theme => ({
+                                    //     label: theme.name || "",
+                                    //     value: theme.name || "",
+                                    // }))
+                                ]}
+                                nativeSelectProps={{
+                                    // value: routeParams.theme?.toString() ?? "",
+                                    onChange: (event) => {
+                                        const value = event.target.value;
+                                        if (value === "") {
+                                            routes
+                                                .media_list({
+                                                    ...routeParams,
+                                                    page: 1,
+                                                })
+                                                .push();
+                                        } else {
+                                            routes
+                                                .media_list({
+                                                    ...routeParams,
+                                                    page: 1,
+                                                })
+                                                .push();
+                                        }
+                                    },
+                                }}
+                                placeholder={tCommon("filter-placeholder")}
+                                disabled={isLoading}
+                            />
+                        }
                     </div>
-                    <div className={classes.filterSelect}>
-                    </div>
+                    <div className={classes.filterSelect}></div>
                     {/* <div className={classes.filterApplyBtn}>
                                 <Button>Valider</Button>
                             </div> */}
@@ -240,19 +242,19 @@ export default function MediaList() {
 
                             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                                 {medias.map((media) => (
-                                    <div className={fr.cx("fr-col-12")} key={media.id} >
-                                        <MediaItem media={media}
+                                    <div className={fr.cx("fr-col-12")} key={media.id}>
+                                        <MediaItem
+                                            media={media}
                                             footer={
                                                 <div className={cx(classes.footerBtnGroup)}>
-
                                                     <Button
                                                         title={tCommon("delete")}
-                                                        iconId='fr-icon-delete-bin-line'
+                                                        iconId="fr-icon-delete-bin-line"
                                                         size="small"
                                                         priority="tertiary"
                                                         onClick={() => {
                                                             setOpenedMedia(media);
-                                                            confirmDeleteMediaModal.open()
+                                                            confirmDeleteMediaModal.open();
                                                         }}
                                                     />
                                                     <Button
@@ -277,15 +279,13 @@ export default function MediaList() {
                                     <Pagination
                                         count={totalPages}
                                         getPageLinkProps={(pageNumber) => ({
-                                            ...routes.media_list({ ...routeParams, page: pageNumber })
-                                                .link,
+                                            ...routes.media_list({ ...routeParams, page: pageNumber }).link,
                                         })}
                                         defaultPage={routeParams.page}
                                     />
                                 </div>
                             ) : (
-                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}>
-                                </div>
+                                <div className={fr.cx("fr-grid-row", "fr-grid-row--center", "fr-mt-6v")}></div>
                             )}
                         </>
                     ) : (
@@ -314,7 +314,7 @@ export default function MediaList() {
                         },
                     ]}
                 >
-                    {t('delete-media--message', { fileName: openedMedia?.fileName })}
+                    {t("delete-media--message", { fileName: openedMedia?.fileName })}
 
                     <div />
                 </confirmDeleteMediaModal.Component>,
@@ -324,9 +324,8 @@ export default function MediaList() {
             {createPortal(
                 <shareMediaModal.Component
                     title="titre"
-                // title={t("share-media")}
+                    // title={t("share-media")}
                 >
-
                     {/* <TextCopyToClipboard label={tCommon("link")} hintText={t("share-media__link-hint")} text={useMediaLink(openedMedia)} className="fr-mb-1w" />
 
                     <TextCopyToClipboard label={tCommon("iframe")} hintText={t("share-media__iframe-hint")} text={useMediaIframe(openedMedia)} textArea className="fr-mb-1w" /> */}
@@ -337,7 +336,7 @@ export default function MediaList() {
             )}
         </>
     );
-};
+}
 
 const useStyles = tss.withName({ MediaList }).create({
     filterRoot: {
