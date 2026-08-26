@@ -14,7 +14,7 @@
         "lint:fix": "eslint src/ --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
         "preview": "vite preview",
         "format": "prettier --check .",
-        "format:fix": "prettier --write .",
+        "format:fix": "prettier -l --write .",
         "prepare": "husky"
     },
     "dependencies": {
@@ -85,7 +85,7 @@
         ]
     },
     "lint-staged": {
-        "*": "prettier --write --ignore-unknown --no-error-on-unmatched-pattern",
+        "*": "prettier --write --ignore-unknown --no-error-on-unmatched-pattern -l",
         "*.{js,ts,jsx,tsx}": "eslint src/ --report-unused-disable-directives --max-warnings 0 --no-warn-ignored --fix"
     },
     "engines": {

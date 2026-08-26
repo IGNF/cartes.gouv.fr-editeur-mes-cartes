@@ -13,7 +13,7 @@ const { i18n } = declareComponentKeys<
     | "add-media"
     | { K: "uploaded-at"; P: { dataUploadedAt: string }; R: string }
     | "delete-media"
-    | { K: "delete-media--message"; P: { fileName?: string }; R: ReactNode }
+    | { K: "delete-media__message"; P: { fileName?: string }; R: ReactNode }
 >()("Media");
 export type I18n = typeof i18n;
 
@@ -26,7 +26,7 @@ export const MediaFrTranslations: Translations<"fr">["Media"] = {
     "add-media": "Ajouter une image",
     "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
     "delete-media": "Supprimer l'image",
-    "delete-media--message": ({ fileName }) => (
+    "delete-media__message": ({ fileName }) => (
         <>
             Êtes-vous sûr de vouloir supprimer cette image
             {fileName ? (
@@ -51,5 +51,5 @@ export const MediaEnTranslations: Translations<"en">["Media"] = {
     "add-media": undefined,
     "uploaded-at": undefined,
     "delete-media": undefined,
-    "delete-media--message": undefined,
+    "delete-media__message": undefined,
 };

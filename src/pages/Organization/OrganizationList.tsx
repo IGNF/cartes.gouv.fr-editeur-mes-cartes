@@ -309,7 +309,7 @@ export default function OrganizationList() {
                         },
                     ]}
                 >
-                    {t("delete-organization--message", { name: openedOrganization?.name })}
+                    {t("delete-organization__message", { name: openedOrganization?.name })}
 
                     <div />
                 </confirmDeleteOrganizationModal.Component>,

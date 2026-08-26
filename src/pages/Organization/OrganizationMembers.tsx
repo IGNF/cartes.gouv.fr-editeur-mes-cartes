@@ -259,7 +259,7 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
                             },
                         ]}
                     >
-                        {t("remove-member--message", { name: memberToDelete?.public_name, organization: organization?.name })}
+                        {t("remove-member__message", { name: memberToDelete?.public_name, organization: organization?.name })}
                     </confirmRemoveUserModal.Component>,
                     document.body
                 )}

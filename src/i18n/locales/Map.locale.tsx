@@ -19,7 +19,7 @@ const { i18n } = declareComponentKeys<
     | "share-map__link-hint"
     | "share-map__iframe-hint"
     | "copy-map"
-    | { K: "delete-map--message"; P: { fileName?: string }; R: ReactNode }
+    | { K: "delete-map__message"; P: { fileName?: string }; R: ReactNode }
     | { K: "updated-at"; P: { date: string }; R: ReactNode }
     | { K: "updated-at-by"; P: { date: string; user: string }; R: ReactNode }
 >()("Map");
@@ -40,7 +40,7 @@ export const MapFrTranslations: Translations<"fr">["Map"] = {
     "share-map__link-hint": "Toute personne ayant ce lien peut visualiser votre carte sans avoir à se créer de compte.",
     "share-map__iframe-hint": "Intégrez votre carte dans un site web",
     "copy-map": "Dupliquer la carte",
-    "delete-map--message": ({ fileName }) => (
+    "delete-map__message": ({ fileName }) => (
         <>
             Êtes-vous sûr de vouloir supprimer
             {fileName ? (
@@ -73,7 +73,7 @@ export const MapEnTranslations: Translations<"en">["Map"] = {
     "share-map__link-hint": undefined,
     "share-map__iframe-hint": undefined,
     "copy-map": undefined,
-    "delete-map--message": undefined,
+    "delete-map__message": undefined,
     "updated-at": undefined,
     "updated-at-by": undefined,
 };

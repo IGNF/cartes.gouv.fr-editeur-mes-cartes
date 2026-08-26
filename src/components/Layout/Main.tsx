@@ -5,15 +5,17 @@ import { PropsWithChildren, memo } from "react";
 
 import useBreadcrumb from "@/hooks/useBreadcrumb";
 import SessionExpiredAlert from "../Utils/SessionExpiredAlert";
+import Notice, { NoticeProps } from "@codegouvfr/react-dsfr/Notice";
 
 export interface MainProps {
     customBreadcrumbProps?: BreadcrumbProps;
+    noticeProps?: NoticeProps;
     title?: string;
     classes?: Partial<Record<"container", string>>;
 }
 
 function Main(props: PropsWithChildren<MainProps>) {
-    const { children, customBreadcrumbProps, title, classes } = props;
+    const { children, customBreadcrumbProps, noticeProps, title, classes } = props;
 
     useHead({
         titleTemplate: "%s | cartes.gouv.fr",
@@ -24,6 +26,7 @@ function Main(props: PropsWithChildren<MainProps>) {
     return (
         <main id="main" role="main">
             {/* doit être le premier élément atteignable après le lien d'évitement (Accessibilité) : https://www.systeme-de-design.gouv.fr/elements-d-interface/composants/bandeau-d-information-importante */}
+            {noticeProps && <Notice isClosable {...noticeProps} />}
 
             <div className={classes?.container ?? fr.cx("fr-container")}>
                 {breadcrumbProps && <Breadcrumb {...breadcrumbProps} />}

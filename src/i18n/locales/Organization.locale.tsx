@@ -15,7 +15,7 @@ const { i18n } = declareComponentKeys<
     | "select-member__label"
     | "add-member"
     | "remove-member"
-    | { K: "remove-member--message"; P: { name?: string; organization?: string }; R: ReactNode }
+    | { K: "remove-member__message"; P: { name?: string; organization?: string }; R: ReactNode }
     | "user-role__label"
     | "owner"
     | "owner__explain"
@@ -39,8 +39,21 @@ const { i18n } = declareComponentKeys<
     | "add-organization"
     | { K: "uploaded-at"; P: { dataUploadedAt: string }; R: string }
     | "delete-organization"
-    | { K: "delete-organization--message"; P: { name?: string }; R: ReactNode }
+    | { K: "delete-organization__message"; P: { name?: string }; R: ReactNode }
     | "inactive"
+    | "info"
+    | "leave-organization"
+    | { K: "leave-organization__message"; P: { organizationName?: string }; R: ReactNode }
+    | "organization-name"
+    | "organization-description"
+    | "organization-description__hint"
+    | "organization-image"
+    | "organization-image__hint"
+    | "organization-image__alt"
+    | "organization-limit-access"
+    | "organization-limit-access__hint"
+    | { K: "organization-limit-access__value"; P: string; R: ReactNode }
+    | "no-registered-domain"
 >()("Organization");
 export type I18n = typeof i18n;
 
@@ -53,7 +66,7 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
     "select-member__label": "Sélectionnez un droit pour ce membre",
     "add-member": "Ajouter un membre",
     "remove-member": "Supprimer le membre de l'espace de travail",
-    "remove-member--message": ({ name, organization }) => (
+    "remove-member__message": ({ name, organization }) => (
         <>
             Êtes-vous sûr de vouloir supprimer {name ? <b>{name}</b> : "ce membre"} de cet espace de travail{" "}
             {organization ? (
@@ -130,13 +143,30 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
     "add-organization": "Ajouter un espace de travail",
     "uploaded-at": ({ dataUploadedAt }) => `${formatDateFromISO(new Date(dataUploadedAt).toISOString())}`,
     "delete-organization": "Supprimer l'espace de travail",
-    "delete-organization--message": ({ name }) => (
+    "delete-organization__message": ({ name }) => (
         <>
-            Êtes-vous sûr de vouloir supprimer cet espace
+            Êtes-vous sûr de vouloir supprimer l'espace de travail
             {name ? (
                 <>
                     {" "}
-                    (<em>{name}</em>)
+                    <em>{name}</em>
+                </>
+            ) : (
+                ""
+            )}{" "}
+            ? Toutes les cartes relatives à cet espace seront définitivement perdus.<b> Cette action est irréversible.</b>
+        </>
+    ),
+    inactive: "Inactif",
+    info: "Informations",
+    "leave-organization": "Quitter l'espace de travail",
+    "leave-organization__message": ({ organizationName }) => (
+        <>
+            Êtes-vous sûr de vouloir quitter l'espace de travail
+            {organizationName ? (
+                <>
+                    {" "}
+                    <em>{organizationName}</em>
                 </>
             ) : (
                 ""
@@ -144,7 +174,17 @@ export const OrganizationFrTranslations: Translations<"fr">["Organization"] = {
             ?<b> Cette action est irréversible.</b>
         </>
     ),
-    inactive: "Inactif",
+    "organization-name": "Nom",
+    "organization-description": "Description",
+    "organization-description__hint": "Ajouter quelques mots pour présenter votre espace de travail.",
+    "organization-image": "Image",
+    "organization-image__hint": "Ajouter un logo ou une image pour votre espace de travail.",
+    "organization-image__alt": "Image de l'espace de travail.",
+    "organization-limit-access": "Limiter l’accès",
+    "organization-limit-access__hint":
+        "Ajoutez un nom de domaine pour restreindre l'accès à votre espace de travail. Ceux qui n'ont pas le bon domaine ne pourront ni consulter ni modifier vos cartes, même avec un lien d'invitation.",
+    "organization-limit-access__value": (pattern) => (pattern.endsWith("$") ? `Le mail finit par : ${pattern.slice(0, -1)}` : `Le mail contient : ${pattern}`),
+    "no-registered-domain": "Aucun nom de domaine renseigné",
 };
 
 export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
@@ -156,7 +196,7 @@ export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
     "select-member__label": undefined,
     "add-member": undefined,
     "remove-member": undefined,
-    "remove-member--message": undefined,
+    "remove-member__message": undefined,
     "user-role__label": undefined,
     owner: undefined,
     owner__explain: undefined,
@@ -180,6 +220,19 @@ export const OrganizationEnTranslations: Translations<"en">["Organization"] = {
     "add-organization": undefined,
     "uploaded-at": undefined,
     "delete-organization": undefined,
-    "delete-organization--message": undefined,
+    "delete-organization__message": undefined,
     inactive: undefined,
+    info: undefined,
+    "leave-organization": undefined,
+    "leave-organization__message": undefined,
+    "organization-name": undefined,
+    "organization-description": undefined,
+    "organization-description__hint": undefined,
+    "organization-image": undefined,
+    "organization-image__hint": undefined,
+    "organization-image__alt": undefined,
+    "organization-limit-access": undefined,
+    "organization-limit-access__hint": undefined,
+    "organization-limit-access__value": undefined,
+    "no-registered-domain": undefined,
 };

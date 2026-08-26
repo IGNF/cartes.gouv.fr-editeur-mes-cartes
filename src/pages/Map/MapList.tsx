@@ -428,7 +428,7 @@ export default function MapList({ role }: MapListProps) {
                         },
                     ]}
                 >
-                    {t("delete-map--message", { fileName: openedMap?.title })}
+                    {t("delete-map__message", { fileName: openedMap?.title })}
                 </confirmDeleteMapModal.Component>,
                 document.body
             )}

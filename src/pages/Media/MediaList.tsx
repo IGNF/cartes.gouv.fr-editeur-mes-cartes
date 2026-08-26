@@ -314,7 +314,7 @@ export default function MediaList() {
                         },
                     ]}
                 >
-                    {t("delete-media--message", { fileName: openedMedia?.fileName })}
+                    {t("delete-media__message", { fileName: openedMedia?.fileName })}
 
                     <div />
                 </confirmDeleteMediaModal.Component>,
