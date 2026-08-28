@@ -87,8 +87,6 @@ const OrganizationMembers: FC<OrganizationLayoutChildrenProps> = ({ organization
     const tableId = useId();
     const { classes, cx } = useStyles();
 
-    console.log("current member : ", memberToDelete);
-
     return (
         <>
             {isLoading && <LoadingText />}

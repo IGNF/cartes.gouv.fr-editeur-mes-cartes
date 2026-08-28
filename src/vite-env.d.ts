@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
     readonly APP_ENV: string;
+    readonly APP_ROOT_URL: string;
     readonly VITE_OIDC_USE_MOCK: string;
     readonly VITE_DEV_STATIC_ACCESS_TOKEN: string;
     readonly VITE_IAM_URL: string;
