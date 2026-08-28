@@ -1,20 +1,19 @@
 import { createGroup, createRouter, defineRoute, param } from "type-route";
-
-export const appRoot = "";
+import { appURL as appRoot } from "@/env";
 
 // Routes non protégées
 const publicRoutes = {
-    home: defineRoute(`${appRoot}/`),
-    // dashboard: defineRoute(`/`),
+    home: defineRoute(`${appRoot}`),
+    dashboard: defineRoute(`/`),
     discover_publish: defineRoute(
         {
             authentication_failed: param.query.optional.number,
             session_expired_login_success: param.query.optional.number,
         },
-        () => `${appRoot}/publier-une-donnee`
+        () => `/publier-une-donnee`
     ),
-    page_not_found: defineRoute(`${appRoot}/404`),
-    login_disabled: defineRoute(`${appRoot}/connexion-desactivee`),
+    page_not_found: defineRoute(`/404`),
+    login_disabled: defineRoute(`/connexion-desactivee`),
 };
 
 const mapRoutes = {
@@ -22,14 +21,14 @@ const mapRoutes = {
         {
             mapId: param.path.string,
         },
-        (p) => `${appRoot}/voir-une-carte/${p.mapId}`
+        (p) => `/voir-une-carte/${p.mapId}`
     ),
     edit_map: defineRoute(
         {
             mapId: param.path.string,
             organizationId: param.query.optional.string,
         },
-        (p) => `${appRoot}/creer-une-carte/${p.mapId}`
+        (p) => `/creer-une-carte/${p.mapId}`
     ),
 
     map_list: defineRoute(
@@ -40,9 +39,9 @@ const mapRoutes = {
             organizationId: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => ["/cartes"]
+        () => [`${appRoot}/cartes`]
     ),
-    create_map: defineRoute(`${appRoot}/creer-une-carte`),
+    create_map: defineRoute(`/creer-une-carte`),
 };
 
 const mediaRoutes = {
@@ -52,7 +51,7 @@ const mediaRoutes = {
             limit: param.query.optional.number.default(10),
             search: param.query.optional.string,
         },
-        () => ["/images"]
+        () => [`${appRoot}/images`]
     ),
 };
 
@@ -60,7 +59,7 @@ const organizationRoute = defineRoute(
     {
         organizationId: param.path.string,
     },
-    (p) => [`/equipes/${p.organizationId}`]
+    (p) => [`${appRoot}/equipes/${p.organizationId}`]
 );
 
 const organizationRoutes = {
@@ -70,7 +69,7 @@ const organizationRoutes = {
             limit: param.query.optional.number.default(10),
             search: param.query.optional.string,
         },
-        () => ["/equipes"]
+        () => [`${appRoot}/equipes`]
     ),
     organization_maps: organizationRoute.extend(
         {
@@ -79,7 +78,7 @@ const organizationRoutes = {
             search: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => "/cartes"
+        () => ["/cartes"]
     ),
     organization_members: organizationRoute.extend(
         {
@@ -87,27 +86,26 @@ const organizationRoutes = {
             limit: param.query.optional.number.default(20),
             search: param.query.optional.string,
         },
-        () => "/membres"
+        () => ["/membres"]
     ),
     organization_info: organizationRoute.extend("/infos"),
 };
 
 // Chemin vers les sources utiles
 const helpRoutes = {
-    help_more_info: defineRoute(`${appRoot}/aide/creer-une-carte`),
+    help_more_info: defineRoute(`/aide/creer-une-carte`),
 };
 
 // Routes protégées qui ne sont pas dans des groupes spécifiques plus bas (community, datastore...etc.)
 const privateRoutes = {
     // utilisateur
-    my_account: defineRoute(`${appRoot}/mon-compte`),
     datastore_selection: defineRoute(
         {
             page: param.query.optional.number.default(1),
             limit: param.query.optional.number.default(20),
             search: param.query.optional.string.default(""),
         },
-        () => `${appRoot}/tableau-de-bord/entrepots`
+        () => `/tableau-de-bord/entrepots`
     ),
 };
 

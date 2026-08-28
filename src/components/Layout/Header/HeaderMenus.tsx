@@ -121,8 +121,8 @@ export function HeaderMenuUser() {
                                 </div>
                             ),
                         },
-                        { iconId: "fr-icon-dashboard-3-line", children: t("board"), linkProps: { href: externalUrls.contact_us } },
-                        { iconId: "fr-icon-user-line", children: t("account"), linkProps: { href: externalUrls.contact_us } },
+                        { iconId: "fr-icon-dashboard-3-line", children: t("board"), linkProps: { href: externalUrls.dashboard } },
+                        { iconId: "fr-icon-user-line", children: t("account"), linkProps: { href: externalUrls.my_account } },
                     ]}
                     actionButtonProps={{
                         children: "Me déconnecter",

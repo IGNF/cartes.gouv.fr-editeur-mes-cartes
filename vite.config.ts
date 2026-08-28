@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
-    envPrefix: ["VITE_", "API_EDITOR_URL", "APP_ENV"],
+    envPrefix: ["VITE_", "API_EDITOR_URL", "APP_ROOT_URL", "APP_ENV"],
     plugins: [react(), babel({ presets: [reactCompilerPreset()] }), oidcSpa()],
     resolve: {
         alias: {
