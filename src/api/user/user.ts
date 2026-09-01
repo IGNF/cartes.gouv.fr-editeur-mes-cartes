@@ -21,7 +21,7 @@ import type {
     UseQueryResult,
 } from "@tanstack/react-query";
 
-import { env } from "../../env";
+import { apiURL } from "../../env";
 
 import type {
     BadRequestResponse,
@@ -36,7 +36,7 @@ import type {
     UserView,
 } from "../model";
 
-import { fetchWithAuth } from "../fetchWithAuth";
+import { fetchWithAuth } from ".././fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -75,7 +75,7 @@ export type getMeResponseError = getMeResponse401 & {
 export type getMeResponse = getMeResponseSuccess | getMeResponseError;
 
 export const getGetMeUrl = () => {
-    return `${env.API_EDITOR_URL}/api/me`;
+    return `${apiURL}/api/me`;
 };
 
 export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
@@ -86,7 +86,7 @@ export const getMe = async (options?: RequestInit): Promise<getMeResponse> => {
 };
 
 export const getGetMeQueryKey = () => {
-    return [`${env.API_EDITOR_URL}/api/me`] as const;
+    return [`${apiURL}/api/me`] as const;
 };
 
 export const getGetMeQueryOptions = <TData = Awaited<ReturnType<typeof getMe>>, TError = NotConnectedResponse>(options?: {
@@ -180,7 +180,7 @@ export type deleteMeResponseError = (deleteMeResponse401 | deleteMeResponse403 |
 export type deleteMeResponse = deleteMeResponseSuccess | deleteMeResponseError;
 
 export const getDeleteMeUrl = () => {
-    return `${env.API_EDITOR_URL}/api/me`;
+    return `${apiURL}/api/me`;
 };
 
 /**
@@ -246,7 +246,7 @@ export type patchMeResponseError = (patchMeResponse400 | patchMeResponse401) & {
 export type patchMeResponse = patchMeResponseSuccess | patchMeResponseError;
 
 export const getPatchMeUrl = () => {
-    return `${env.API_EDITOR_URL}/api/me`;
+    return `${apiURL}/api/me`;
 };
 
 /**
@@ -315,7 +315,7 @@ export type getUserByPublicidResponseError = getUserByPublicidResponse404 & {
 export type getUserByPublicidResponse = getUserByPublicidResponseSuccess | getUserByPublicidResponseError;
 
 export const getGetUserByPublicidUrl = (publicId: string) => {
-    return `${env.API_EDITOR_URL}/api/users/public/${publicId}`;
+    return `${apiURL}/api/users/public/${publicId}`;
 };
 
 export const getUserByPublicid = async (publicId: string, options?: RequestInit): Promise<getUserByPublicidResponse> => {
@@ -326,7 +326,7 @@ export const getUserByPublicid = async (publicId: string, options?: RequestInit)
 };
 
 export const getGetUserByPublicidQueryKey = (publicId: string) => {
-    return [`${env.API_EDITOR_URL}/api/users/public/${publicId}`] as const;
+    return [`${apiURL}/api/users/public/${publicId}`] as const;
 };
 
 export const getGetUserByPublicidQueryOptions = <TData = Awaited<ReturnType<typeof getUserByPublicid>>, TError = NotFoundResponse>(
@@ -445,7 +445,7 @@ export const getGetUsersUrl = (params: GetUsersParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/users?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/users`;
+    return stringifiedParams.length > 0 ? `${apiURL}/api/users?${stringifiedParams}` : `${apiURL}/api/users`;
 };
 
 /**
@@ -459,7 +459,7 @@ export const getUsers = async (params: GetUsersParams, options?: RequestInit): P
 };
 
 export const getGetUsersQueryKey = (params?: GetUsersParams) => {
-    return [`${env.API_EDITOR_URL}/api/users`, ...(params ? [params] : [])] as const;
+    return [`${apiURL}/api/users`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetUsersQueryOptions = <TData = Awaited<ReturnType<typeof getUsers>>, TError = BadRequestResponse>(

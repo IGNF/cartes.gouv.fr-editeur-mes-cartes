@@ -18,11 +18,11 @@ import type {
     UseQueryResult,
 } from "@tanstack/react-query";
 
-import { env } from "../../env";
+import { apiURL } from "../../env";
 
 import type { Theme } from "../model";
 
-import { fetchWithAuth } from "../fetchWithAuth";
+import { fetchWithAuth } from ".././fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -52,7 +52,7 @@ export type getThemesResponseSuccess = getThemesResponse200 & {
 export type getThemesResponse = getThemesResponseSuccess;
 
 export const getGetThemesUrl = () => {
-    return `${env.API_EDITOR_URL}/api/themes`;
+    return `${apiURL}/api/themes`;
 };
 
 export const getThemes = async (options?: RequestInit): Promise<getThemesResponse> => {
@@ -63,7 +63,7 @@ export const getThemes = async (options?: RequestInit): Promise<getThemesRespons
 };
 
 export const getGetThemesQueryKey = () => {
-    return [`${env.API_EDITOR_URL}/api/themes`] as const;
+    return [`${apiURL}/api/themes`] as const;
 };
 
 export const getGetThemesQueryOptions = <TData = Awaited<ReturnType<typeof getThemes>>, TError = unknown>(options?: {

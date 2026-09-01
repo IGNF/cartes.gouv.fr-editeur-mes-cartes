@@ -18,11 +18,11 @@ import type {
     UseQueryResult,
 } from "@tanstack/react-query";
 
-import { env } from "../../env";
+import { apiURL } from "../../env";
 
 import type { Notification } from "../model";
 
-import { fetchWithAuth } from "../fetchWithAuth";
+import { fetchWithAuth } from ".././fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -52,7 +52,7 @@ export type getNotificationsResponseSuccess = getNotificationsResponse200 & {
 export type getNotificationsResponse = getNotificationsResponseSuccess;
 
 export const getGetNotificationsUrl = () => {
-    return `${env.API_EDITOR_URL}/api/notifications`;
+    return `${apiURL}/api/notifications`;
 };
 
 export const getNotifications = async (options?: RequestInit): Promise<getNotificationsResponse> => {
@@ -63,7 +63,7 @@ export const getNotifications = async (options?: RequestInit): Promise<getNotifi
 };
 
 export const getGetNotificationsQueryKey = () => {
-    return [`${env.API_EDITOR_URL}/api/notifications`] as const;
+    return [`${apiURL}/api/notifications`] as const;
 };
 
 export const getGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getNotifications>>, TError = unknown>(options?: {

@@ -1,5 +1,6 @@
 import { oidcSpa } from "oidc-spa/react-spa";
 import { z } from "zod";
+import { iamClientId, iamRealm, iamUrl } from "./env";
 
 // Inspiré de https://github.com/keycloakify/oidc-spa/blob/main/examples/tanstack-router-file-router/src/oidc.ts
 
@@ -20,6 +21,7 @@ export const { bootstrapOidc, useOidc, getOidc, OidcInitializationGate } = oidcS
     .createUtils();
 
 void bootstrapOidc(
+    // Local seulement
     import.meta.env.VITE_OIDC_USE_MOCK === "true"
         ? {
               // Mode mock pour les tests (si jamais) : pas de requêtes à l'iam
@@ -29,9 +31,9 @@ void bootstrapOidc(
           }
         : {
               implementation: "real",
-              issuerUri: `${import.meta.env.VITE_IAM_URL}/realms/${import.meta.env.VITE_IAM_REALM}`,
+              issuerUri: `${iamUrl}/realms/${iamRealm}`,
               // issuerUri: "http://localhost:8000",
-              clientId: import.meta.env.VITE_IAM_CLIENT_ID,
+              clientId: iamClientId,
               debugLogs: import.meta.env.MODE === "development",
           }
 );
