@@ -14,6 +14,7 @@ export default defineConfig([
         // Dossiers générés / externes ignorés par le lint
         "public/build",
         "public/bundles",
+        "public/env.js",
         "assets/data",
         "vendor",
         "var",

@@ -26,11 +26,9 @@ Créer ou adapter le fichier `.env.local` à la racine du projet. Les variables 
 
 ```dotenv
 API_EDITOR_URL=https://url.to/api/
-VITE_IAM_URL=https://url.to/sso
-VITE_IAM_REALM=geoplateforme
-VITE_IAM_CLIENT_ID=client_oidc
-VITE_EDITOR_URL=https://url.to/editor
-VITE_VIEWER_URL=https://url.to/viewer
+IAM_URL=https://url.to/sso
+IAM_REALM=geoplateforme
+IAM_CLIENT_ID=client_oidc
 ```
 
 Lancer le projet en local :

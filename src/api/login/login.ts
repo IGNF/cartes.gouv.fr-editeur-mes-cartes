@@ -8,11 +8,11 @@
 import { useMutation } from "@tanstack/react-query";
 import type { MutationFunction, QueryClient, UseMutationOptions, UseMutationResult } from "@tanstack/react-query";
 
-import { env } from "../../env";
+import { apiURL } from "../../env";
 
 import type { Login, NotConnectedResponse, PostLogin401, PostLogin429, PostLoginParams, RefreshToken401, RefreshTokenParams } from "../model";
 
-import { fetchWithAuth } from "../fetchWithAuth";
+import { fetchWithAuth } from ".././fetchWithAuth";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
@@ -46,7 +46,7 @@ export const getRefreshTokenUrl = (params: RefreshTokenParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/token/refresh?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/token/refresh`;
+    return stringifiedParams.length > 0 ? `${apiURL}/api/token/refresh?${stringifiedParams}` : `${apiURL}/api/token/refresh`;
 };
 
 export const refreshToken = async (params: RefreshTokenParams, options?: RequestInit): Promise<refreshTokenResponse> => {
@@ -124,7 +124,7 @@ export const getPostLoginUrl = (params: PostLoginParams) => {
 
     const stringifiedParams = normalizedParams.toString();
 
-    return stringifiedParams.length > 0 ? `${env.API_EDITOR_URL}/api/login?${stringifiedParams}` : `${env.API_EDITOR_URL}/api/login`;
+    return stringifiedParams.length > 0 ? `${apiURL}/api/login?${stringifiedParams}` : `${apiURL}/api/login`;
 };
 
 export const postLogin = async (params: PostLoginParams, options?: RequestInit): Promise<postLoginResponse> => {
@@ -187,7 +187,7 @@ export type postLogoutResponseError = postLogoutResponse401 & {
 export type postLogoutResponse = postLogoutResponseSuccess | postLogoutResponseError;
 
 export const getPostLogoutUrl = () => {
-    return `${env.API_EDITOR_URL}/api/logout`;
+    return `${apiURL}/api/logout`;
 };
 
 export const postLogout = async (options?: RequestInit): Promise<postLogoutResponse> => {

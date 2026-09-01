@@ -13,8 +13,8 @@ export default defineConfig({
             formatter: "prettier",
             client: "react-query",
             baseUrl: {
-                runtime: "env.API_EDITOR_URL",
-                imports: [{ name: "env", importPath: "../env" }],
+                runtime: "apiURL",
+                imports: [{ name: "apiURL", importPath: "../env" }],
             },
             mock: true,
             override: {
