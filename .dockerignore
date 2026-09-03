@@ -1,0 +1,17 @@
+# Secrets
+/.env.local
+/.env.*.local
+/.env.local.php
+
+# NE PAS ignorer : .git (vite.config.ts lit git describe/rev-parse au build),
+# .env (défauts non secrets requis au build), tsconfig*.json (lus par Vite/esbuild)
+
+/.vscode
+/.history
+/.github
+/.husky
+/dist
+/node_modules/
+/public/build
+/public/bundles
+/docs
