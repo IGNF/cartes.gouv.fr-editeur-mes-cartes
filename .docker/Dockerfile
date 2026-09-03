@@ -12,7 +12,7 @@ RUN npm ci \
 	&& npm run build
 
 #----------------------------------------------------------------------
-# cartesgouvfr-documentation : Config d'un serveur statique avec nginx
+# cartes.gouv.fr-editeur-mes-cartes : Config d'un serveur statique avec nginx
 #----------------------------------------------------------------------
 FROM nginxinc/nginx-unprivileged:alpine-slim
 COPY --from=builder /app/dist /usr/share/nginx/html/

@@ -5,7 +5,6 @@
         iamUrl: undefined,
         iamRealm: undefined,
         iamClientId: undefined,
-        appRootUrl: undefined,
         apiEditorUrl: undefined,
     };
     Object.freeze(window.__DASHBOARD_EDITEUR_ENV);
