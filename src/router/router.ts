@@ -1,5 +1,6 @@
 import { createGroup, createRouter, defineRoute, param } from "type-route";
-import { appURL as appRoot } from "@/env";
+
+const appRoot = import.meta.env.BASE_URL;
 
 // Routes non protégées
 const publicRoutes = {

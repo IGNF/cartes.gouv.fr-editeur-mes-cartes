@@ -1,9 +1,10 @@
-import { FC } from "react";
+import { FC, lazy } from "react";
 import { symToStr } from "tsafe/symToStr";
 import { api } from "@/api";
 import PageNotFound from "../error/PageNotFound";
 import { OrganizationLayoutChildrenProps } from "./OrganizationLayout";
-import MapList from "@/pages/Map/MapList";
+
+const MapList = lazy(() => import("@/pages/Map/MapList"));
 
 const OrganizationMaps: FC<OrganizationLayoutChildrenProps> = ({ organizationId, role }) => {
     const { data: organization } = api.organization.useGetOrganizationsById(organizationId, {

@@ -9,7 +9,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
-    envPrefix: ["VITE_", "API_EDITOR_URL", "APP_ROOT_URL", "APP_ENV", "IAM_"],
+    base: process.env.BASE_URL || "/tableau-de-bord/editeur",
+    envPrefix: ["VITE_", "API_EDITOR_URL", "APP_ENV", "IAM_"],
     plugins: [react(), babel({ presets: [reactCompilerPreset()] }), oidcSpa()],
     resolve: {
         alias: {
