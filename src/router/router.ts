@@ -12,17 +12,17 @@ const mapRoutes = {
     // WARNING: Route externe (ne pas utiliser `routes.view_map(id).link`)
     view_map: defineRoute(
         {
-            mapId: param.path.string,
+            map: param.query.string,
         },
-        (p) => `/voir-une-carte/${p.mapId}`
+        () => `/voir-une-carte`
     ),
     // WARNING: Route externe (ne pas utiliser `routes.edit_map(id).link`)
     edit_map: defineRoute(
         {
-            mapId: param.path.string,
+            map: param.path.string,
             organizationId: param.query.optional.string,
         },
-        (p) => `/creer-une-carte/${p.mapId}`
+        (p) => `/creer-une-carte/${p.map}`
     ),
     map_list: defineRoute(
         {

@@ -386,9 +386,9 @@ export default function MapList({ role }: MapListProps) {
                                                         linkProps={
                                                             // role !== UserRole.MEMBER
                                                             //     ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
-                                                            //     : routes.view_map({ mapId: map.view_id || "" }).link
+                                                            //     : routes.view_map({ map: map.view_id || "" }).link
                                                             {
-                                                                href: routes.edit_map({ mapId: map.view_id || "" }).link.href,
+                                                                href: routes.edit_map({ map: map.view_id || "" }).link.href,
                                                             }
                                                         }
                                                     >
