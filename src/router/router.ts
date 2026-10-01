@@ -5,33 +5,25 @@ const appRoot = import.meta.env.BASE_URL;
 // Routes non protégées
 const publicRoutes = {
     home: defineRoute(`${appRoot}`),
-    dashboard: defineRoute(`/`),
-    discover_publish: defineRoute(
-        {
-            authentication_failed: param.query.optional.number,
-            session_expired_login_success: param.query.optional.number,
-        },
-        () => `/publier-une-donnee`
-    ),
     page_not_found: defineRoute(`/404`),
-    login_disabled: defineRoute(`/connexion-desactivee`),
 };
 
 const mapRoutes = {
+    // WARNING: Route externe (ne pas utiliser `routes.view_map(id).link`)
     view_map: defineRoute(
         {
-            mapId: param.path.string,
+            map: param.query.string,
         },
-        (p) => `/voir-une-carte/${p.mapId}`
+        () => `/voir-une-carte`
     ),
+    // WARNING: Route externe (ne pas utiliser `routes.edit_map(id).link`)
     edit_map: defineRoute(
         {
-            mapId: param.path.string,
+            map: param.path.string,
             organizationId: param.query.optional.string,
         },
-        (p) => `/creer-une-carte/${p.mapId}`
+        (p) => `/creer-une-carte/${p.map}`
     ),
-
     map_list: defineRoute(
         {
             page: param.query.optional.number.default(1),
@@ -42,7 +34,6 @@ const mapRoutes = {
         },
         () => [`${appRoot}/cartes`]
     ),
-    create_map: defineRoute(`/creer-une-carte`),
 };
 
 const mediaRoutes = {
@@ -92,11 +83,6 @@ const organizationRoutes = {
     organization_info: organizationRoute.extend("/infos"),
 };
 
-// Chemin vers les sources utiles
-const helpRoutes = {
-    help_more_info: defineRoute(`/aide/creer-une-carte`),
-};
-
 // Routes protégées qui ne sont pas dans des groupes spécifiques plus bas (community, datastore...etc.)
 const privateRoutes = {
     // utilisateur
@@ -113,7 +99,6 @@ const privateRoutes = {
 const routeDefs = {
     ...publicRoutes,
     ...privateRoutes,
-    ...helpRoutes,
     ...mapRoutes,
     ...mediaRoutes,
     ...organizationRoutes,

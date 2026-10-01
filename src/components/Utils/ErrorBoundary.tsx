@@ -32,7 +32,7 @@ const ErrorBoundary: FC<PropsWithChildren> = ({ children }) => {
             FallbackComponent={Fallback}
             onReset={(details) => {
                 // Reset the state of your app so the error doesn't happen again
-                console.log(details);
+                console.error(details);
             }}
         >
             {children}

@@ -9,7 +9,8 @@ export function useMapLink(map?: MapView | MapResearchItem): string {
     if (!map?.view_id) {
         return "";
     }
-    return routes.view_map({ mapId: map.view_id }).href;
+    // Recréé le bon url
+    return `${window.location.origin}${routes.view_map({ map: map.view_id }).href}`;
 }
 
 /**

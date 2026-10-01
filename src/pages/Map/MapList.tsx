@@ -15,9 +15,9 @@ import { tss } from "tss-react";
 import MapItem from "./MapItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { usePrefetchQuery } from "@tanstack/react-query";
-import RQKeys from "@/modules/maps/RQKeys";
-import { MapResearchItem, UserView } from "@/api/model";
+// import { usePrefetchQuery } from "@tanstack/react-query";
+// import RQKeys from "@/modules/maps/RQKeys";
+import { BadRequestResponse, MapAdd, MapResearchItem, NotConnectedResponse, NotFoundResponse } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
@@ -25,9 +25,17 @@ import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
 import NoMap from "./NoMap";
 import { UserRole } from "@/types/UserRole";
 import type { Route } from "type-route";
-import { useEditorUser } from "@/hooks/useEditorUser";
+// import { useEditorUser } from "@/hooks/useEditorUser";
 import { useOrganizationMaps } from "@/hooks/useOrganizationMaps";
 import { ShareDefinition } from "../Media/ShareDefinition";
+import { externalUrls } from "@/router/externalUrls";
+import { PostMapMutationVariables, postMapResponse } from "@/api/map/map";
+import { UseMutationResult } from "@tanstack/react-query";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+
+// TODO : implémenter organisations (en décommentant lignes)
+
+type MutationPostMap = UseMutationResult<postMapResponse, NotFoundResponse | NotConnectedResponse | BadRequestResponse, PostMapMutationVariables, void>;
 
 /**
  * Élément dans l'URL de recherche
@@ -45,12 +53,12 @@ type MapListProps = {
     role?: UserRole;
 };
 
-type canDeleteProps = {
-    map: MapResearchItem;
-    user?: UserView;
-    role?: UserRole;
-    organizationId?: string;
-};
+// type canDeleteProps = {
+//     map: MapResearchItem;
+//     user?: UserView;
+//     role?: UserRole;
+//     organizationId?: string;
+// };
 
 // Modales
 const confirmDeleteMapModal = createModal({
@@ -60,11 +68,6 @@ const confirmDeleteMapModal = createModal({
 
 const shareMapModal = createModal({
     id: "share-map-modal",
-    isOpenedByDefault: false,
-});
-
-const confirmCopyMapModal = createModal({
-    id: "confirm-copy-map-modal",
     isOpenedByDefault: false,
 });
 
@@ -113,13 +116,66 @@ function useMapRouteParams(): MapRouteParams {
  * - La carte est dans une équipe, l'utilisateur a les droits
  * d'édition sur l'équipe ET la carte lui appartient;
  */
-function canDelete(props: canDeleteProps): boolean {
-    const { role, map, organizationId, user } = props;
-    const isNotOrganisation = !organizationId;
-    const isOwner = organizationId && role === UserRole.OWNER;
-    const isEditorAndAuthor = organizationId && role === UserRole.EDITOR && map.user_id === user?.public_id;
-    return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
+// function canDelete(props: canDeleteProps): boolean {
+//     const { role, map, organizationId, user } = props;
+//     const isNotOrganisation = !organizationId;
+//     const isOwner = organizationId && role === UserRole.OWNER;
+//     const isEditorAndAuthor = organizationId && role === UserRole.EDITOR && map.user_id === user?.public_id;
+//     return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
+// }
+
+/**
+ * Fonction permettant de transformer un objet de recherche en objet à copier
+ * @param map Objet à copier
+ * @returns Objet copié
+ */
+function toMapAdd(map: MapResearchItem): MapAdd {
+    if (map.theme_id === null) {
+        throw new Error("La carte doit avoir un thème");
+    }
+
+    return {
+        title: `${map.title} (copie)`,
+        description: map.description,
+        theme_id: map.theme_id,
+        type: map.type,
+        premium: map.premium ?? "default",
+        active: map.active,
+        share: map.share,
+        bbox: map.bbox,
+        img_url: map.img_url,
+        organization_id: map.organization_id ?? undefined,
+    };
 }
+
+/**
+ * Copie une carte.
+ * @param map Carte à copier
+ * @param mutation Mutation à utiliser pour envoyer la requête
+ * @returns Vrai s'il n'y a pas eu d'erreur, faux sinon
+ */
+const onCopyClick = async (map: MapResearchItem, mutation: MutationPostMap) => {
+    if (!map.edit_id) {
+        return false;
+    }
+
+    const response = await api.map.getMapFileByEditId(map.edit_id);
+
+    if (response.status !== 200) {
+        return false;
+    }
+
+    const mapObject = toMapAdd(map);
+
+    await mutation.mutateAsync({
+        data: {
+            carte: mapObject,
+            file: new Blob([JSON.stringify(response.data)], { type: "application/json" }),
+        },
+    });
+
+    return true;
+};
 
 export default function MapList({ role }: MapListProps) {
     // Traduction
@@ -141,10 +197,27 @@ export default function MapList({ role }: MapListProps) {
                 // TODO : AFFICHER MESSAGE ERREUR ?
                 console.error(error);
             },
-            onMutate: (args) => {
+            onMutate: () => {
                 // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
                 confirmDeleteMapModal.close();
-                console.log(args);
+            },
+        },
+    });
+
+    // Appelé lors de la copie d'une carte
+    const copyMapMutation = api.map.usePostMap({
+        mutation: {
+            onSuccess: () => {
+                // TODO : AFFICHER MESSAGE VALIDATION ?
+                void refetch();
+            },
+            onError: (error) => {
+                // TODO : AFFICHER MESSAGE ERREUR ?
+                console.error(error);
+            },
+            onMutate: () => {
+                // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
+                confirmDeleteMapModal.close();
             },
         },
     });
@@ -155,7 +228,7 @@ export default function MapList({ role }: MapListProps) {
     const offset = (routeParams.page - 1) * routeParams.limit;
     const organizationId = routeParams.organizationId;
 
-    const user = useEditorUser();
+    // const user = useEditorUser();
     const route = useRoute();
 
     // Envoi deux requêtes dans le cas d'une équipe
@@ -167,16 +240,17 @@ export default function MapList({ role }: MapListProps) {
         refetch,
     } = useOrganizationMaps(role, organizationId, { ...routeParams, query: routeParams.search, offset: offset });
 
-    const context = role === UserRole.MEMBER ? "organization" : "profile";
+    // const context = role === UserRole.MEMBER ? "organization" : "profile";
+    // const context = "profile";
 
     // Va chercher les cartes de la page d'après
-    // TODO : améliorer cela car pas l'air de fonctionner
-    const nextPageOffset = routeParams.page * routeParams.limit;
-    usePrefetchQuery({
-        queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
-        queryFn: ({ signal }) =>
-            api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
-    });
+    // TODO : Permettre le prefetch pour aller chercher les cartes d'après
+    // const nextPageOffset = routeParams.page * routeParams.limit;
+    // usePrefetchQuery({
+    //     queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
+    //     queryFn: ({ signal }) =>
+    //         api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
+    // });
 
     const { data: themesResponse } = api.theme.useGetThemes({
         query: {
@@ -229,7 +303,14 @@ export default function MapList({ role }: MapListProps) {
                         {mapCount}
                     </Badge>
                     {role !== UserRole.MEMBER && (
-                        <Button linkProps={routes.create_map().link} iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
+                        <Button
+                            linkProps={{
+                                href: externalUrls.create_map,
+                            }}
+                            iconId="fr-icon-add-line"
+                            iconPosition="right"
+                            className={fr.cx("fr-ml-auto")}
+                        >
                             {t("create-map")}
                         </Button>
                     )}
@@ -265,6 +346,16 @@ export default function MapList({ role }: MapListProps) {
                     )}
                 </div>
             </div>
+
+            {(copyMapMutation.isPending || copyMapMutation.isSuccess || copyMapMutation.isError) && (
+                <Alert
+                    className={fr.cx("fr-mt-2v")}
+                    description={t(`copy-map__${copyMapMutation.status}`)}
+                    severity={copyMapMutation.status === "pending" ? "info" : copyMapMutation.status}
+                    closable={!copyMapMutation.isPending}
+                    small={true}
+                ></Alert>
+            )}
 
             {hasFilters && showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
@@ -343,18 +434,15 @@ export default function MapList({ role }: MapListProps) {
                                                                     setOpenedMap(map);
                                                                     confirmDeleteMapModal.open();
                                                                 }}
-                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                                // disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                             <Button
                                                                 title={tCommon("duplicate")}
                                                                 iconId="ri-file-copy-line"
                                                                 size="small"
                                                                 priority="tertiary"
-                                                                onClick={() => {
-                                                                    setOpenedMap(map);
-                                                                    confirmCopyMapModal.open();
-                                                                }}
-                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                                onClick={() => onCopyClick(map, copyMapMutation)}
+                                                                // disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                         </>
                                                     )}
@@ -374,9 +462,12 @@ export default function MapList({ role }: MapListProps) {
                                                         size="small"
                                                         iconPosition="right"
                                                         linkProps={
-                                                            role !== UserRole.MEMBER
-                                                                ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
-                                                                : routes.view_map({ mapId: map.view_id || "" }).link
+                                                            // role !== UserRole.MEMBER
+                                                            //     ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
+                                                            //     : routes.view_map({ map: map.view_id || "" }).link
+                                                            {
+                                                                href: routes.edit_map({ map: map.view_id || "" }).link.href,
+                                                            }
                                                         }
                                                     >
                                                         {role !== UserRole.MEMBER ? tCommon("open") : tCommon("see")}
@@ -430,26 +521,6 @@ export default function MapList({ role }: MapListProps) {
                 >
                     {t("delete-map--message", { fileName: openedMap?.title })}
                 </confirmDeleteMapModal.Component>,
-                document.body
-            )}
-
-            {createPortal(
-                <confirmCopyMapModal.Component
-                    title={t("copy-map")}
-                    buttons={[
-                        {
-                            children: tCommon("cancel"),
-                            priority: "secondary",
-                        },
-                        {
-                            children: tCommon("duplicate"),
-                            priority: "primary",
-                            doClosesModal: false,
-                        },
-                    ]}
-                >
-                    <div />
-                </confirmCopyMapModal.Component>,
                 document.body
             )}
 
