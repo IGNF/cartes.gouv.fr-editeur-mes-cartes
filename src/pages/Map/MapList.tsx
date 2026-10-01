@@ -144,10 +144,9 @@ export default function MapList({ role }: MapListProps) {
                 // TODO : AFFICHER MESSAGE ERREUR ?
                 console.error(error);
             },
-            onMutate: (args) => {
+            onMutate: () => {
                 // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
                 confirmDeleteMapModal.close();
-                console.log(args);
             },
         },
     });

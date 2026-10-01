@@ -14,20 +14,15 @@ const RouterRenderer: FC = () => {
     const route = useRoute();
 
     const content: JSX.Element = useMemo(() => {
-        console.log(route.name);
+        // vérification si la route demandée est bien connue/enregistrée
+        if (route.name === false || !knownRoutes.includes(route.name) || route.name === "page_not_found") {
+            return <PageNotFoundWithLayout />;
+        }
         if (route.name === "home") {
             routes.map_list().push();
             // TODO : corriger breadcrumb ?
             return <GroupMap route={routes.map_list()} />;
         }
-        // vérification si la route demandée est bien connue/enregistrée
-        if (route.name === false || !knownRoutes.includes(route.name) || route.name === "page_not_found") {
-            return <PageNotFoundWithLayout />;
-        }
-        // // vérifier si l'utilisateur est authentifié et éventuellement ses droits à la ressource demandée
-        // if (!groups.public.has(route) && !user) {
-        //     return <RedirectToLogin />;
-        // }
 
         // Redirige l'uitilisateur de home vers /cartes
         if (groups.map.has(route)) {

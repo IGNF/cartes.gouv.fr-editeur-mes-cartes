@@ -1,10 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { externalLink, externalUrls } from "@/router/externalUrls";
-import { routes } from "@/router/router";
 import HeaderMenu from "./HeaderMenu";
 import "../../../sass/components/buttons.scss";
 import { useOidc } from "@/oidc";
 import { useTranslation } from "@/i18n";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 
 export function HeaderMenuHelp() {
     return (
@@ -60,20 +60,20 @@ export function HeaderMenuServices() {
                 {
                     iconId: "fr-icon-database-line",
                     children: "Publier une donnée",
-                    linkProps: routes.discover_publish().link,
+                    linkProps: { href: externalUrls.discover_publish },
                 },
-                // {
-                //     iconId: "fr-icon-brush-line",
-                //     children: (
-                //         <>
-                //             Créer une carte{" "}
-                //             <Badge severity="success" className={"fr-ml-auto"}>
-                //                 Bêta
-                //             </Badge>
-                //         </>
-                //     ),
-                //     linkProps: { href: externalUrls.create_map },
-                // },
+                {
+                    iconId: "fr-icon-brush-line",
+                    children: (
+                        <>
+                            Créer une carte{" "}
+                            <Badge severity="success" className={"fr-ml-auto"} noIcon={true} small={true}>
+                                Bêta
+                            </Badge>
+                        </>
+                    ),
+                    linkProps: { href: externalUrls.create_map },
+                },
             ]}
             actionButtonProps={{
                 children: "Découvrir cartes.gouv.fr",

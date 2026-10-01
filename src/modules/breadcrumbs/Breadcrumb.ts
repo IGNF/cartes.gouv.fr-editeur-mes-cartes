@@ -3,6 +3,7 @@ import { Route } from "type-route";
 
 import { getTranslation } from "../../i18n/i18n";
 import { routes } from "../../router/router";
+import { externalUrls } from "@/router/externalUrls";
 // import { Organization } from "@/api/model";
 
 const { t } = getTranslation("Breadcrumb");
@@ -27,7 +28,7 @@ const getBreadcrumb = (
 
     const mapProps: BreadcrumbProps = {
         homeLinkProps: {
-            href: routes.dashboard().href,
+            href: externalUrls.dashboard,
         },
         // segments: [{ label: t("dashboard"), linkProps: routes.dashboard().link }],
         segments: [],
