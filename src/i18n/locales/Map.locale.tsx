@@ -10,6 +10,9 @@ const { i18n } = declareComponentKeys<
     | "map-list__description"
     | "create-map"
     | "create-map-service"
+    | "copy-map__pending"
+    | "copy-map__success"
+    | "copy-map__error"
     | "view"
     | "no-corresponding-map__title"
     | "no-corresponding-map__description"
@@ -31,6 +34,9 @@ export const MapFrTranslations: Translations<"fr">["Map"] = {
     "map-list__description": "Gérer mes cartes",
     "create-map": "Créer une carte",
     "create-map-service": "Créer",
+    "copy-map__pending": "Copie en cours",
+    "copy-map__success": "Carte copiée avec succès.",
+    "copy-map__error": "Erreur lors de la copie de la carte. Veuillez réessayer ultérieurement.",
     view: "Ouvrir",
     "no-corresponding-map__title": "Aucune carte correspondante",
     "no-corresponding-map__description": "Aucune carte ne correspond à vos filtres.",
@@ -64,6 +70,9 @@ export const MapEnTranslations: Translations<"en">["Map"] = {
     "map-list__description": undefined,
     "create-map": undefined,
     "create-map-service": undefined,
+    "copy-map__pending": undefined,
+    "copy-map__success": undefined,
+    "copy-map__error": undefined,
     view: undefined,
     "no-corresponding-map__title": undefined,
     "no-corresponding-map__description": undefined,

@@ -17,7 +17,7 @@ import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
 // import { usePrefetchQuery } from "@tanstack/react-query";
 // import RQKeys from "@/modules/maps/RQKeys";
-import { MapResearchItem } from "@/api/model";
+import { BadRequestResponse, MapAdd, MapResearchItem, NotConnectedResponse, NotFoundResponse } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
@@ -29,8 +29,13 @@ import type { Route } from "type-route";
 import { useOrganizationMaps } from "@/hooks/useOrganizationMaps";
 import { ShareDefinition } from "../Media/ShareDefinition";
 import { externalUrls } from "@/router/externalUrls";
+import { PostMapMutationVariables, postMapResponse } from "@/api/map/map";
+import { UseMutationResult } from "@tanstack/react-query";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 // TODO : implémenter organisations (en décommentant lignes)
+
+type MutationPostMap = UseMutationResult<postMapResponse, NotFoundResponse | NotConnectedResponse | BadRequestResponse, PostMapMutationVariables, void>;
 
 /**
  * Élément dans l'URL de recherche
@@ -63,11 +68,6 @@ const confirmDeleteMapModal = createModal({
 
 const shareMapModal = createModal({
     id: "share-map-modal",
-    isOpenedByDefault: false,
-});
-
-const confirmCopyMapModal = createModal({
-    id: "confirm-copy-map-modal",
     isOpenedByDefault: false,
 });
 
@@ -124,6 +124,59 @@ function useMapRouteParams(): MapRouteParams {
 //     return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
 // }
 
+/**
+ * Fonction permettant de transformer un objet de recherche en objet à copier
+ * @param map Objet à copier
+ * @returns Objet copié
+ */
+function toMapAdd(map: MapResearchItem): MapAdd {
+    if (map.theme_id === null) {
+        throw new Error("La carte doit avoir un thème");
+    }
+
+    return {
+        title: `${map.title} (copie)`,
+        description: map.description,
+        theme_id: map.theme_id,
+        type: map.type,
+        premium: map.premium ?? "default",
+        active: map.active,
+        share: map.share,
+        bbox: map.bbox,
+        img_url: map.img_url,
+        organization_id: map.organization_id ?? undefined,
+    };
+}
+
+/**
+ * Copie une carte.
+ * @param map Carte à copier
+ * @param mutation Mutation à utiliser pour envoyer la requête
+ * @returns Vrai s'il n'y a pas eu d'erreur, faux sinon
+ */
+const onCopyClick = async (map: MapResearchItem, mutation: MutationPostMap) => {
+    if (!map.edit_id) {
+        return false;
+    }
+
+    const response = await api.map.getMapFileByEditId(map.edit_id);
+
+    if (response.status !== 200) {
+        return false;
+    }
+
+    const mapObject = toMapAdd(map);
+
+    await mutation.mutateAsync({
+        data: {
+            carte: mapObject,
+            file: new Blob([JSON.stringify(response.data)], { type: "application/json" }),
+        },
+    });
+
+    return true;
+};
+
 export default function MapList({ role }: MapListProps) {
     // Traduction
     const { t } = useTranslation("Map");
@@ -135,6 +188,24 @@ export default function MapList({ role }: MapListProps) {
 
     // Appelé plus tard dans la modale
     const deleteMapMutation = api.map.useDeleteMapByEditId({
+        mutation: {
+            onSuccess: () => {
+                // TODO : AFFICHER MESSAGE VALIDATION ?
+                void refetch();
+            },
+            onError: (error) => {
+                // TODO : AFFICHER MESSAGE ERREUR ?
+                console.error(error);
+            },
+            onMutate: () => {
+                // TODO : FERMER LA MODALE ET AFFICHER MESSAGE IN PROGRESS ?
+                confirmDeleteMapModal.close();
+            },
+        },
+    });
+
+    // Appelé lors de la copie d'une carte
+    const copyMapMutation = api.map.usePostMap({
         mutation: {
             onSuccess: () => {
                 // TODO : AFFICHER MESSAGE VALIDATION ?
@@ -276,6 +347,16 @@ export default function MapList({ role }: MapListProps) {
                 </div>
             </div>
 
+            {(copyMapMutation.isPending || copyMapMutation.isSuccess || copyMapMutation.isError) && (
+                <Alert
+                    className={fr.cx("fr-mt-2v")}
+                    description={t(`copy-map__${copyMapMutation.status}`)}
+                    severity={copyMapMutation.status === "pending" ? "info" : copyMapMutation.status}
+                    closable={!copyMapMutation.isPending}
+                    small={true}
+                ></Alert>
+            )}
+
             {hasFilters && showFilters && (
                 <div className={cx(classes.filterRoot, fr.cx("fr-my-6v"))}>
                     <div className={classes.filterSelect}>
@@ -360,10 +441,7 @@ export default function MapList({ role }: MapListProps) {
                                                                 iconId="ri-file-copy-line"
                                                                 size="small"
                                                                 priority="tertiary"
-                                                                onClick={() => {
-                                                                    setOpenedMap(map);
-                                                                    confirmCopyMapModal.open();
-                                                                }}
+                                                                onClick={() => onCopyClick(map, copyMapMutation)}
                                                                 // disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                         </>
@@ -443,26 +521,6 @@ export default function MapList({ role }: MapListProps) {
                 >
                     {t("delete-map--message", { fileName: openedMap?.title })}
                 </confirmDeleteMapModal.Component>,
-                document.body
-            )}
-
-            {createPortal(
-                <confirmCopyMapModal.Component
-                    title={t("copy-map")}
-                    buttons={[
-                        {
-                            children: tCommon("cancel"),
-                            priority: "secondary",
-                        },
-                        {
-                            children: tCommon("duplicate"),
-                            priority: "primary",
-                            doClosesModal: false,
-                        },
-                    ]}
-                >
-                    <div />
-                </confirmCopyMapModal.Component>,
                 document.body
             )}
 
