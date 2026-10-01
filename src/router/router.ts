@@ -5,7 +5,7 @@ const appRoot = import.meta.env.BASE_URL;
 // Routes non protégées
 const publicRoutes = {
     home: defineRoute(`${appRoot}`),
-    dashboard: defineRoute(`/`),
+    dashboard: defineRoute(`/tableau-de-bord`),
     discover_publish: defineRoute(
         {
             authentication_failed: param.query.optional.number,
@@ -31,7 +31,6 @@ const mapRoutes = {
         },
         (p) => `/creer-une-carte/${p.mapId}`
     ),
-
     map_list: defineRoute(
         {
             page: param.query.optional.number.default(1),
@@ -42,7 +41,6 @@ const mapRoutes = {
         },
         () => [`${appRoot}/cartes`]
     ),
-    create_map: defineRoute(`/creer-une-carte`),
 };
 
 const mediaRoutes = {

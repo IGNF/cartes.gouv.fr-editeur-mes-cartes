@@ -15,9 +15,9 @@ import { tss } from "tss-react";
 import MapItem from "./MapItem";
 import Skeleton from "@/components/Utils/Skeleton";
 import { ListHeader } from "@/components/Layout/ListHeader";
-import { usePrefetchQuery } from "@tanstack/react-query";
-import RQKeys from "@/modules/maps/RQKeys";
-import { MapResearchItem, UserView } from "@/api/model";
+// import { usePrefetchQuery } from "@tanstack/react-query";
+// import RQKeys from "@/modules/maps/RQKeys";
+import { MapResearchItem } from "@/api/model";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { createPortal } from "react-dom";
 import TextCopyToClipboard from "@/components/Utils/TextCopyToClipboard";
@@ -25,9 +25,12 @@ import { useMapIframe, useMapLink } from "@/hooks/useShareMap";
 import NoMap from "./NoMap";
 import { UserRole } from "@/types/UserRole";
 import type { Route } from "type-route";
-import { useEditorUser } from "@/hooks/useEditorUser";
+// import { useEditorUser } from "@/hooks/useEditorUser";
 import { useOrganizationMaps } from "@/hooks/useOrganizationMaps";
 import { ShareDefinition } from "../Media/ShareDefinition";
+import { externalUrls } from "@/router/externalUrls";
+
+// TODO : implémenter organisations (en décommentant lignes)
 
 /**
  * Élément dans l'URL de recherche
@@ -45,12 +48,12 @@ type MapListProps = {
     role?: UserRole;
 };
 
-type canDeleteProps = {
-    map: MapResearchItem;
-    user?: UserView;
-    role?: UserRole;
-    organizationId?: string;
-};
+// type canDeleteProps = {
+//     map: MapResearchItem;
+//     user?: UserView;
+//     role?: UserRole;
+//     organizationId?: string;
+// };
 
 // Modales
 const confirmDeleteMapModal = createModal({
@@ -113,13 +116,13 @@ function useMapRouteParams(): MapRouteParams {
  * - La carte est dans une équipe, l'utilisateur a les droits
  * d'édition sur l'équipe ET la carte lui appartient;
  */
-function canDelete(props: canDeleteProps): boolean {
-    const { role, map, organizationId, user } = props;
-    const isNotOrganisation = !organizationId;
-    const isOwner = organizationId && role === UserRole.OWNER;
-    const isEditorAndAuthor = organizationId && role === UserRole.EDITOR && map.user_id === user?.public_id;
-    return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
-}
+// function canDelete(props: canDeleteProps): boolean {
+//     const { role, map, organizationId, user } = props;
+//     const isNotOrganisation = !organizationId;
+//     const isOwner = organizationId && role === UserRole.OWNER;
+//     const isEditorAndAuthor = organizationId && role === UserRole.EDITOR && map.user_id === user?.public_id;
+//     return !!(isNotOrganisation || isOwner || isEditorAndAuthor);
+// }
 
 export default function MapList({ role }: MapListProps) {
     // Traduction
@@ -155,7 +158,7 @@ export default function MapList({ role }: MapListProps) {
     const offset = (routeParams.page - 1) * routeParams.limit;
     const organizationId = routeParams.organizationId;
 
-    const user = useEditorUser();
+    // const user = useEditorUser();
     const route = useRoute();
 
     // Envoi deux requêtes dans le cas d'une équipe
@@ -167,16 +170,17 @@ export default function MapList({ role }: MapListProps) {
         refetch,
     } = useOrganizationMaps(role, organizationId, { ...routeParams, query: routeParams.search, offset: offset });
 
-    const context = role === UserRole.MEMBER ? "organization" : "profile";
+    // const context = role === UserRole.MEMBER ? "organization" : "profile";
+    // const context = "profile";
 
     // Va chercher les cartes de la page d'après
-    // TODO : améliorer cela car pas l'air de fonctionner
-    const nextPageOffset = routeParams.page * routeParams.limit;
-    usePrefetchQuery({
-        queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
-        queryFn: ({ signal }) =>
-            api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
-    });
+    // TODO : Permettre le prefetch pour aller chercher les cartes d'après
+    // const nextPageOffset = routeParams.page * routeParams.limit;
+    // usePrefetchQuery({
+    //     queryKey: RQKeys.maps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }),
+    //     queryFn: ({ signal }) =>
+    //         api.map.getMaps({ ...routeParams, query: routeParams.search, offset: nextPageOffset, context: context, organization: organizationId }, { signal }),
+    // });
 
     const { data: themesResponse } = api.theme.useGetThemes({
         query: {
@@ -229,7 +233,14 @@ export default function MapList({ role }: MapListProps) {
                         {mapCount}
                     </Badge>
                     {role !== UserRole.MEMBER && (
-                        <Button linkProps={routes.create_map().link} iconId="fr-icon-add-line" iconPosition="right" className={fr.cx("fr-ml-auto")}>
+                        <Button
+                            linkProps={{
+                                href: externalUrls.create_map,
+                            }}
+                            iconId="fr-icon-add-line"
+                            iconPosition="right"
+                            className={fr.cx("fr-ml-auto")}
+                        >
                             {t("create-map")}
                         </Button>
                     )}
@@ -343,7 +354,7 @@ export default function MapList({ role }: MapListProps) {
                                                                     setOpenedMap(map);
                                                                     confirmDeleteMapModal.open();
                                                                 }}
-                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                                // disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                             <Button
                                                                 title={tCommon("duplicate")}
@@ -354,7 +365,7 @@ export default function MapList({ role }: MapListProps) {
                                                                     setOpenedMap(map);
                                                                     confirmCopyMapModal.open();
                                                                 }}
-                                                                disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
+                                                                // disabled={!canDelete({ organizationId: organizationId, role: role, map: map, user: user })}
                                                             />
                                                         </>
                                                     )}
@@ -374,9 +385,12 @@ export default function MapList({ role }: MapListProps) {
                                                         size="small"
                                                         iconPosition="right"
                                                         linkProps={
-                                                            role !== UserRole.MEMBER
-                                                                ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
-                                                                : routes.view_map({ mapId: map.view_id || "" }).link
+                                                            // role !== UserRole.MEMBER
+                                                            //     ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
+                                                            //     : routes.view_map({ mapId: map.view_id || "" }).link
+                                                            {
+                                                                href: routes.edit_map({ mapId: map.view_id || "" }).link.href,
+                                                            }
                                                         }
                                                     >
                                                         {role !== UserRole.MEMBER ? tCommon("open") : tCommon("see")}

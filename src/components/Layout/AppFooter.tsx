@@ -12,13 +12,13 @@ const AppFooter = () => {
             accessibilityLinkProps={{
                 href: externalUrls.accessibility,
             }}
-            brandTop={
-                <>
-                    République
-                    <br />
-                    Française
-                </>
-            }
+            // brandTop={
+            //     <>
+            //         République
+            //         <br />
+            //         Française
+            //     </>
+            // }
             contentDescription="
                 Cartes.gouv.fr est le service public des cartes et données du territoire français. Porté par l’IGN et ses partenaires, il offre à tous un accès à la référence de la cartographie publique et permet à chacun de créer, d’héberger et de publier ses propres données et représentations.
             "
@@ -29,13 +29,19 @@ const AppFooter = () => {
                     },
                     text: "Conditions générales d’utilisation",
                 },
+                {
+                    linkProps: {
+                        href: externalUrls.personal_data,
+                    },
+                    text: "Données personelles",
+                },
                 // <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
                 // <FooterConsentManagementItem key="footer-consent-management-item" />,
                 // Choix du thème clair/sombre
                 headerFooterDisplayItem,
             ]}
             homeLinkProps={{
-                href: externalUrls.discover_cartesgouvfr,
+                href: externalUrls.dashboard,
                 title: "Accueil - cartes.gouv.fr",
             }}
             termsLinkProps={{

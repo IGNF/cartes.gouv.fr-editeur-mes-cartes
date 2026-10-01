@@ -40,7 +40,10 @@ const OrganizationLayout: FC<PropsWithChildren<OrganizationLayoutProps>> = ({ or
 
     return organization && organization.public_id ? (
         <OrganizationProvider organization={organization} isFetching={isFetching} status={status}>
-            <ListMain title={organization.name} organizationId={organization.public_id}>
+            <ListMain
+                title={organization.name}
+                // organizationId={organization.public_id}
+            >
                 <PageTitle title={organization.name}>
                     {role && (
                         <>

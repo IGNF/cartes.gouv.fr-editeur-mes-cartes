@@ -12,11 +12,11 @@ import { type MainProps } from "./Main";
 
 export type ListMainProps = PropsWithChildren<MainProps> & {
     classes?: Partial<MainProps["classes"] & Record<"content", string>>;
-    organizationId?: string;
+    // organizationId?: string;
 };
 
 export default function ListMain(props: ListMainProps) {
-    const { children, customBreadcrumbProps, title, classes: propsClasses, organizationId } = props;
+    const { children, customBreadcrumbProps, title, classes: propsClasses } = props;
 
     useHead({
         titleTemplate: "%s | cartes.gouv.fr",
@@ -31,7 +31,7 @@ export default function ListMain(props: ListMainProps) {
             <div className={propsClasses?.container ?? fr.cx("fr-container")}>
                 <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-grid-row--center")}>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}>
-                        <AppSideMenu organizationId={organizationId} />
+                        <AppSideMenu /* organizationId={organizationId} */ />
                     </div>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-md-9"), classes.content, propsClasses?.content)}>
                         {/* // "fr-px-5w" */}
