@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import Button from "@codegouvfr/react-dsfr/Button";
+import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import SearchBar from "@codegouvfr/react-dsfr/SearchBar";
 import SelectNext from "@codegouvfr/react-dsfr/SelectNext";
@@ -32,11 +32,19 @@ import { externalUrls } from "@/router/externalUrls";
 import { PostMapMutationVariables, postMapResponse } from "@/api/map/map";
 import { UseMutationResult } from "@tanstack/react-query";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 
 // TODO : implémenter organisations (en décommentant lignes)
 
 type MutationPostMap = UseMutationResult<postMapResponse, NotFoundResponse | NotConnectedResponse | BadRequestResponse, PostMapMutationVariables, void>;
 
+type OpenMapButtonCommonProps = Pick<ButtonProps.WithIcon, "iconId" | "iconPosition"> & Pick<ButtonProps.Common, "size">;
+type OpenMapButtonAnchorProps = OpenMapButtonCommonProps & {
+    linkProps: RegisteredLinkProps;
+};
+type OpenMapButtonDisabledProps = OpenMapButtonCommonProps & {
+    disabled: boolean;
+};
 /**
  * Élément dans l'URL de recherche
  */
@@ -106,6 +114,36 @@ function useMapRouteParams(): MapRouteParams {
     const organizationId = route.params?.["organizationId"] ?? undefined;
 
     return { page, limit, theme, search, organizationId };
+}
+
+/**
+ * Fonction permettant d'éviter les erreurs typescript : soit le bouton est un lien
+ * (impossible à désactiver), soit c'est un bouton désactivé
+ * @param map Carte sur laquelle appliquer la fonction
+ * @returns
+ */
+function getOpenMapButtonProps(map: MapResearchItem): OpenMapButtonAnchorProps | OpenMapButtonDisabledProps {
+    const common = {
+        iconId: "fr-icon-arrow-right-s-line",
+        size: "small",
+        iconPosition: "right",
+    };
+    if (map.edit_id) {
+        return {
+            // role !== UserRole.MEMBER ?
+            // routes.edit_map({ edit: map.view_id || "", organizationId: organizationId }).link
+            // : routes.view_map({ map: map.view_id || "" }).link
+            linkProps: {
+                href: routes.edit_map({ edit: map.edit_id }).link.href,
+            },
+            ...common,
+        } as OpenMapButtonAnchorProps;
+    } else {
+        return {
+            disabled: true,
+            ...common,
+        } as OpenMapButtonDisabledProps;
+    }
 }
 
 /**
@@ -457,19 +495,7 @@ export default function MapList({ role }: MapListProps) {
                                                             shareMapModal.open();
                                                         }}
                                                     />
-                                                    <Button
-                                                        iconId="fr-icon-arrow-right-s-line"
-                                                        size="small"
-                                                        iconPosition="right"
-                                                        linkProps={
-                                                            // role !== UserRole.MEMBER
-                                                            //     ? routes.edit_map({ mapId: map.view_id || "", organizationId: organizationId }).link
-                                                            //     : routes.view_map({ map: map.view_id || "" }).link
-                                                            {
-                                                                href: routes.edit_map({ map: map.view_id || "" }).link.href,
-                                                            }
-                                                        }
-                                                    >
+                                                    <Button {...getOpenMapButtonProps(map)}>
                                                         {role !== UserRole.MEMBER ? tCommon("open") : tCommon("see")}
                                                     </Button>
                                                 </div>
