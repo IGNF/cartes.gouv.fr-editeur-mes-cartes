@@ -19,10 +19,10 @@ const mapRoutes = {
     // WARNING: Route externe (ne pas utiliser `routes.edit_map(id).link`)
     edit_map: defineRoute(
         {
-            map: param.path.string,
+            edit: param.query.string,
             organizationId: param.query.optional.string,
         },
-        (p) => `/creer-une-carte/${p.map}`
+        () => `/creer-une-carte`
     ),
     map_list: defineRoute(
         {
