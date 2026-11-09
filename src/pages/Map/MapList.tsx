@@ -215,6 +215,39 @@ const onCopyClick = async (map: MapResearchItem, mutation: MutationPostMap) => {
     return true;
 };
 
+/**
+ * Affiche l'alerte de copie et la ferme 5 secondes après le succès ou l'erreur.
+ * Le survol suspend la fermeture.
+ * La key liée à submittedAt réinitialise le composant à chaque nouvelle copie.
+ */
+function CopyMapAlert({ status, description }: { status: "pending" | "success" | "error"; description: string }) {
+    const [isClosed, setIsClosed] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
+    useEffect(() => {
+        if (status === "pending" || isHovered || isClosed) {
+            return;
+        }
+
+        const timeout = window.setTimeout(() => setIsClosed(true), 5000);
+        return () => window.clearTimeout(timeout);
+    }, [status, isHovered, isClosed]);
+
+    return (
+        <div role="presentation" onMouseEnter={() => setIsHovered(true)}>
+            <Alert
+                className={fr.cx("fr-mt-2v")}
+                description={description}
+                severity={status === "pending" ? "info" : status}
+                closable={status !== "pending"}
+                isClosed={isClosed}
+                onClose={() => setIsClosed(true)}
+                small={true}
+            />
+        </div>
+    );
+}
+
 export default function MapList({ role }: MapListProps) {
     // Traduction
     const { t } = useTranslation("Map");
@@ -303,6 +336,7 @@ export default function MapList({ role }: MapListProps) {
         },
     });
 
+    console.log(copyMapMutation.submittedAt);
     const themes = themesResponse || [];
 
     // Cartes et nombre total de cartes
@@ -386,13 +420,7 @@ export default function MapList({ role }: MapListProps) {
             </div>
 
             {(copyMapMutation.isPending || copyMapMutation.isSuccess || copyMapMutation.isError) && (
-                <Alert
-                    className={fr.cx("fr-mt-2v")}
-                    description={t(`copy-map__${copyMapMutation.status}`)}
-                    severity={copyMapMutation.status === "pending" ? "info" : copyMapMutation.status}
-                    closable={!copyMapMutation.isPending}
-                    small={true}
-                ></Alert>
+                <CopyMapAlert key={copyMapMutation.submittedAt} status={copyMapMutation.status} description={t(`copy-map__${copyMapMutation.status}`)} />
             )}
 
             {hasFilters && showFilters && (
