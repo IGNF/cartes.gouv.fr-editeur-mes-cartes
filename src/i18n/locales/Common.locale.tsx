@@ -126,7 +126,7 @@ export const commonFrTranslations: Translations<"fr">["Common"] = {
     share: "Partager",
     open: "Ouvrir",
     link: "Lien",
-    iframe: "iframe",
+    iframe: "Iframe",
     "tab-nav": "Navigation tertiaire",
     email: "Email",
     username: "Nom d'utilisateur",
