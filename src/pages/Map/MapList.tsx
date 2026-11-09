@@ -552,7 +552,12 @@ export default function MapList({ role }: MapListProps) {
 
             {createPortal(
                 <shareMapModal.Component title={t("share-map")}>
-                    <TextCopyToClipboard label={tCommon("link")} hintText={t("share-map__link-hint")} text={useMapLink(openedMap)} className="fr-mb-1w" />
+                    <TextCopyToClipboard
+                        label={tCommon("link")}
+                        hintText={t("share-map__link-hint")}
+                        text={useMapLink(openedMap)}
+                        className={fr.cx("fr-mb-3w")}
+                    />
 
                     <TextCopyToClipboard
                         label={tCommon("iframe")}
