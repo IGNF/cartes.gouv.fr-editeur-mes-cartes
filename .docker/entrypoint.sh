@@ -5,6 +5,7 @@ set -eu
 : "${IAM_REALM:?Missing required env var IAM_REALM}"
 : "${IAM_CLIENT_ID:?Missing required env var IAM_CLIENT_ID}"
 : "${API_EDITOR_URL:?Missing required env var API_EDITOR_URL}"
+: "${VITE_FORM_URL:?Missing required env var VITE_FORM_URL}"
 
 if [ ! -w /tmp ]; then
     echo >&2 "ERROR: /tmp is not writable; mount an emptyDir/tmpfs at /tmp"
@@ -21,16 +22,20 @@ iam_url_escaped="$(escape_js_string "$IAM_URL")"
 iam_realm_escaped="$(escape_js_string "$IAM_REALM")"
 iam_client_id_escaped="$(escape_js_string "$IAM_CLIENT_ID")"
 api_editor_url_escaped="$(escape_js_string "$API_EDITOR_URL")"
+vite_form_url_escaped="$(escape_js_string "$VITE_FORM_URL")"
 
 cat > /tmp/env.js <<EOF
 // Generated at container startup. Do not edit.
 (() => {
+    // @ts-ignore
     window.__DASHBOARD_EDITEUR_ENV = {
         iamUrl: "${iam_url_escaped}",
         iamRealm: "${iam_realm_escaped}",
         iamClientId: "${iam_client_id_escaped}",
         apiEditorUrl: "${api_editor_url_escaped}",
+        formUrl: "${vite_form_url_escaped}",
     };
+    // @ts-ignore
     Object.freeze(window.__DASHBOARD_EDITEUR_ENV);
     Object.defineProperty(window, '__DASHBOARD_EDITEUR_ENV', { configurable: false, writable: false });
 })();

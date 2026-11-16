@@ -10,3 +10,4 @@ export const apiURL = dashboardEnv.apiEditorUrl ?? env.API_EDITOR_URL ?? "";
 export const iamClientId = dashboardEnv.iamClientId ?? env.IAM_CLIENT_ID ?? "";
 export const iamRealm = dashboardEnv.iamRealm ?? env.IAM_REALM ?? "";
 export const iamUrl = dashboardEnv.iamUrl ?? env.IAM_URL ?? "";
+export const formUrl = dashboardEnv.formUrl ?? env.VITE_FORM_URL ?? "";

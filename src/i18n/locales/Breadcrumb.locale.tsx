@@ -2,12 +2,13 @@ import { declareComponentKeys } from "@/i18n/i18n";
 import { Translations } from "@/i18n/types";
 
 const { i18n } = declareComponentKeys<
-    "home" | "dashboard" | "map_list" | "media_list" | "organization_list" | "organization_info" | "organization_maps" | "organization_members"
+    "home" | "create_map" | "dashboard" | "map_list" | "media_list" | "organization_list" | "organization_info" | "organization_maps" | "organization_members"
 >()("Breadcrumb");
 export type I18n = typeof i18n;
 
 export const BreadcrumbFrTranslations: Translations<"fr">["Breadcrumb"] = {
     home: "Tableau de bord",
+    create_map: "Créer",
     dashboard: "Tableau de bord",
     map_list: "Mes cartes",
     media_list: "Mes images",
@@ -19,6 +20,7 @@ export const BreadcrumbFrTranslations: Translations<"fr">["Breadcrumb"] = {
 
 export const BreadcrumbEnTranslations: Translations<"en">["Breadcrumb"] = {
     home: undefined,
+    create_map: undefined,
     dashboard: undefined,
     map_list: undefined,
     media_list: undefined,

@@ -1,13 +1,17 @@
+import { formUrl } from "@/env";
 import { type RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 
 export const externalUrls = {
     accessibility: "/accessibilite",
     catalogue: "/rechercher-une-donnee/search",
+    collaborate: "/contribuer-aux-donnees/",
     contact_us: "/aide/fr/nous-ecrire",
-    create_map: "/creer-une-carte",
+    create_map: "/creer-une-carte/",
     dashboard: "/tableau-de-bord",
     discover_cartesgouvfr: "/decouvrir",
     discover_publish: "/publier-une-donnee",
+    extract_data: "/extraire-une-donnee/",
+    feedback: formUrl,
     help: "/aide/",
     helpProducerGuide: "/aide/fr/guides-producteur/",
     helpUserGuideCreateMap: "/aide/fr/guides-utilisateur/creer-une-carte/",

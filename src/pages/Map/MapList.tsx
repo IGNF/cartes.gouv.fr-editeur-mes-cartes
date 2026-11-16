@@ -336,7 +336,6 @@ export default function MapList({ role }: MapListProps) {
         },
     });
 
-    console.log(copyMapMutation.submittedAt);
     const themes = themesResponse || [];
 
     // Cartes et nombre total de cartes
