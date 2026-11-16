@@ -1,3 +1,4 @@
+import { formUrl } from "@/env";
 import { type RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 
 export const externalUrls = {
@@ -8,6 +9,7 @@ export const externalUrls = {
     dashboard: "/tableau-de-bord",
     discover_cartesgouvfr: "/decouvrir",
     discover_publish: "/publier-une-donnee",
+    feedback: formUrl,
     help: "/aide/",
     helpProducerGuide: "/aide/fr/guides-producteur/",
     helpUserGuideCreateMap: "/aide/fr/guides-utilisateur/creer-une-carte/",

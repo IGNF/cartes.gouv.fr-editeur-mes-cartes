@@ -1,8 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import SideMenu from "@codegouvfr/react-dsfr/SideMenu";
 import { tss } from "tss-react";
-import { externalLink } from "@/router/externalUrls";
+import { externalLink, externalUrls } from "@/router/externalUrls";
 import Badge from "@codegouvfr/react-dsfr/Badge";
+import { useTranslation } from "@/i18n";
 
 // import { Highlight, type HighlightProps } from "@codegouvfr/react-dsfr/Highlight";
 // import { useTranslation } from "@/i18n";
@@ -21,6 +22,8 @@ export default function AppSideMenu(
     // const { t: tOrganization } = useTranslation("Organization");
     // const route = useRoute();
     const { classes, css, cx } = useStyles();
+
+    const { t } = useTranslation("Layout");
 
     // const highlightOptions: Partial<HighlightProps> = {
     //     className: css({
@@ -68,7 +71,7 @@ export default function AppSideMenu(
                         })}
                     >
                         <span className={fr.cx("fr-icon-brush-line", "fr-icon--md")} />
-                        <h1 className={fr.cx("fr-text--xl", "fr-m-0")}>Mes cartes</h1>
+                        <h1 className={fr.cx("fr-text--xl", "fr-m-0")}>{t("my-maps")}</h1>
                     </div>
                     <p
                         className={cx(
@@ -79,7 +82,7 @@ export default function AppSideMenu(
                             })
                         )}
                     >
-                        Gérer mes cartes
+                        {t("manage-my-maps")}
                     </p>
                     <p
                         className={cx(
@@ -91,21 +94,15 @@ export default function AppSideMenu(
                         )}
                     ></p>
                     <Badge as="span" noIcon severity="success" className={cx(fr.cx("fr-mb-4v"))}>
-                        SERVICE BETA
+                        {t("beta-service")}
                     </Badge>
-                    <p className={cx(classes.text)}>Créez et partagez des cartes interactives, librement et gratuitement.</p>
-                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>
-                        1. Utilisez les données de cartes.gouv.fr, ou importez vos propres données.
-                    </p>
-                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>2. Personnalisez le style de vos données.</p>
-                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>
-                        3. Ajouter une mise en forme à votre carte et partagez-là autour de vous.
-                    </p>
-                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v"), marginBottom: fr.spacing("4v") }))}>
-                        4. Retrouvez toutes vos cartes depuis votre tableau de bord.
-                    </p>
+                    <p className={cx(classes.text)}>{t("maps-description")}</p>
+                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>{t("maps-step-1")}</p>
+                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>{t("maps-step-2")}</p>
+                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>{t("maps-step-3")}</p>
+                    <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v"), marginBottom: fr.spacing("4v") }))}>{t("maps-step-4")}</p>
                     <a
-                        {...externalLink("helpUserGuideCreateMap", "En savoir plus")}
+                        {...externalLink("helpUserGuideCreateMap", t("learn-more"))}
                         className={cx(
                             fr.cx("fr-link"),
                             fr.cx("fr-mb-4v"),
@@ -115,11 +112,28 @@ export default function AppSideMenu(
                             })
                         )}
                     >
-                        En savoir plus
+                        {t("learn-more")}
                     </a>
+
+                    {externalUrls.feedback && (
+                        <div className={fr.cx("fr-my-4v")}>
+                            <a
+                                {...externalLink("feedback", t("give-feedback"))}
+                                className={cx(
+                                    fr.cx("fr-link"),
+                                    css({
+                                        "--underline-img": "linear-gradient(0deg,currentColor,currentColor)",
+                                        fontWeight: "initial",
+                                    })
+                                )}
+                            >
+                                {t("give-feedback")}
+                            </a>
+                        </div>
+                    )}
                 </div>
             }
-            burgerMenuButtonText="Entrepôts"
+            burgerMenuButtonText={t("my-maps")}
             items={[]}
 
             // items={[

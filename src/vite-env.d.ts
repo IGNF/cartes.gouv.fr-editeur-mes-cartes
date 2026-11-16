@@ -8,6 +8,7 @@ interface ImportMetaEnv {
     readonly IAM_REALM: string;
     readonly IAM_CLIENT_ID: string;
     readonly VITE_API_EDITOR_URL: string;
+    readonly VITE_FORM_URL: string;
 }
 
 interface ImportMeta {
@@ -20,6 +21,7 @@ interface DashboardEditeurEnv {
     readonly iamRealm?: string;
     readonly iamClientId?: string;
     readonly apiEditorUrl?: string;
+    readonly formUrl?: string;
 }
 
 interface Window {

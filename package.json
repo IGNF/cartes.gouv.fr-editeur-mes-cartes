@@ -14,7 +14,7 @@
         "lint:fix": "eslint src/ --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
         "preview": "vite preview",
         "format": "prettier --check .",
-        "format:fix": "prettier --write .",
+        "format:fix": "prettier --list-different --write .",
         "prepare": "husky"
     },
     "dependencies": {
