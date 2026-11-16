@@ -4,7 +4,7 @@ import AppLayout from "../components/Layout/AppLayout";
 import Main from "../components/Layout/Main";
 import LoadingText from "../components/Utils/LoadingText";
 import GroupMap from "./GroupMap";
-import { groups, knownRoutes, routes, useRoute } from "./router";
+import { groups, knownRoutes, useRoute } from "./router";
 import PageNotFoundWithLayout from "@/pages/error/PageNotFoundWithLayout";
 import GroupApp from "./GroupApp";
 // import GroupMedia from "./GroupMedia";
@@ -18,13 +18,7 @@ const RouterRenderer: FC = () => {
         if (route.name === false || !knownRoutes.includes(route.name) || route.name === "page_not_found") {
             return <PageNotFoundWithLayout />;
         }
-        if (route.name === "home") {
-            routes.map_list().push();
-            // TODO : corriger breadcrumb ?
-            return <GroupMap route={routes.map_list()} />;
-        }
 
-        // Redirige l'uitilisateur de home vers /cartes
         if (groups.map.has(route)) {
             return <GroupMap route={route} />;
         }

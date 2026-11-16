@@ -4,7 +4,6 @@ const appRoot = import.meta.env.BASE_URL;
 
 // Routes non protégées
 const publicRoutes = {
-    home: defineRoute(`${appRoot}`),
     page_not_found: defineRoute(`/404`),
 };
 
@@ -32,7 +31,7 @@ const mapRoutes = {
             organizationId: param.query.optional.string,
             theme: param.query.optional.string.default(""),
         },
-        () => [`${appRoot}/cartes`]
+        () => [`${appRoot}`]
     ),
 };
 

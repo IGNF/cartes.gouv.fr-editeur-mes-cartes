@@ -31,7 +31,14 @@ const getBreadcrumb = (
             href: externalUrls.dashboard,
         },
         // segments: [{ label: t("dashboard"), linkProps: routes.dashboard().link }],
-        segments: [],
+        segments: [
+            {
+                label: t("create_map"),
+                linkProps: {
+                    href: externalUrls.create_map,
+                },
+            },
+        ],
         currentPageLabel: t("map_list"),
     };
 
@@ -59,7 +66,6 @@ const getBreadcrumb = (
     // };
 
     switch (route.name) {
-        case "home":
         case "map_list":
             return { ...mapProps, currentPageLabel: t("map_list") };
         // case "media_list":

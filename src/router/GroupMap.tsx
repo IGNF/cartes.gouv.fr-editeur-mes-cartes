@@ -18,7 +18,6 @@ function GroupMap(props: GroupAppProps) {
     const content: { render: JSX.Element } | undefined = useMemo(() => {
         switch (route.name) {
             case "map_list":
-            case "home":
                 return {
                     render: (
                         <MapLayout>

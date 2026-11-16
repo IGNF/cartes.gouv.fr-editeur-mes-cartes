@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig({
-    base: process.env.BASE_URL || "/tableau-de-bord/editeur",
+    base: process.env.BASE_URL || "/creer-une-carte/mes-cartes",
     envPrefix: ["VITE_", "API_EDITOR_URL", "APP_ENV", "IAM_"],
     plugins: [react(), babel({ presets: [reactCompilerPreset()] }), oidcSpa()],
     resolve: {
