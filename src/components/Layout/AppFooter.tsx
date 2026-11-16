@@ -3,9 +3,12 @@ import Footer from "@codegouvfr/react-dsfr/Footer";
 import { memo } from "react";
 
 import { externalUrls } from "@/router/externalUrls";
+import { useTranslation } from "@/i18n";
 // import { FooterConsentManagementItem, FooterPersonalDataPolicyItem } from "../../config/consentManagement";
 
 const AppFooter = () => {
+    const { t } = useTranslation("Layout");
+
     return (
         <Footer
             accessibility="partially compliant"
@@ -19,21 +22,19 @@ const AppFooter = () => {
             //         Française
             //     </>
             // }
-            contentDescription="
-                Cartes.gouv.fr est le service public des cartes et données du territoire français. Porté par l’IGN et ses partenaires, il offre à tous un accès à la référence de la cartographie publique et permet à chacun de créer, d’héberger et de publier ses propres données et représentations.
-            "
+            contentDescription={t("footer-description")}
             bottomItems={[
                 {
                     linkProps: {
                         href: externalUrls.terms_of_service,
                     },
-                    text: "Conditions générales d’utilisation",
+                    text: t("terms-of-service"),
                 },
                 {
                     linkProps: {
                         href: externalUrls.personal_data,
                     },
-                    text: "Données personelles",
+                    text: t("personal-data"),
                 },
                 // <FooterPersonalDataPolicyItem key="footer-personal-data-policy-item" />,
                 // <FooterConsentManagementItem key="footer-consent-management-item" />,
@@ -42,7 +43,7 @@ const AppFooter = () => {
             ]}
             homeLinkProps={{
                 href: externalUrls.dashboard,
-                title: "Accueil - cartes.gouv.fr",
+                title: t("home-title"),
             }}
             termsLinkProps={{
                 href: externalUrls.legal_notice,
@@ -52,23 +53,23 @@ const AppFooter = () => {
             }}
             partnersLogos={{
                 main: {
-                    alt: "IGN",
+                    alt: t("partner-ign"),
                     href: "https://www.ign.fr",
                     imgUrl: "https://data.geopf.fr/annexes/ressources/footer/ign.png",
                 },
                 sub: [
                     {
-                        alt: "MINISTÈRE DE LA TRANSFORMATION ET DE LA FONCTION PUBLIQUES",
+                        alt: t("partner-transformation-ministry"),
                         href: "https://www.transformation.gouv.fr/",
                         imgUrl: "https://data.geopf.fr/annexes/ressources/footer/min_fp.jpg",
                     },
                     {
-                        alt: "MINISTÈRE DE LA TRANSITION ÉCOLOGIQUE ET DE LA COHÉSION DES TERRITOIRES",
+                        alt: t("partner-ecology-ministry"),
                         href: "https://www.ecologie.gouv.fr/",
                         imgUrl: "https://data.geopf.fr/annexes/ressources/footer/min_ecologie.jpg",
                     },
                     {
-                        alt: "Conseil National de l’Information Géolocalisée",
+                        alt: t("partner-cnig"),
                         href: "https://cnig.gouv.fr/",
                         imgUrl: "https://data.geopf.fr/annexes/ressources/footer/rf_cnig.jpg",
                     },

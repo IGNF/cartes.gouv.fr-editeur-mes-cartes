@@ -4,6 +4,7 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { FC, memo } from "react";
 
 import { externalUrls } from "@/router/externalUrls";
+import { useTranslation } from "@/i18n";
 import { HeaderMenuHelp, HeaderMenuServices, HeaderMenuUser } from "./Header/HeaderMenus";
 import SiteBadge from "./Header/SiteBadge";
 
@@ -14,19 +15,14 @@ type AppHeaderProps = {
 };
 const AppHeader: FC<AppHeaderProps> = ({ navItems = [] }) => {
     const { isDark } = useIsDark();
+    const { t } = useTranslation("Layout");
 
     return (
         <Header
-            brandTop={
-                <>
-                    République
-                    <br />
-                    Française
-                </>
-            }
+            brandTop={t("brand-top")}
             homeLinkProps={{
                 href: externalUrls.maps,
-                title: "Accueil - cartes.gouv.fr",
+                title: t("home-title"),
             }}
             operatorLogo={{
                 imgUrl: isDark
@@ -37,10 +33,10 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems = [] }) => {
             }}
             serviceTitle={
                 <>
-                    cartes.gouv.fr <SiteBadge />
+                    {t("service-title")} <SiteBadge />
                 </>
             }
-            serviceTagline="Notre territoire commun"
+            serviceTagline={t("service-tagline")}
             quickAccessItems={[
                 <HeaderMenuHelp key="header-menu-help" />,
                 <HeaderMenuServices key="header-menu-services" />,

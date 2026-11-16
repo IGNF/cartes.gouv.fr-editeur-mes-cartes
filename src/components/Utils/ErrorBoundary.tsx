@@ -5,21 +5,24 @@ import { FC, PropsWithChildren } from "react";
 import { ErrorBoundary as BaseErrorBoundary, type FallbackProps, getErrorMessage } from "react-error-boundary";
 
 import { externalUrls } from "@/router/externalUrls";
+import { useTranslation } from "@/i18n";
 import AppLayout from "../Layout/AppLayout";
 import Main from "../Layout/Main";
 
 function Fallback({ error, resetErrorBoundary }: FallbackProps) {
+    const { t } = useTranslation("Layout");
+
     return (
         <AppLayout>
-            <Main title="Une erreur est survenue">
-                <Alert severity="error" title="Une erreur est survenue" description={getErrorMessage(error) ?? undefined} className={fr.cx("fr-my-3w")} />
+            <Main title={t("error-occurred")}>
+                <Alert severity="error" title={t("error-occurred")} description={getErrorMessage(error) ?? undefined} className={fr.cx("fr-my-3w")} />
                 <Button
                     onClick={() => {
                         resetErrorBoundary();
                         window.location.assign(externalUrls.map_list);
                     }}
                 >
-                    {"Retour à l'accueil"}
+                    {t("back-to-home")}
                 </Button>
             </Main>
         </AppLayout>

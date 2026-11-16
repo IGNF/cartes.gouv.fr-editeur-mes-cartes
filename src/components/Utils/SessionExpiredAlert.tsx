@@ -4,8 +4,10 @@ import { FC, memo } from "react";
 
 import { groups, useRoute } from "@/router/router";
 import { useOidc } from "@/oidc";
+import { useTranslation } from "@/i18n";
 
 const SessionExpiredAlert: FC = () => {
+    const { t } = useTranslation("Layout");
     const sessionExpired = false;
     const { isUserLoggedIn } = useOidc();
     const route = useRoute();
@@ -15,20 +17,7 @@ const SessionExpiredAlert: FC = () => {
         sessionExpired &&
         isUserLoggedIn && (
             <div className={fr.cx("fr-mb-4v")}>
-                <Alert
-                    severity="error"
-                    title="Session expirée"
-                    description={
-                        <>
-                            Veuillez{" "}
-                            <a href="./login" rel="noreferrer" target="_blank">
-                                vous-reconnecter
-                            </a>{" "}
-                            dans un nouvel onglet
-                        </>
-                    }
-                    closable={true}
-                />
+                <Alert severity="error" title={t("session-expired")} description={t("session-expired-description") ?? undefined} closable={true} />
             </div>
         )
     );

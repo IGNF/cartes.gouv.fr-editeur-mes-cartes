@@ -7,32 +7,34 @@ import { useTranslation } from "@/i18n";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
 export function HeaderMenuHelp() {
+    const { t } = useTranslation("Layout");
+
     return (
         <HeaderMenu
             openButtonProps={{
-                children: "Aide",
+                children: t("help"),
                 iconId: "fr-icon-question-fill",
             }}
             items={[
                 {
                     iconId: "fr-icon-question-mark",
-                    children: "Questions fréquentes",
-                    linkProps: externalLink("help", "Questions fréquentes"),
+                    children: t("faq"),
+                    linkProps: externalLink("help", t("faq")),
                 },
                 {
                     iconId: "fr-icon-book-2-line",
-                    children: "Guide d’utilisation",
-                    linkProps: externalLink("helpProducerGuide", "Guide d’utilisation"),
+                    children: t("user-guide"),
+                    linkProps: externalLink("helpProducerGuide", t("user-guide")),
                 },
                 {
                     iconId: "fr-icon-rfid-line",
-                    children: "Niveau de service",
-                    linkProps: externalLink("service_status", "Niveau de service"),
+                    children: t("service-status"),
+                    linkProps: externalLink("service_status", t("service-status")),
                 },
                 {
                     iconId: "fr-icon-mail-line",
-                    children: "Nous contacter",
-                    linkProps: externalLink("contact_us", "Nous contacter"),
+                    children: t("contact-us"),
+                    linkProps: externalLink("contact_us", t("contact-us")),
                 },
             ]}
         />
@@ -40,47 +42,74 @@ export function HeaderMenuHelp() {
 }
 
 export function HeaderMenuServices() {
+    const { t } = useTranslation("Layout");
+
     return (
         <HeaderMenu
             openButtonProps={{
-                children: "Services",
+                children: t("services"),
                 iconId: "fr-icon-grid-fill",
             }}
             items={[
                 {
                     iconId: "fr-icon-road-map-line",
-                    children: "Explorer les cartes",
+                    children: t("explore-maps"),
                     linkProps: { href: externalUrls.maps },
                 },
                 {
                     iconId: "fr-icon-search-line",
-                    children: "Rechercher une donnée",
+                    children: t("search-data"),
                     linkProps: { href: externalUrls.catalogue },
                 },
                 {
                     iconId: "fr-icon-database-line",
-                    children: "Publier une donnée",
+                    children: t("publish-data"),
                     linkProps: { href: externalUrls.discover_publish },
                 },
                 {
                     iconId: "fr-icon-brush-line",
                     children: (
                         <>
-                            Créer une carte{" "}
+                            {t("create-map")}{" "}
                             <Badge severity="success" className={"fr-ml-auto"} noIcon={true} small={true}>
-                                Bêta
+                                {t("beta")}
                             </Badge>
                         </>
                     ),
                     linkProps: { href: externalUrls.create_map },
                 },
+                {
+                    // @ts-expect-error Icône personnalisé non prise en compte dans React-dsfr
+                    iconId: "fr-icon-extract",
+                    children: (
+                        <>
+                            {t("extract-data")}{" "}
+                            <Badge severity="success" className={"fr-ml-auto"} noIcon={true} small={true}>
+                                {t("beta")}
+                            </Badge>
+                        </>
+                    ),
+                    linkProps: { href: externalUrls.extract_data },
+                },
+                {
+                    iconId: "fr-icon-message-2-line",
+                    children: (
+                        <>
+                            {t("contribute-data")}{" "}
+                            <Badge severity="success" className={"fr-ml-auto"} noIcon={true} small={true}>
+                                {t("beta")}
+                            </Badge>
+                        </>
+                    ),
+                    linkProps: { href: externalUrls.collaborate },
+                },
             ]}
             actionButtonProps={{
-                children: "Découvrir cartes.gouv.fr",
+                children: t("discover-cartesgouvfr"),
                 className: "frx-btn-discover",
                 linkProps: {
                     href: externalUrls.discover_cartesgouvfr,
-                    title: "Découvrir cartes.gouv",
+                    title: t("discover-cartesgouvfr-title"),
                 },
             }}
         />
@@ -97,7 +126,7 @@ export function HeaderMenuUser() {
             {isUserLoggedIn ? (
                 <HeaderMenu
                     openButtonProps={{
-                        children: "Mon compte",
+                        children: t("account"),
                         iconId: "fr-icon-account-circle-fill",
                     }}
                     items={[
@@ -125,7 +154,7 @@ export function HeaderMenuUser() {
                         { iconId: "fr-icon-user-line", children: t("account"), linkProps: { href: externalUrls.my_account } },
                     ]}
                     actionButtonProps={{
-                        children: "Me déconnecter",
+                        children: t("disconnect-me"),
                         iconId: "fr-icon-logout-box-r-line",
                         onClick: () => logout({ redirectTo: "home" }),
                     }}
