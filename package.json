@@ -82,7 +82,7 @@
         "typescript-7": "npm:typescript@7.0.2",
         "typescript-eslint": "^8.62.1",
         "uuid": "^14.0.1",
-        "vite": "^8.3.1"
+        "vite": "^8.3.8"
     },
     "commitlint": {
         "extends": [
