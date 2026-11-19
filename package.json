@@ -7,6 +7,7 @@
         "dev": "vite",
         "predev": "react-dsfr update-icons",
         "build": "tsc -b && vite build",
+        "build-image": "vite build",
         "generate-api": "orval",
         "prebuild": "react-dsfr update-icons",
         "check-types": "tsc -b",
@@ -82,7 +83,7 @@
         "typescript-7": "npm:typescript@7.0.2",
         "typescript-eslint": "^8.62.1",
         "uuid": "^14.0.1",
-        "vite": "^8.3.1"
+        "vite": "^8.3.8"
     },
     "commitlint": {
         "extends": [
