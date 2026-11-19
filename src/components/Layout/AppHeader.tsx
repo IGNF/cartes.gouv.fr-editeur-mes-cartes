@@ -21,7 +21,7 @@ const AppHeader: FC<AppHeaderProps> = ({ navItems = [] }) => {
         <Header
             brandTop={t("brand-top")}
             homeLinkProps={{
-                href: externalUrls.maps,
+                href: externalUrls.create_map,
                 title: t("home-title"),
             }}
             operatorLogo={{

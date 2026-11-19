@@ -101,7 +101,7 @@ export default function AppSideMenu(
                     <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>{t("maps-step-2")}</p>
                     <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v") }))}>{t("maps-step-3")}</p>
                     <p className={cx(classes.text, css({ paddingTop: fr.spacing("4v"), marginBottom: fr.spacing("4v") }))}>{t("maps-step-4")}</p>
-                    <a
+                    {/* <a
                         {...externalLink("helpUserGuideCreateMap", t("learn-more"))}
                         className={cx(
                             fr.cx("fr-link"),
@@ -113,7 +113,7 @@ export default function AppSideMenu(
                         )}
                     >
                         {t("learn-more")}
-                    </a>
+                    </a> */}
 
                     {externalUrls.feedback && (
                         <div className={fr.cx("fr-my-4v")}>

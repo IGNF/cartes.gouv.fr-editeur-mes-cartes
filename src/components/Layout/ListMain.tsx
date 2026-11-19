@@ -29,7 +29,7 @@ export default function ListMain(props: ListMainProps) {
     return (
         <main id="main" role="main">
             <div className={propsClasses?.container ?? fr.cx("fr-container")}>
-                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-grid-row--center")}>
+                <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-grid-row--center", "fr-my-0")}>
                     <div className={cx(fr.cx("fr-col-12", "fr-col-md-3"), classes?.sideMenuCol)}>
                         <AppSideMenu /* organizationId={organizationId} */ />
                     </div>

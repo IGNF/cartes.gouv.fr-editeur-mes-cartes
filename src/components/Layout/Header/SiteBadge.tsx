@@ -1,27 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 
-import { useRoute } from "@/router/router";
+import { groups, useRoute } from "@/router/router";
+import { useTranslation } from "@/i18n";
 
 export default function SiteBadge() {
     const route = useRoute();
+    const { t } = useTranslation("Layout");
 
-    if (
-        route.name &&
-        [
-            "dashboard",
-            "datastore_selection",
-            "datastore_create_request",
-            "datastore_create_request_confirm",
-            "join_community",
-            "accesses_request",
-            "discover_publish",
-        ].includes(route.name)
-    ) {
+    if (groups.map.has(route)) {
         return (
-            <Badge className={fr.cx("fr-badge--green-archipel")} noIcon={true} as="span" small={true}>
-                <span className={fr.cx("fr-icon--sm", "fr-icon-database-line", "fr-mr-1v")} />
-                Publier
+            <Badge className={fr.cx("fr-badge--yellow-tournesol")} noIcon={true} as="span" small={true}>
+                <span className={fr.cx("fr-icon--xs", "fr-icon-brush-fill", "fr-mr-1v")} />
+                {t("badge")}
             </Badge>
         );
     }

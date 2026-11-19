@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 const { i18n } = declareComponentKeys<
     | "account-btn"
     | "account"
+    | "badge"
     | "board"
     | "disconnect"
     | "my-maps"
@@ -54,6 +55,7 @@ export type I18n = typeof i18n;
 export const LayoutFrTranslations: Translations<"fr">["Layout"] = {
     "account-btn": "Mon espace",
     account: "Mon compte",
+    badge: "Créer",
     board: "Tableau de bord",
     disconnect: "Se déconnecter",
     "my-maps": "Mes cartes",
@@ -86,7 +88,7 @@ export const LayoutFrTranslations: Translations<"fr">["Layout"] = {
         "Cartes.gouv.fr est le service public des cartes et données du territoire français. Porté par l’IGN et ses partenaires, il offre à tous un accès à la référence de la cartographie publique et permet à chacun de créer, d’héberger et de publier ses propres données et représentations.",
     "terms-of-service": "Conditions générales d’utilisation",
     "personal-data": "Données personelles",
-    "home-title": "Accueil - cartes.gouv.fr",
+    "home-title": "cartes.gouv.fr | Créer une carte",
     "partner-ign": "IGN",
     "partner-transformation-ministry": "MINISTÈRE DE LA TRANSFORMATION ET DE LA FONCTION PUBLIQUES",
     "partner-ecology-ministry": "MINISTÈRE DE LA TRANSITION ÉCOLOGIQUE ET DE LA COHÉSION DES TERRITOIRES",
@@ -117,6 +119,7 @@ export const LayoutFrTranslations: Translations<"fr">["Layout"] = {
 export const LayoutEnTranslations: Translations<"en">["Layout"] = {
     "account-btn": undefined,
     account: undefined,
+    badge: undefined,
     board: undefined,
     disconnect: undefined,
     "my-maps": undefined,
