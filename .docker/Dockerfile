@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 
 RUN npm ci \
-	&& npm run build
+	&& npm run build-image
 
 #----------------------------------------------------------------------
 # cartes.gouv.fr-editeur-mes-cartes : Config d'un serveur statique avec nginx

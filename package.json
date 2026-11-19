@@ -7,6 +7,7 @@
         "dev": "vite",
         "predev": "react-dsfr update-icons",
         "build": "tsc -b && vite build",
+        "build-image": "vite build",
         "generate-api": "orval",
         "prebuild": "react-dsfr update-icons",
         "check-types": "tsc -b",
